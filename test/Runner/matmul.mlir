@@ -1,5 +1,5 @@
 // RUN: mlir-opt %s -convert-linalg-to-std -convert-linalg-to-llvm \
-// RUN: | mlir-cpu-runner -e dot -entry-point-result=f32 -shared-libs=%linalg_test_lib_dir/libmlir_test_cblas%shlibext,%linalg_test_lib_dir/libmlir_test_cblas_interface%shlibext \
+// RUN: | mlir-runner -e dot -entry-point-result=f32 -shared-libs=%linalg_test_lib_dir/libmlir_test_cblas%shlibext,%linalg_test_lib_dir/libmlir_test_cblas_interface%shlibext \
 // RUN: | FileCheck %s
 
 // This test was extracted from the llvm project:

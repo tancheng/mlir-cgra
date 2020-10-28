@@ -1,3 +1,3 @@
-// RUN: soda-opt --show-dialects | FileCheck %s
+// RUN: soda-opt -h | FileCheck %s
 //
 // CHECK: OVERVIEW: SODA optimizer driver

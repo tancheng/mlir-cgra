@@ -1,3 +1,3 @@
-#add_subdirectory(stda-opt)
-#add_subdirectory(stda-translate)
+add_subdirectory(soda-opt)
+add_subdirectory(soda-translate)
 add_subdirectory(mlir-runner)

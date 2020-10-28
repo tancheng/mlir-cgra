@@ -1,13 +1,66 @@
 *.log
-build/
-.clangd/
-.vscode/
-.idea/
 cmake-build-debug/
 cmake-build-release/
 
+# Nested build directory
+/build*
 
+# Nested install directory
+/install*
+
+#==============================================================================#
+# Explicit files to ignore (only matches one).
+#==============================================================================#
+# Various tag programs
+/tags
+/TAGS
+/GPATH
+/GRTAGS
+/GSYMS
+/GTAGS
+/ID
+.gitusers
+autom4te.cache
+cscope.files
+cscope.out
+autoconf/aclocal.m4
+autoconf/autom4te.cache
+/compile_commands.json
+# Visual Studio built-in CMake configuration
+/CMakeSettings.json
+# CLion project configuration
+/.idea
+
+#==============================================================================#
+# Directories to ignore (do not add trailing '/'s, they skip symlinks).
+#==============================================================================#
+# VS2017 and VSCode config files.
+.vscode
+.vs
+# pythonenv for github Codespaces
+pythonenv*
+# clangd index. (".clangd" is a config file now, thus trailing slash)
+.clangd/
+.cache
+# static analyzer regression testing project files
+/clang/utils/analyzer/projects/*/CachedSource
+/clang/utils/analyzer/projects/*/PatchedSource
+/clang/utils/analyzer/projects/*/ScanBuildResults
+/clang/utils/analyzer/projects/*/RefScanBuildResults
+
+#==============================================================================#
+# File extensions to be ignored anywhere in the tree.
+#==============================================================================#
+# Merge files created by git.
+*.orig
+# Byte compiled python modules.
+*.pyc
+#OS X specific files.
+.DS_store
+
+#==============================================================================#
 #==-- VIM --==#
+#==============================================================================#
 
 # Swap
 [._]*.s[a-v][a-z]
@@ -29,7 +82,9 @@ tags
 # Persistent undo
 [._]*.un~
 
+#==============================================================================#
 #==-- MacOS --==#
+#==============================================================================#
 
 # General
 .DS_Store

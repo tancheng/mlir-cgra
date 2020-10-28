@@ -52,4 +52,4 @@ cmake -GNinja \
     -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
     -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir
 
-cmake --build "$MY_BUILD_DIR" --target check-stda
+cmake --build "$MY_BUILD_DIR" --target check-soda
