@@ -1,3 +1,8 @@
-// RUN: soda-opt -h | FileCheck %s
+// RUN: soda-opt --show-dialects | FileCheck %s
 //
-// CHECK: OVERVIEW: SODA optimizer driver
+// CHECK: affine
+// CHECK: linalg
+// CHECK: llvm
+// CHECK: scf
+// CHECK: std
+// CHECK: vector

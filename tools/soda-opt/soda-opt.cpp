@@ -27,6 +27,7 @@ int main(int argc, char **argv) {
   //===--------------------------------------------------------------------===//
   // Register mlir dialects and passes
   //===--------------------------------------------------------------------===//
+
   mlir::registerInlinerPass();
   mlir::registerCanonicalizerPass();
   mlir::registerCSEPass();
@@ -37,6 +38,11 @@ int main(int argc, char **argv) {
   // include what you need like above. You only need to register dialects that
   // will be *parsed* by the tool, not the one generated
   registry.insert<mlir::StandardOpsDialect>();
+  registry.insert<mlir::LLVM::LLVMDialect>();
+  registry.insert<mlir::linalg::LinalgDialect>();
+  registry.insert<mlir::scf::SCFDialect>();
+  registry.insert<mlir::vector::VectorDialect>();
+  registry.insert<mlir::AffineDialect>();
   // mlir::registerAllDialects(registry);
 
   //===--------------------------------------------------------------------===//

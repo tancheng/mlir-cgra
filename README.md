@@ -1,4 +1,4 @@
-# An out-of-tree dialect template for MLIR
+# soda-opt - Enabling System Level Design in MLIR
 
 This project aims to create `soda-opt`, a tool that leverages `mlir` to
 extract pre-selected high-level code snippets and compile these snippets to
