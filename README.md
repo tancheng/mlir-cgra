@@ -48,7 +48,7 @@ cmake --build . --target mlir-doc
 
 LLVM can be build with the helper `build_tools/build_mlir.sh`.
 The current version of the project was tested with `llvm-project` commit:
-`92bca1284308452b8eb549e9382873645320cf19`.
+`1ce5f8bbb6f3fb581fd4c5905e5574c8b9a09268`.
 Make sure you have the correct commit checked-out.
 
 ```bash
