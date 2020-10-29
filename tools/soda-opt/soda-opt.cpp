@@ -34,9 +34,16 @@ int main(int argc, char **argv) {
   mlir::registerAffineLoopFusionPass();
   mlir::registerMemRefDataFlowOptPass();
 
-  // Add the following to include *all* MLIR Core dialects, or selectively
-  // include what you need like above. You only need to register dialects that
-  // will be *parsed* by the tool, not the one generated
+  mlir::registerConvertLinalgToStandardPass();
+  // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
+  mlir::registerLinalgLowerToAffineLoopsPass();
+  mlir::registerConvertStandardToLLVMPass();
+  mlir::registerSCFToStandardPass();
+  mlir::registerConvertAffineToStandardPass();
+
+  // Add the following to selectively include what you need like above. You only
+  // need to register dialects that will be *parsed* by the tool, not the one
+  // generated
   registry.insert<mlir::StandardOpsDialect>();
   registry.insert<mlir::LLVM::LLVMDialect>();
   registry.insert<mlir::linalg::LinalgDialect>();

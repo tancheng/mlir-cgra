@@ -3,12 +3,12 @@
 get_property(dialect_libs GLOBAL PROPERTY MLIR_DIALECT_LIBS)
 get_property(conversion_libs GLOBAL PROPERTY MLIR_CONVERSION_LIBS)
 
-#message(PUBLIC "${dialect_libs}")
-#message(PUBLIC "${conversion_libs}")
+message(PUBLIC "${dialect_libs}")
+message(PUBLIC "${conversion_libs}")
 
 set(LIBS
-  #${dialect_libs}
-  #${conversion_libs}
+  # ${dialect_libs}
+  # ${conversion_libs}
 
   # Core
   MLIRIR
@@ -17,15 +17,22 @@ set(LIBS
   
   # Dialects
   MLIRLLVMIR
+  MLIRLinalg
   MLIRAffine
   MLIRStandard
   MLIRSCF
+ 
+  # Transforms
+  MLIRLinalgTransforms
+  MLIRAffineTransforms
+  MLIRSCFTransforms
   
   # Conversion
   MLIRAffineToStandard
   MLIRSCFToStandard
   MLIRStandardToLLVM
   MLIRLinalgToLLVM
+  MLIRLinalgToStandard
 
 )
 
