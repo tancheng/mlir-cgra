@@ -19,6 +19,8 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
 
+#include "soda/Misc/Passes.h"
+
 int main(int argc, char **argv) {
   // mlir::registerAllDialects();
   // mlir::registerAllPasses();
@@ -41,7 +43,7 @@ int main(int argc, char **argv) {
   mlir::registerSCFToStandardPass();
   mlir::registerConvertAffineToStandardPass();
 
-  // Add the following to selectively include what you need like above. You only
+  // Add the following to selectively include the necessary dialects. You only
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
   registry.insert<mlir::StandardOpsDialect>();
@@ -57,6 +59,9 @@ int main(int argc, char **argv) {
   //===--------------------------------------------------------------------===//
 
   // Dialects
+
+  // Misc passes
+  mlir::soda::registerTestPrintOpNestingPass();
 
   // Optimization passes
 
