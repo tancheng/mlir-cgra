@@ -13,10 +13,18 @@ passes to offload and perform HLS of selected code snippets. As a final
 goal, `soda-opt` could later be merged into the main `llvm-project` codebase.
 
 
-## How to build
+## How to build?
 
 This setup assumes that you have built LLVM and MLIR in `$BUILD_DIR` and
-installed it to `$PREFIX`. To build and launch the tests of this project, run:
+installed it to `$PREFIX`. 
+The current version of the project was tested with `llvm-project` commit:
+`1ce5f8bbb6f3fb581fd4c5905e5574c8b9a09268`.
+Make sure you have the correct commit checked-out.
+
+**Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM/MLIR 
+with CMake so that it installs `FileCheck`.
+
+To build `soda-opt` and run the tests of this project, execute:
 
 ```sh
 mkdir build && cd build
@@ -24,19 +32,29 @@ cmake -G Ninja .. \
     -DLLVM_EXTERNAL_LIT=$BUILD_DIR/bin/llvm-lit \
     -DMLIR_DIR=$PREFIX/lib/cmake/mlir
 
+# Run tests
 cmake --build . --target check-soda
 ```
 
-**Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM with
-CMake so that it installs `FileCheck` to the chosen installation prefix.
+### Building LLVM/MLIR with Helper Script
 
-Alternatively it is possible to use the build helper: `build_tools/build_proj.sh`
+LLVM can be build with the helper `build_tools/build_mlir.sh`.
+
+```bash
+# To configure, build, and install
+./build_mlir.sh <path/to/llvm/src> <llvm_build_dir> <llvm_install_dir>
+
+### Building soda-opt with Helper Script
+
+Alternatively it is possible to use the helper script
+`build_tools/build_proj.sh` to build this project:
 
 ```sh
+# To configure, build, and install
 ./build_tools/build_proj.sh <source_dir> <build_dir> <path/to/llvm/build/dir> <path/to/llvm/install/dir>
 ```
 
-### How to generate docs?
+## How to generate the docs?
 
 To build the documentation from the TableGen description of the dialect
 operations, run
@@ -44,19 +62,27 @@ operations, run
 cmake --build . --target mlir-doc
 ```
 
-### Building LLVM with Helper Script
+## How to use this project?
 
-LLVM can be build with the helper `build_tools/build_mlir.sh`.
-The current version of the project was tested with `llvm-project` commit:
-`1ce5f8bbb6f3fb581fd4c5905e5574c8b9a09268`.
-Make sure you have the correct commit checked-out.
+After successfull build, available passes can be displayed with:
 
-```bash
-# To configure and build
-./build_mlir.sh <path/to/llvm> <llvm_build_dir> <llvm_install_dir>
+```sh
+$PROJ_BUILD_DIR/bin/soda-opt -h
+```
 
-# To install
-cmake --build <llvm_build_dir> --target install
+Optimizations passes and lowerings can be executed on a `.mlir` file with the
+following command:
+
+```sh
+# With loop tiling to fit 512KiB "L1" memory
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
+  --soda-test-opt-pipeline="cache-size=512"
+
+# Without loop tiling
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
+  --soda-test-opt-pipeline
 ```
 
 ## License
