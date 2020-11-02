@@ -38,7 +38,7 @@ cmake --build . --target check-soda
 
 ### Building LLVM/MLIR with Helper Script
 
-LLVM can be build with the helper `build_tools/build_mlir.sh`.
+LLVM can be built with the helper `build_tools/build_mlir.sh`.
 
 ```sh
 # To configure, build, and install
