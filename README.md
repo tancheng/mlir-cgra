@@ -40,9 +40,10 @@ cmake --build . --target check-soda
 
 LLVM can be build with the helper `build_tools/build_mlir.sh`.
 
-```bash
+```sh
 # To configure, build, and install
 ./build_mlir.sh <path/to/llvm/src> <llvm_build_dir> <llvm_install_dir>
+```
 
 ### Building soda-opt with Helper Script
 
