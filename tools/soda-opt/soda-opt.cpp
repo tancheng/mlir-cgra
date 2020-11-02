@@ -20,6 +20,7 @@
 #include "llvm/Support/ToolOutputFile.h"
 
 #include "soda/Misc/Passes.h"
+#include "soda/Misc/Pipelines.h"
 
 int main(int argc, char **argv) {
   // mlir::registerAllDialects();
@@ -64,6 +65,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerTestPrintOpNestingPass();
 
   // Optimization passes
+  mlir::soda::registerPassManagerMiscPass(); // The one PM to rule them all
 
   // Conversion passes
 
