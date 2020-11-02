@@ -26,6 +26,10 @@ def TestPrintOpNesting : FunctionPass<"soda-test-print-nesting"> {
       Print nested intructure and metadata info associated with mlir operations.
   }];
   let constructor = "mlir::soda::createTestPrintOpNestingPass()";
+  let options = [
+    Option<"varName", "option-name", "uint64_t", /*default=*/"512",
+           "Description of the option">,
+  ];
 }
 
 /// Note: The DRR definition used for defining patterns is shown below:
