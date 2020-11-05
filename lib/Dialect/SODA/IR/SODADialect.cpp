@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 //
 // This file implements the SODA kernel-related dialect and its operations.
-// 
+//
 // It was strongly inspired by the GPU dialect.
 //
 //===----------------------------------------------------------------------===//
@@ -46,7 +46,27 @@ void SODADialect::initialize() {
       >();
 }
 
-//TODO(NICO): Add implementations
+Type SODADialect::parseType(DialectAsmParser &parser) const {
+  StringRef keyword;
+  if (parser.parseKeyword(&keyword))
+    return Type();
+  MLIRContext *context = getContext();
+
+  // Handle `async token` types.
+  if (keyword == "async.token")
+    return AsyncTokenType::get(context);
+
+  parser.emitError(parser.getNameLoc(), "unknown soda target type " + keyword);
+  return Type();
+}
+
+void SODADialect::printType(Type type, DialectAsmPrinter &os) const {
+  TypeSwitch<Type>(type)
+      .Case<AsyncTokenType>([&](Type) { os << "async.token"; })
+      .Default([](Type) { llvm_unreachable("unexpected 'soda' type kind"); });
+}
+
+// TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
 // #define GET_OP_CLASSES
