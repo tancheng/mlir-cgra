@@ -36,6 +36,7 @@ set(LIBS
 
   # SODA
   SODAMisc
+  MLIRSODA
 
 )
 
