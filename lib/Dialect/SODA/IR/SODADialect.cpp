@@ -790,7 +790,7 @@ static ParseResult parseSODAModuleOp(OpAsmParser &parser,
     return failure();
 
   // If module attributes are present, parse them.
-  if(parser.parseOptionalAttrDictWithKeyword(result.attributes))
+  if (parser.parseOptionalAttrDictWithKeyword(result.attributes))
     return failure();
 
   // Parse the module body.
@@ -826,8 +826,8 @@ static ParseResult parseAsyncDependencies(
 }
 
 static void printAsyncDependencies(OpAsmPrinter &printer, Operation *op,
-                                  Type asyncTokenType,
-                                  OperandRange asyncDependencies) {
+                                   Type asyncTokenType,
+                                   OperandRange asyncDependencies) {
   if (asyncTokenType)
     printer << "async ";
   if (asyncDependencies.empty())
@@ -837,8 +837,7 @@ static void printAsyncDependencies(OpAsmPrinter &printer, Operation *op,
   printer << ']';
 }
 
-// TODO(NICO): Add implementations
-// #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
+#include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
-// #define GET_OP_CLASSES
-// #include "soda/Dialect/SODA/SODAOps.cpp.inc"
+#define GET_OP_CLASSES
+#include "soda/Dialect/SODA/SODAOps.cpp.inc"
