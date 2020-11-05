@@ -294,6 +294,112 @@ static LogicalResult verify(LaunchOp op) {
   return success();
 }
 
+// TODO(NICO): remove
+// Pretty-print the kernel grid/block size assignment as
+//   (%iter-x, %iter-y, %iter-z) in
+//   (%size-x = %ssa-use, %size-y = %ssa-use, %size-z = %ssa-use)
+// where %size-* and %iter-* will correspond to the body region arguments.
+static void printSizeAssignment(OpAsmPrinter &p, KernelDim3 size,
+                                KernelDim3 operands, KernelDim3 ids) {
+  p << '(' << ids.x << ", " << ids.y << ", " << ids.z << ") in (";
+  p << size.x << " = " << operands.x << ", ";
+  p << size.y << " = " << operands.y << ", ";
+  p << size.z << " = " << operands.z << ')';
+}
+
+static void printLaunchOp(OpAsmPrinter &p, LaunchOp op) {
+  // Print the launch configuration.
+  // TODO(NICO): modify, remove blocks/threads info
+  p << LaunchOp::getOperationName() << ' ' << op.getBlocksKeyword();
+  printSizeAssignment(p, op.getGridSize(), op.getGridSizeOperandValues(),
+                      op.getBlockIds());
+  p << ' ' << op.getThreadsKeyword();
+  printSizeAssignment(p, op.getBlockSize(), op.getBlockSizeOperandValues(),
+                      op.getThreadIds());
+
+  p.printRegion(op.body(), /*printEntryBlockArgs=*/false);
+  p.printOptionalAttrDict(op.getAttrs());
+}
+
+// Parse the size assignment blocks for blocks and threads.  These have the form
+//   (%region_arg, %region_arg, %region_arg) in
+//   (%region_arg = %operand, %region_arg = %operand, %region_arg = %operand)
+// where %region_arg are percent-identifiers for the region arguments to be
+// introduced further (SSA defs), and %operand are percent-identifiers for the
+// SSA value uses.
+static ParseResult
+parseSizeAssignment(OpAsmParser &parser,
+                    MutableArrayRef<OpAsmParser::OperandType> sizes,
+                    MutableArrayRef<OpAsmParser::OperandType> regionSizes,
+                    MutableArrayRef<OpAsmParser::OperandType> indices) {
+  // TODO(NICO): modify, probably not using this info
+  assert(indices.size() == 3 && "space for three indices expected");
+  SmallVector<OpAsmParser::OperandType, 3> args;
+  if (parser.parseRegionArgumentList(args, /*requiredOperandCount=*/3,
+                                     OpAsmParser::Delimiter::Paren) ||
+      parser.parseKeyword("in") || parser.parseLParen())
+    return failure();
+  std::move(args.begin(), args.end(), indices.begin());
+
+  for (int i = 0; i < 3; ++i) {
+    if (i != 0 && parser.parseComma())
+      return failure();
+    if (parser.parseRegionArgument(regionSizes[i]) || parser.parseEqual() ||
+        parser.parseOperand(sizes[i]))
+      return failure();
+  }
+
+  return parser.parseRParen();
+}
+
+// TODO(NICO): skip blocks/threads dependency
+// Parses a Launch operation.
+// operation ::= `gpu.launch` `blocks` `(` ssa-id-list `)` `in` ssa-reassignment
+//                           `threads` `(` ssa-id-list `)` `in` ssa-reassignment
+//                            region attr-dict?
+// ssa-reassignment ::= `(` ssa-id `=` ssa-use (`,` ssa-id `=` ssa-use)* `)`
+static ParseResult parseLaunchOp(OpAsmParser &parser, OperationState &result) {
+  // Sizes of the grid and block.
+  SmallVector<OpAsmParser::OperandType, LaunchOp::kNumConfigOperands> sizes(
+      LaunchOp::kNumConfigOperands);
+  MutableArrayRef<OpAsmParser::OperandType> sizesRef(sizes);
+
+  // Actual (data) operands passed to the kernel.
+  SmallVector<OpAsmParser::OperandType, 4> dataOperands;
+
+  // Region arguments to be created.
+  SmallVector<OpAsmParser::OperandType, 16> regionArgs(
+      LaunchOp::kNumConfigRegionAttributes);
+  MutableArrayRef<OpAsmParser::OperandType> regionArgsRef(regionArgs);
+
+  // Parse the size assignment segments: the first segment assigns grid sizes
+  // and defines values for block identifiers; the second segment assigns block
+  // sizes and defines values for thread identifiers.  In the region argument
+  // list, identifiers precede sizes, and block-related values precede
+  // thread-related values.
+  if (parser.parseKeyword(LaunchOp::getBlocksKeyword().data()) ||
+      parseSizeAssignment(parser, sizesRef.take_front(3),
+                          regionArgsRef.slice(6, 3),
+                          regionArgsRef.slice(0, 3)) ||
+      parser.parseKeyword(LaunchOp::getThreadsKeyword().data()) ||
+      parseSizeAssignment(parser, sizesRef.drop_front(3),
+                          regionArgsRef.slice(9, 3),
+                          regionArgsRef.slice(3, 3)) ||
+      parser.resolveOperands(sizes, parser.getBuilder().getIndexType(),
+                             result.operands))
+    return failure();
+
+  // Introduce the body region and parse it. The region has
+  // kNumConfigRegionAttributes arguments that correspond to
+  // block/thread identifiers and grid/block sizes, all of the `index` type.
+  Type index = parser.getBuilder().getIndexType();
+  SmallVector<Type, LaunchOp::kNumConfigRegionAttributes> dataTypes(
+      LaunchOp::kNumConfigRegionAttributes, index);
+  Region *body = result.addRegion();
+  return failure(parser.parseRegion(*body, regionArgs, dataTypes) ||
+                 parser.parseOptionalAttrDict(result.attributes));
+}
+
 // TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
