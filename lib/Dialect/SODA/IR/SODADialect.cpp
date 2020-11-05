@@ -120,6 +120,26 @@ static ParseResult parseShuffleOp(OpAsmParser &parser, OperationState &state) {
   return success();
 }
 
+//===----------------------------------------------------------------------===//
+// AsyncOpInterface
+//===----------------------------------------------------------------------===//
+
+void soda::addAsyncDependency(Operation *op, Value token) {
+  op->insertOperands(0, {token});
+  if (!op->template hasTrait<OpTrait::AttrSizedOperandSegments>())
+    return;
+  auto attrName =
+      OpTrait::AttrSizedOperandSegments<void>::getOperandSegmentSizeAttr();
+  auto sizeAttr = op->template getAttrOfType<DenseIntElementsAttr>(attrName);
+  if (!sizeAttr)
+    return; // Async deps is the only variadic operand.
+  SmallVector<int32_t, 8> sizes;
+  for (auto size : sizeAttr.getIntValues())
+    sizes.push_back(size.getSExtValue());
+  ++sizes.front();
+  op->setAttr(attrName, Builder(op->getContext()).getI32VectorAttr(sizes));
+}
+
 // TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
