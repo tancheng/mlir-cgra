@@ -483,6 +483,255 @@ static void printLaunchFuncOperands(OpAsmPrinter &printer, Operation *,
   printer << ")";
 }
 
+//===----------------------------------------------------------------------===//
+// SODAFuncOp
+//===----------------------------------------------------------------------===//
+
+/// Adds a new block argument that corresponds to buffers located in
+/// workgroup memory.
+BlockArgument SODAFuncOp::addWorkgroupAttribution(Type type) {
+  auto attrName = getNumWorkgroupAttributionsAttrName();
+  auto attr = getAttrOfType<IntegerAttr>(attrName);
+  setAttr(attrName, IntegerAttr::get(attr.getType(), attr.getValue() + 1));
+  return getBody().insertArgument(getType().getNumInputs() + attr.getInt(),
+                                  type);
+}
+
+/// Adds a new block argument that corresponds to buffers located in
+/// private memory.
+BlockArgument SODAFuncOp::addPrivateAttribution(Type type) {
+  // Buffers on the private memory always come after buffers on the workgroup
+  // memory.
+  return getBody().addArgument(type);
+}
+
+void SODAFuncOp::build(OpBuilder &builder, OperationState &result,
+                       StringRef name, FunctionType type,
+                       TypeRange workgroupAttributions,
+                       TypeRange privateAttributions,
+                       ArrayRef<NamedAttribute> attrs) {
+  result.addAttribute(SymbolTable::getSymbolAttrName(),
+                      builder.getStringAttr(name));
+  result.addAttribute(getTypeAttrName(), TypeAttr::get(type));
+  result.addAttribute(getNumWorkgroupAttributionsAttrName(),
+                      builder.getI64IntegerAttr(workgroupAttributions.size()));
+  result.addAttributes(attrs);
+  Region *body = result.addRegion();
+  Block *entryBlock = new Block;
+  entryBlock->addArguments(type.getInputs());
+  entryBlock->addArguments(workgroupAttributions);
+  entryBlock->addArguments(privateAttributions);
+
+  body->getBlocks().push_back(entryBlock);
+}
+
+/// Parses a SODA function memory attribution.
+///
+/// memory-attribution ::= (`workgroup` `(` ssa-id-and-type-list `)`)?
+///                        (`private` `(` ssa-id-and-type-list `)`)?
+///
+/// Note that this function parses only one of the two similar parts, with the
+/// keyword provided as argument.
+static ParseResult
+parseAttributions(OpAsmParser &parser, StringRef keyword,
+                  SmallVectorImpl<OpAsmParser::OperandType> &args,
+                  SmallVectorImpl<Type> &argTypes) {
+  // If we could not parse the keyword, just assume empty list and succeed.
+  if (failed(parser.parseOptionalKeyword(keyword)))
+    return success();
+
+  if (failed(parser.parseLParen()))
+    return failure();
+
+  // Early exit for an empty list.
+  if (succeeded(parser.parseOptionalRParen()))
+    return success();
+
+  do {
+    OpAsmParser::OperandType arg;
+    Type type;
+
+    if (parser.parseRegionArgument(arg) || parser.parseColonType(type))
+      return failure();
+
+    args.push_back(arg);
+    argTypes.push_back(type);
+  } while (succeeded(parser.parseOptionalComma()));
+
+  return parser.parseRParen();
+}
+
+/// Parses a SODA function.
+///
+/// <operation> ::= `soda.func` symbol-ref-id `(` argument-list `)`
+///                 (`->` function-result-list)? memory-attribution `kernel`?
+///                 function-attributes? region
+static ParseResult parseSODAFuncOp(OpAsmParser &parser,
+                                   OperationState &result) {
+  SmallVector<OpAsmParser::OperandType, 8> entryArgs;
+  SmallVector<NamedAttrList, 1> argAttrs;
+  SmallVector<NamedAttrList, 1> resultAttrs;
+  SmallVector<Type, 8> argTypes;
+  SmallVector<Type, 4> resultTypes;
+  bool isVariadic;
+
+  // Parse the function name.
+  StringAttr nameAttr;
+  if (parser.parseSymbolName(nameAttr, ::mlir::SymbolTable::getSymbolAttrName(),
+                             result.attributes))
+    return failure();
+
+  auto signatureLocation = parser.getCurrentLocation();
+  if (failed(impl::parseFunctionSignature(
+          parser, /*allowVariadic=*/false, entryArgs, argTypes, argAttrs,
+          isVariadic, resultTypes, resultAttrs)))
+    return failure();
+
+  if (entryArgs.empty() && !argTypes.empty())
+    return parser.emitError(signatureLocation)
+           << "soda.func requires named arguments";
+
+  // Construct the function type. More types will be added to the region, but
+  // not to the function type.
+  Builder &builder = parser.getBuilder();
+  auto type = builder.getFunctionType(argTypes, resultTypes);
+  result.addAttribute(SODAFuncOp::getTypeAttrName(), TypeAttr::get(type));
+
+  // Parse workgroup memory attributions.
+  if (failed(parseAttributions(parser, SODAFuncOp::getWorkgroupKeyword(),
+                               entryArgs, argTypes)))
+    return failure();
+
+  // Store the number of operands we just parsed as the number of workgroup
+  // memory attributions.
+  unsigned numWorkgroupAttrs = argTypes.size() - type.getNumInputs();
+  result.addAttribute(SODAFuncOp::getNumWorkgroupAttributionsAttrName(),
+                      builder.getI64IntegerAttr(numWorkgroupAttrs));
+
+  // Parse private memory attributions.
+  if (failed(parseAttributions(parser, SODAFuncOp::getPrivateKeyword(),
+                               entryArgs, argTypes)))
+    return failure();
+
+  // Parse the kernel attribute if present.
+  if (succeeded(parser.parseOptionalKeyword(SODAFuncOp::getKernelKeyword())))
+    result.addAttribute(SODADialect::getKernelFuncAttrName(),
+                        builder.getUnitAttr());
+
+  // Parse attributes.
+  if (failed(parser.parseOptionalAttrDictWithKeyword(result.attributes)))
+    return failure();
+  mlir::impl::addArgAndResultAttrs(builder, result, argAttrs, resultAttrs);
+
+  // Parse the region. If no argument names were provided, take all names
+  // (including those of attributions) from the entry block.
+  auto *body = result.addRegion();
+  return parser.parseRegion(*body, entryArgs, argTypes);
+}
+
+static void printAttributions(OpAsmPrinter &p, StringRef keyword,
+                              ArrayRef<BlockArgument> values) {
+  if (values.empty())
+    return;
+
+  p << ' ' << keyword << '(';
+  llvm::interleaveComma(
+      values, p, [&p](BlockArgument v) { p << v << " : " << v.getType(); });
+  p << ')';
+}
+
+/// Prints a SODA Func op.
+static void printSODAFuncOp(OpAsmPrinter &p, SODAFuncOp op) {
+  p << SODAFuncOp::getOperationName() << ' ';
+  p.printSymbolName(op.getName());
+
+  FunctionType type = op.getType();
+  impl::printFunctionSignature(p, op.getOperation(), type.getInputs(),
+                               /*isVariadic=*/false, type.getResults());
+
+  printAttributions(p, op.getWorkgroupKeyword(), op.getWorkgroupAttributions());
+  printAttributions(p, op.getPrivateKeyword(), op.getPrivateAttributions());
+  if (op.isKernel())
+    p << ' ' << op.getKernelKeyword();
+
+  impl::printFunctionAttributes(p, op.getOperation(), type.getNumInputs(),
+                                type.getNumResults(),
+                                {op.getNumWorkgroupAttributionsAttrName(),
+                                 SODADialect::getKernelFuncAttrName()});
+  p.printRegion(op.getBody(), /*printEntryBlockArgs=*/false);
+}
+
+void SODAFuncOp::setType(FunctionType newType) {
+  auto oldType = getType();
+  assert(newType.getNumResults() == oldType.getNumResults() &&
+         "unimplemented: changes to the number of results");
+
+  SmallVector<char, 16> nameBuf;
+  for (int i = newType.getNumInputs(), e = oldType.getNumInputs(); i < e; i++)
+    removeAttr(getArgAttrName(i, nameBuf));
+
+  setAttr(getTypeAttrName(), TypeAttr::get(newType));
+}
+
+/// Hook for FunctionLike verifier.
+LogicalResult SODAFuncOp::verifyType() {
+  Type type = getTypeAttr().getValue();
+  if (!type.isa<FunctionType>())
+    return emitOpError("requires '" + getTypeAttrName() +
+                       "' attribute of function type");
+
+  if (isKernel() && getType().getNumResults() != 0)
+    return emitOpError() << "expected void return type for kernel function";
+
+  return success();
+}
+
+static LogicalResult verifyAttributions(Operation *op,
+                                        ArrayRef<BlockArgument> attributions,
+                                        unsigned memorySpace) {
+  for (Value v : attributions) {
+    auto type = v.getType().dyn_cast<MemRefType>();
+    if (!type)
+      return op->emitOpError() << "expected memref type in attribution";
+
+    if (type.getMemorySpace() != memorySpace) {
+      return op->emitOpError()
+             << "expected memory space " << memorySpace << " in attribution";
+    }
+  }
+  return success();
+}
+
+/// Verifies the body of the function.
+LogicalResult SODAFuncOp::verifyBody() {
+  unsigned numFuncArguments = getNumArguments();
+  unsigned numWorkgroupAttributions = getNumWorkgroupAttributions();
+  unsigned numBlockArguments = front().getNumArguments();
+
+  // TODO(NICO): Remove this check
+  if (numBlockArguments < numFuncArguments + numWorkgroupAttributions)
+    return emitOpError() << "expected at least "
+                         << numFuncArguments + numWorkgroupAttributions
+                         << " arguments to body region";
+
+  ArrayRef<Type> funcArgTypes = getType().getInputs();
+  for (unsigned i = 0; i < numFuncArguments; ++i) {
+    Type blockArgType = front().getArgument(i).getType();
+    if (funcArgTypes[i] != blockArgType)
+      return emitOpError() << "expected body region argument #" << i
+                           << " to be of type " << funcArgTypes[i] << ", got "
+                           << blockArgType;
+  }
+
+  if (failed(verifyAttributions(getOperation(), getWorkgroupAttributions(),
+                                SODADialect::getWorkgroupAddressSpace())) ||
+      failed(verifyAttributions(getOperation(), getPrivateAttributions(),
+                                SODADialect::getPrivateAddressSpace())))
+    return failure();
+
+  return success();
+}
+
 // TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
