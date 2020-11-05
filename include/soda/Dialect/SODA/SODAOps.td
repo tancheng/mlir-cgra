@@ -490,6 +490,7 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   ];
 
   let extraClassDeclaration = [{
+    // TODO(NICO): Removed unecessary dcls
     /// Get the SSA values corresponding to kernel block identifiers.
     KernelDim3 getBlockIds();
     /// Get the SSA values corresponding to kernel thread identifiers.

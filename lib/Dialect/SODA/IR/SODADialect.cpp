@@ -205,6 +205,95 @@ void soda::addAsyncDependency(Operation *op, Value token) {
   op->setAttr(attrName, Builder(op->getContext()).getI32VectorAttr(sizes));
 }
 
+//===----------------------------------------------------------------------===//
+// LaunchOp
+//===----------------------------------------------------------------------===//
+
+// TODO(NICO): remove gpu meta information
+void LaunchOp::build(OpBuilder &builder, OperationState &result,
+                     Value gridSizeX, Value gridSizeY, Value gridSizeZ,
+                     Value blockSizeX, Value blockSizeY, Value blockSizeZ) {
+
+  // Add grid and block sizes as op operands, followed by the data operands.
+  result.addOperands(
+      {gridSizeX, gridSizeY, gridSizeZ, blockSizeX, blockSizeY, blockSizeZ});
+
+  // TODO(NICO): modify kNumConfigRegionAttributes
+  // Create a kernel body region with kNumConfigRegionAttributes + N arguments,
+  // where the first kNumConfigRegionAttributes arguments have `index` type and
+  // the rest have the same types as the data operands.
+  Region *kernelRegion = result.addRegion();
+  Block *body = new Block();
+  body->addArguments(
+      std::vector<Type>(kNumConfigRegionAttributes, builder.getIndexType()));
+  kernelRegion->push_back(body);
+}
+
+// TODO(NICO): remove all these calls, from here
+KernelDim3 LaunchOp::getBlockIds() {
+  assert(!body().empty() && "LaunchOp body must not be empty.");
+  auto args = body().getArguments();
+  return KernelDim3{args[0], args[1], args[2]};
+}
+
+KernelDim3 LaunchOp::getThreadIds() {
+  assert(!body().empty() && "LaunchOp body must not be empty.");
+  auto args = body().getArguments();
+  return KernelDim3{args[3], args[4], args[5]};
+}
+
+KernelDim3 LaunchOp::getGridSize() {
+  assert(!body().empty() && "LaunchOp body must not be empty.");
+  auto args = body().getArguments();
+  return KernelDim3{args[6], args[7], args[8]};
+}
+
+KernelDim3 LaunchOp::getBlockSize() {
+  assert(!body().empty() && "LaunchOp body must not be empty.");
+  auto args = body().getArguments();
+  return KernelDim3{args[9], args[10], args[11]};
+}
+
+KernelDim3 LaunchOp::getGridSizeOperandValues() {
+  return KernelDim3{getOperand(0), getOperand(1), getOperand(2)};
+}
+
+KernelDim3 LaunchOp::getBlockSizeOperandValues() {
+  return KernelDim3{getOperand(3), getOperand(4), getOperand(5)};
+}
+// TODO(NICO): remove all these calls, until here
+
+// TODO(NICO) modify to suport other kind of arguments/attributes
+static LogicalResult verify(LaunchOp op) {
+  // Kernel launch takes KNumConfigOperands leading operands for grid/block
+  // sizes and transforms them into kNumConfigRegionAttributes region arguments
+  // for block/thread identifiers and grid/block sizes.
+  if (!op.body().empty()) {
+    if (op.body().getNumArguments() !=
+        LaunchOp::kNumConfigOperands + op.getNumOperands())
+      return op.emitOpError("unexpected number of region arguments");
+  }
+
+  // Block terminators without successors are expected to exit the kernel region
+  // and must be `soda.terminal`.
+  for (Block &block : op.body()) {
+    if (block.empty())
+      continue;
+    if (block.back().getNumSuccessors() != 0)
+      continue;
+    if (!isa<soda::TerminatorOp>(&block.back())) {
+      return block.back()
+          .emitError()
+          .append("expected '", soda::TerminatorOp::getOperationName(),
+                  "' or a terminator with successors")
+          .attachNote(op.getLoc())
+          .append("in '", LaunchOp::getOperationName(), "' body region");
+    }
+  }
+
+  return success();
+}
+
 // TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
