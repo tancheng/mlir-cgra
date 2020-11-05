@@ -400,6 +400,89 @@ static ParseResult parseLaunchOp(OpAsmParser &parser, OperationState &result) {
                  parser.parseOptionalAttrDict(result.attributes));
 }
 
+//===----------------------------------------------------------------------===//
+// LaunchFuncOp
+//===----------------------------------------------------------------------===//
+
+void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
+                         SODAFuncOp kernelFunc, KernelDim3 gridSize,
+                         KernelDim3 blockSize, ValueRange kernelOperands) {
+  // Add grid and block sizes as operands, followed by the data operands.
+  result.addOperands({gridSize.x, gridSize.y, gridSize.z, blockSize.x,
+                      blockSize.y, blockSize.z});
+  result.addOperands(kernelOperands);
+  auto kernelModule = kernelFunc.getParentOfType<SODAModuleOp>();
+  auto kernelSymbol = builder.getSymbolRefAttr(
+      kernelModule.getName(), {builder.getSymbolRefAttr(kernelFunc.getName())});
+  result.addAttribute(getKernelAttrName(), kernelSymbol);
+}
+
+unsigned LaunchFuncOp::getNumKernelOperands() {
+  return getNumOperands() - kNumConfigOperands;
+}
+
+StringRef LaunchFuncOp::getKernelModuleName() {
+  return kernel().getRootReference();
+}
+
+StringRef LaunchFuncOp::getKernelName() { return kernel().getLeafReference(); }
+
+Value LaunchFuncOp::getKernelOperand(unsigned i) {
+  return getOperation()->getOperand(i + kNumConfigOperands);
+}
+
+KernelDim3 LaunchFuncOp::getGridSizeOperandValues() {
+  return KernelDim3{getOperand(0), getOperand(1), getOperand(2)};
+}
+
+KernelDim3 LaunchFuncOp::getBlockSizeOperandValues() {
+  return KernelDim3{getOperand(3), getOperand(4), getOperand(5)};
+}
+
+static LogicalResult verify(LaunchFuncOp op) {
+  auto module = op.getParentOfType<ModuleOp>();
+  if (!module)
+    return op.emitOpError("expected to belong to a module");
+  if (!module.getAttrOfType<UnitAttr>(
+          SODADialect::getContainerModuleAttrName()))
+    return op.emitOpError(
+        "expected the closest surrounding module to have the '" +
+        SODADialect::getContainerModuleAttrName() + "'attribute");
+  auto kernelAttr = op.getAttrOfType<SymbolRefAttr>(op.getKernelAttrName());
+  if (!kernelAttr)
+    return op.emitOpError("symbol reference attribute '" +
+                          op.getKernelAttrName() + "' must be specified");
+
+  return success();
+}
+
+static ParseResult
+parseLaunchFuncOperands(OpAsmParser &parser,
+                        SmallVectorImpl<OpAsmParser::OperandType> &argNames,
+                        SmallVectorImpl<Type> &argTypes) {
+  if (parser.parseOptionalKeyword("args"))
+    return success();
+  SmallVector<NamedAttrList, 4> argAttrs;
+  bool isVariadic = false;
+  return impl::parseFunctionArgumentList(parser, /*allowAttributes=*/false,
+                                         /*allowVariadic=*/false, argNames,
+                                         argTypes, argAttrs, isVariadic);
+}
+
+static void printLaunchFuncOperands(OpAsmPrinter &printer, Operation *,
+                                    OperandRange operands, TypeRange types) {
+  if (operands.empty())
+    return;
+  printer << "args(";
+  llvm::interleaveComma(llvm::zip(operands, types), printer,
+                        [&](const auto &pair) {
+                          printer.printOperand(std::get<0>(pair));
+                          printer << " : ";
+                          printer.printType(std::get<1>(pair));
+                        });
+  printer << ")";
+}
+
 // TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
