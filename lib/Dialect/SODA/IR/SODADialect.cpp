@@ -732,6 +732,47 @@ LogicalResult SODAFuncOp::verifyBody() {
   return success();
 }
 
+//===----------------------------------------------------------------------===//
+// ReturnOp
+//===----------------------------------------------------------------------===//
+
+static ParseResult parseReturnOp(OpAsmParser &parser, OperationState &result) {
+  llvm::SmallVector<OpAsmParser::OperandType, 4> operands;
+  llvm::SmallVector<Type, 4> types;
+  if (parser.parseOperandList(operands) ||
+      parser.parseOptionalColonTypeList(types) ||
+      parser.resolveOperands(operands, types, parser.getCurrentLocation(),
+                             result.operands))
+    return failure();
+
+  return success();
+}
+
+static LogicalResult verify(soda::ReturnOp returnOp) {
+  SODAFuncOp function = returnOp.getParentOfType<SODAFuncOp>();
+
+  FunctionType funType = function.getType();
+
+  if (funType.getNumResults() != returnOp.operands().size())
+    return returnOp.emitOpError()
+        .append("expected ", funType.getNumResults(), " result operands")
+        .attachNote(function.getLoc())
+        .append("return type declared here");
+
+  for (auto pair : llvm::enumerate(
+           llvm::zip(function.getType().getResults(), returnOp.operands()))) {
+    Type type;
+    Value operand;
+    std::tie(type, operand) = pair.value();
+    if (type != operand.getType())
+      return returnOp.emitOpError() << "unexpected type `" << operand.getType()
+                                    << "' for operand #" << pair.index();
+  }
+  return success();
+}
+
+
+
 // TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
 
