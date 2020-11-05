@@ -19,6 +19,7 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
 
+#include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
@@ -60,6 +61,7 @@ int main(int argc, char **argv) {
   //===--------------------------------------------------------------------===//
 
   // Dialects
+  registry.insert<mlir::soda::SODADialect>();
 
   // Misc passes
   mlir::soda::registerTestPrintOpNestingPass();

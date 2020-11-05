@@ -43,10 +43,12 @@ def SODA_Dialect : Dialect {
     /// Returns the number of workgroup (thread, block) dimensions supported in
     /// the SODA dialect.
     // TODO: consider generalizing this.
+    //TODO(NICO): Remove
     static unsigned getNumWorkgroupDimensions() { return 3; }
 
     /// Returns the numeric value used to identify the workgroup memory address
     /// space.
+    //TODO(NICO): Remove
     static unsigned getWorkgroupAddressSpace() { return 3; }
 
     /// Returns the numeric value used to identify the private memory address

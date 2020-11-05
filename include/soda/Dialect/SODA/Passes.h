@@ -21,13 +21,13 @@ namespace mlir {
 std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelOutliningPass();
 
 /// Collect a set of patterns to rewrite all-reduce ops within the SODA dialect.
-void populateSodaAllReducePatterns(MLIRContext *context,
-                                  OwningRewritePatternList &patterns);
+// void populateSodaAllReducePatterns(MLIRContext *context,
+//                                   OwningRewritePatternList &patterns);
 
 /// Collect all patterns to rewrite ops within the SODA dialect.
 inline void populateSodaRewritePatterns(MLIRContext *context,
                                        OwningRewritePatternList &patterns) {
-  populateSodaAllReducePatterns(context, patterns);
+  // populateSodaAllReducePatterns(context, patterns);
 }
 
 //===----------------------------------------------------------------------===//

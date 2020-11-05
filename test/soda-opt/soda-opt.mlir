@@ -7,4 +7,5 @@
 // CHECK: scf
 // CHECK: std
 // CHECK: vector
+// CHECK: soda
 // CHECKHELP: soda-test-opt-pipeline

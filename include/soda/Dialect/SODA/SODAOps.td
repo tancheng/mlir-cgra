@@ -567,60 +567,6 @@ def SODA_YieldOp : SODA_Op<"yield", [NoSideEffect, Terminator]>,
   }];
 }
 
-// add, mul mirror the XLA ComparisonDirection enum.
-def SODA_AllReduceOpAdd : StrEnumAttrCase<"add">;
-def SODA_AllReduceOpAnd : StrEnumAttrCase<"and">;
-def SODA_AllReduceOpMax : StrEnumAttrCase<"max">;
-def SODA_AllReduceOpMin : StrEnumAttrCase<"min">;
-def SODA_AllReduceOpMul : StrEnumAttrCase<"mul">;
-def SODA_AllReduceOpOr : StrEnumAttrCase<"or">;
-def SODA_AllReduceOpXor : StrEnumAttrCase<"xor">;
-
-def SODA_AllReduceOperationAttr : StrEnumAttr<"AllReduceOperationAttr",
-    "built-in reduction operations supported by soda.allreduce.",
-    [
-      SODA_AllReduceOpAdd,
-      SODA_AllReduceOpAnd,
-      SODA_AllReduceOpMax,
-      SODA_AllReduceOpMin,
-      SODA_AllReduceOpMul,
-      SODA_AllReduceOpOr,
-      SODA_AllReduceOpXor
-    ]>;
-
-def SODA_AllReduceOp : SODA_Op<"all_reduce",
-    [SameOperandsAndResultType, IsolatedFromAbove]>,
-    Arguments<(ins AnyType:$value,
-               OptionalAttr<SODA_AllReduceOperationAttr>:$op)>,
-    Results<(outs AnyType)> {
-  let summary = "Reduce values among workgroup.";
-  let description = [{
-    The `all_reduce` op reduces the value of every work item across a local
-    workgroup. The result is equal for all work items of a workgroup.
-
-    For example, both
-
-    ```mlir
-    %1 = "soda.all_reduce"(%0) ({}) { op = "add" } : (f32) -> (f32)
-    %2 = "soda.all_reduce"(%0) ({
-    ^bb(%lhs : f32, %rhs : f32):
-      %sum = addf %lhs, %rhs : f32
-      "soda.yield"(%sum) : (f32) -> ()
-    }) : (f32) -> (f32)
-    ```
-
-    compute the sum of each work item's %0 value. The first version specifies
-    the accumulation as operation, whereas the second version specifies the
-    accumulation as code region. The accumulation operation must be one of:
-    `add`, `and`, `max`, `min`, `mul`, `or`, `xor`.
-
-    Either none or all work items of a workgroup need to execute this op
-    in convergence.
-  }];
-  let regions = (region AnyRegion:$body);
-  let verifier = [{ return ::verifyAllReduce(*this); }];
-}
-
 def SODA_ShuffleOpXor : StrEnumAttrCase<"xor">;
 
 def SODA_ShuffleModeAttr : StrEnumAttr<"ShuffleModeAttr",
@@ -768,8 +714,8 @@ def SODA_WaitOp : SODA_Op<"wait", [SODA_AsyncOpInterface]> {
     %t0 = soda.foo async : !soda.async.token
     %t1 = soda.bar async : !soda.async.token
     %t2 = soda.wait async [%t0, %t1]
-    // soda.baz doesn't run until soda.foo and soda.bar have both completed, just
-    // as if the async dependencies were [%t0, %t1].
+    // soda.baz doesn't run until soda.foo and soda.bar have both completed,
+    // just as if the async dependencies were [%t0, %t1].
     %t3 = soda.baz async [%t2]
     ```
 
