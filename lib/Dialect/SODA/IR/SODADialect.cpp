@@ -71,6 +71,71 @@ LogicalResult SODADialect::verifyOperationAttribute(Operation *op,
   if (!attr.second.isa<UnitAttr>() ||
       attr.first != getContainerModuleAttrName())
     return success();
+
+  auto module = dyn_cast<ModuleOp>(op);
+  if (!module)
+    return op->emitError("expected '")
+           << getContainerModuleAttrName() << "' attribute to be attached to '"
+           << ModuleOp::getOperationName() << '\'';
+
+  auto walkResult = module.walk([&module](LaunchFuncOp launchOp) -> WalkResult {
+    // Ignore launches that are nested more or less deep than functions in the
+    // module we are currently checking.
+    if (!launchOp.getParentOp() ||
+        launchOp.getParentOp()->getParentOp() != module)
+      return success();
+
+    // Ignore launch ops with missing attributes here. The errors will be
+    // reported by the verifiers of those ops.
+    if (!launchOp.getAttrOfType<SymbolRefAttr>(
+            LaunchFuncOp::getKernelAttrName()))
+      return success();
+
+    // Check that `launch_func` refers to a well-formed SODA kernel module.
+    StringRef kernelModuleName = launchOp.getKernelModuleName();
+    auto kernelModule = module.lookupSymbol<SODAModuleOp>(kernelModuleName);
+    if (!kernelModule)
+      return launchOp.emitOpError()
+             << "kernel module '" << kernelModuleName << "' is undefined";
+
+    // Check that `launch_func` refers to a well-formed kernel function.
+    Operation *kernelFunc = module.lookupSymbol(launchOp.kernel());
+    auto kernelSODAFunction = dyn_cast_or_null<soda::SODAFuncOp>(kernelFunc);
+    auto kernelLLVMFunction = dyn_cast_or_null<LLVM::LLVMFuncOp>(kernelFunc);
+    if (!kernelSODAFunction && !kernelLLVMFunction)
+      return launchOp.emitOpError("kernel function '")
+             << launchOp.kernel() << "' is undefined";
+    if (!kernelFunc->getAttrOfType<mlir::UnitAttr>(
+            SODADialect::getKernelFuncAttrName()))
+      return launchOp.emitOpError("kernel function is missing the '")
+             << SODADialect::getKernelFuncAttrName() << "' attribute";
+
+    // TODO: if the kernel function has been converted to
+    // the LLVM dialect but the caller hasn't (which happens during the
+    // separate compilation), do not check type correspondence as it would
+    // require the verifier to be aware of the LLVM type conversion.
+    if (kernelLLVMFunction)
+      return success();
+
+    unsigned actualNumArguments = launchOp.getNumKernelOperands();
+    unsigned expectedNumArguments = kernelSODAFunction.getNumArguments();
+    if (expectedNumArguments != actualNumArguments)
+      return launchOp.emitOpError("got ")
+             << actualNumArguments << " kernel operands but expected "
+             << expectedNumArguments;
+
+    auto functionType = kernelSODAFunction.getType();
+    for (unsigned i = 0; i < expectedNumArguments; ++i) {
+      if (launchOp.getKernelOperand(i).getType() != functionType.getInput(i)) {
+        return launchOp.emitOpError("type of function argument ")
+               << i << " does not match";
+      }
+    }
+
+    return success();
+  });
+
+  return walkResult.wasInterrupted() ? failure() : success();
 }
 
 template <typename T>
