@@ -771,7 +771,71 @@ static LogicalResult verify(soda::ReturnOp returnOp) {
   return success();
 }
 
+//===----------------------------------------------------------------------===//
+// SODAModuleOp
+//===----------------------------------------------------------------------===//
 
+void SODAModuleOp::build(OpBuilder &builder, OperationState &result,
+                         StringRef name) {
+  ensureTerminator(*result.addRegion(), builder, result.location);
+  result.attributes.push_back(builder.getNamedAttr(
+      ::mlir::SymbolTable::getSymbolAttrName(), builder.getStringAttr(name)));
+}
+
+static ParseResult parseSODAModuleOp(OpAsmParser &parser,
+                                     OperationState &result) {
+  StringAttr nameAttr;
+  if (parser.parseSymbolName(nameAttr, SymbolTable::getSymbolAttrName(),
+                             result.attributes))
+    return failure();
+
+  // If module attributes are present, parse them.
+  if(parser.parseOptionalAttrDictWithKeyword(result.attributes))
+    return failure();
+
+  // Parse the module body.
+  auto *body = result.addRegion();
+  if (parser.parseRegion(*body, None, None))
+    return failure();
+
+  // Ensure that this module has a valid terminator.
+  SODAModuleOp::ensureTerminator(*body, parser.getBuilder(), result.location);
+  return success();
+}
+
+static void print(OpAsmPrinter &p, SODAModuleOp op) {
+  p << op.getOperationName() << ' ';
+  p.printSymbolName(op.getName());
+  p.printOptionalAttrDictWithKeyword(op.getAttrs(),
+                                     {SymbolTable::getSymbolAttrName()});
+  p.printRegion(op.getOperation()->getRegion(0), /*printEntryBlockArgs=*/false,
+                /*printBlockTerminators=*/false);
+}
+
+static ParseResult parseAsyncDependencies(
+    OpAsmParser &parser, Type &asyncTokenType,
+    SmallVectorImpl<OpAsmParser::OperandType> &asyncDependencies) {
+  auto loc = parser.getCurrentLocation();
+  if (succeeded(parser.parseOptionalKeyword("async"))) {
+    if (parser.getNumResults() == 0)
+      return parser.emitError(loc, "needs to be named when marked 'async'");
+    asyncTokenType = parser.getBuilder().getType<AsyncTokenType>();
+  }
+  return parser.parseOperandList(asyncDependencies,
+                                 OpAsmParser::Delimiter::OptionalSquare);
+}
+
+static void printAsyncDependencies(OpAsmPrinter &printer, Operation *op,
+                                  Type asyncTokenType,
+                                  OperandRange asyncDependencies) {
+  if (asyncTokenType)
+    printer << "async ";
+  if (asyncDependencies.empty())
+    return;
+  printer << '[';
+  llvm::interleaveComma(asyncDependencies, printer);
+  printer << ']';
+}
 
 // TODO(NICO): Add implementations
 // #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
