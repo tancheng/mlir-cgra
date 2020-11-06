@@ -26,12 +26,97 @@
 
 using namespace mlir;
 
+// TODO(NICO): remove
+template <typename OpTy>
+static void createForAllDimensions(OpBuilder &builder, Location loc,
+                                   SmallVectorImpl<Value> &values) {
+  for (StringRef dim : {"x", "y", "z"}) {
+    Value v = builder.create<OpTy>(loc, builder.getIndexType(),
+                                   builder.getStringAttr(dim));
+    values.push_back(v);
+  }
+}
+
+// TODO(NICO): remove
+/// Adds operations generating block/thread ids and grid/block dimensions at the
+/// beginning of the `launchFuncOpBody` region. Add mapping from argument in
+/// entry block of `launchOpBody`, to the corresponding result value of the
+/// added operations.
+static void injectSodaIndexOperations(Location loc, Region &launchFuncOpBody,
+                                     Region &launchOpBody,
+                                     BlockAndValueMapping &map) {
+  OpBuilder builder(loc->getContext());
+  Block &firstBlock = launchOpBody.front();
+  builder.setInsertionPointToStart(&launchFuncOpBody.front());
+  SmallVector<Value, 12> indexOps;
+  createForAllDimensions<soda::BlockIdOp>(builder, loc, indexOps);
+  createForAllDimensions<soda::ThreadIdOp>(builder, loc, indexOps);
+  createForAllDimensions<soda::GridDimOp>(builder, loc, indexOps);
+  createForAllDimensions<soda::BlockDimOp>(builder, loc, indexOps);
+  // Replace the leading 12 function args with the respective thread/block index
+  // operations. Iterate backwards since args are erased and indices change.
+  for (auto indexOp : enumerate(indexOps))
+    map.map(firstBlock.getArgument(indexOp.index()), indexOp.value());
+}
+
 /// Outline the `soda.launch` operation body into a kernel function. Replace
 /// `soda.terminator` operations by `soda.return` in the generated function.
 static soda::SODAFuncOp
 outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
                       llvm::SetVector<Value> &operands) {
-  // TODO!
+  Location loc = launchOp.getLoc();
+  // Create a builder with no insertion point, insertion will happen separately
+  // due to symbol table manipulation
+  OpBuilder builder(launchOp.getContext());
+  // Contains the region of code that will be outlined
+  Region &launchOpBody = launchOp.body();
+
+  // Identify uses from values defined outside of the scope of the launch
+  // operation.
+  getUsedValuesDefinedAbove(launchOpBody, operands);
+
+  // Create the soda.func operation.
+  SmallVector<Type, 4> kernelOperandTypes;
+  kernelOperandTypes.reserve(operands.size());
+  for (Value operand : operands) {
+    kernelOperandTypes.push_back(operand.getType());
+  }
+  FunctionType type = 
+    FunctionType::get(kernelOperandTypes, {}, launchOp.getContext());
+  auto outlinedFunc = builder.create<soda::SODAFuncOp>(loc, kernelFnName, type);
+  outlinedFunc.setAttr(soda::SODADialect::getKernelFuncAttrName(),
+                       builder.getUnitAttr());
+  BlockAndValueMapping map;
+
+  // TODO(NICO): remove this part
+  // Map the arguments corresponding to the launch parameter like blockIdx, threadIdx, etc.
+  Region &outlinedFuncBody = outlinedFunc.body();
+  injectSodaIndexOperations(loc, outlinedFuncBody, launchOpBody, map);
+
+  // Map arguments from soda.launch region to the argument of the soda.func
+  // operation.
+  Block &entryBlock = outlinedFuncBody.front();
+  for (auto operand : enumerate(operands))
+    map.map(operand.value(), entryBlock.getArgument(operand.index()));
+
+  // Clone the region of the soda.launch operation into the soda.func operation.
+  // TODO: If cloneInto can be modified such that if a mapping for a block
+  // exists, that block will be used to clone operations into (at the end of the
+  // block), instead of creating a new block this would be much cleaner.
+  launchOpBody.cloneInto(&outlinedFuncBody,map);
+
+  // Branch from entry of the soda.func operation to the block that is cloned
+  // from the entry block of the gpu.launch operation
+  Block &launchOpEntry = launchOpBody.front();
+  Block *clonedLaunchOpEntry = map.lookup(&launchOpEntry);
+  builder.setInsertionPointToEnd(&entryBlock);
+
+  outlinedFunc.walk([](soda::TerminatorOp op) {
+    OpBuilder replacer(op);
+    replacer.create<soda::ReturnOp>(op.getLoc());
+    op.erase();
+  });
+  return outlinedFunc;
 }
 
 soda::SODAFuncOp
