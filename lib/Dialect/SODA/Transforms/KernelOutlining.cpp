@@ -189,6 +189,7 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
   Block &launchOpEntry = launchOpBody.front();
   Block *clonedLaunchOpEntry = map.lookup(&launchOpEntry);
   builder.setInsertionPointToEnd(&entryBlock);
+  builder.create<BranchOp>(loc, clonedLaunchOpEntry);
 
   outlinedFunc.walk([](soda::TerminatorOp op) {
     OpBuilder replacer(op);
