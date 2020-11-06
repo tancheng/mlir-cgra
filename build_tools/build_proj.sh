@@ -49,7 +49,8 @@ set -x
 cmake -GNinja \
   "-H$MY_SOURCE_DIR" \
   "-B$MY_BUILD_DIR" \
-    -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
-    -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
+  -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir
 
 cmake --build "$MY_BUILD_DIR" --target check-soda
