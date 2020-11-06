@@ -59,6 +59,85 @@ static void injectSodaIndexOperations(Location loc, Region &launchFuncOpBody,
     map.map(firstBlock.getArgument(indexOp.index()), indexOp.value());
 }
 
+/// Identifies operations that are beneficial to sink into kernels. These
+/// operations may not have side-effects, as otherwise sinking (and hence
+/// duplicating them) is not legal.
+static bool isSinkingBeneficiary(Operation *op) {
+  return isa<ConstantOp, DimOp, SelectOp, CmpIOp>(op);
+}
+
+/// For a given operation `op`, computes whether it is beneficial to sink the
+/// operation into the kernel. An operation can be sunk if doing so does not
+/// introduce new kernel arguments. Whether a value is already available in the
+/// kernel (and hence does not introduce new arguments) is checked by
+/// querying `existingDependencies` and `availableValues`.
+/// If an operand is not yet available, we recursively check whether it can be
+/// made available by siking its defining op.
+/// Operations that are indentified for sinking are added to `beneficiaryOps` in
+/// the order they should appear in the kernel. Furthermore, `availableValues`
+/// is updated with results that will be available after sinking the identified
+/// ops.
+static bool
+extractBeneficiaryOps(Operation *op,
+                      llvm::SetVector<Value> existingDependencies,
+                      llvm::SetVector<Operation *> &beneficiaryOps,
+                      llvm::SmallPtrSetImpl<Value> &availableValues) {
+  if (beneficiaryOps.count(op))
+    return true;
+
+  if (!isSinkingBeneficiary(op))
+    return false;
+
+  for (Value operand : op->getOperands()) {
+    // It is already visible in the kernel, keep going.
+    if (availableValues.count(operand))
+      continue;
+    // Else check whether it can be made available via sinking or already is a
+    // dependency.
+    Operation *definingOp = operand.getDefiningOp();
+    if ((!definingOp ||
+         !extractBeneficiaryOps(definingOp, existingDependencies,
+                                beneficiaryOps, availableValues)) &&
+        !existingDependencies.count(operand))
+      return false;
+  }
+  // We will sink the operation, mark its results as now available.
+  beneficiaryOps.insert(op);
+  for (Value result: op->getResults())
+    availableValues.insert(result);
+  return true;
+}
+
+LogicalResult mlir::sinkOperationsIntoLaunchOp(soda::LaunchOp launchOp) {
+  Region &launchOpBody = launchOp.body();
+
+  // Identify uses from values defined outside of the scope of the launch
+  // operation.
+  llvm::SetVector<Value> sinkCandidates;
+  getUsedValuesDefinedAbove(launchOpBody, sinkCandidates);
+
+  llvm::SetVector<Operation *> toBeSunk;
+  llvm::SmallPtrSet<Value, 4> availableValues;
+  for(Value operand : sinkCandidates) {
+    Operation *operandOp = operand.getDefiningOp();
+    if (!operandOp)
+      continue;
+    extractBeneficiaryOps(operandOp, sinkCandidates, toBeSunk, availableValues);
+  }
+
+  // Insert operations so that the defs get cloned before uses.
+  BlockAndValueMapping map;
+  OpBuilder builder(launchOpBody);
+  for (Operation *op : toBeSunk) {
+    Operation *clonedOp = builder.clone(*op, map);
+    // Only replace uses within the launch op.
+    for (auto pair : llvm::zip(op->getResults(), clonedOp->getResults()))
+      replaceAllUsesInRegionWith(std::get<0>(pair), std::get<1>(pair),
+                                 launchOp.body());
+  }
+  return success();
+}
+
 /// Outline the `soda.launch` operation body into a kernel function. Replace
 /// `soda.terminator` operations by `soda.return` in the generated function.
 static soda::SODAFuncOp
