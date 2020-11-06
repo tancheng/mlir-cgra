@@ -19,7 +19,7 @@ include "mlir/Pass/PassBase.td"
 
 def SodaKernelOutlining : Pass<"soda-kernel-outlining", "ModuleOp"> {
   let summary = "Outline soda.launch bodies to kernel functions";
-  let constructor = "mlir::createSodaKernelOutliningPass()";
+  let constructor = "mlir::soda::createSodaKernelOutliningPass()";
 }
 
 #endif // MLIR_DIALECT_SODA_PASSES

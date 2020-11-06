@@ -43,8 +43,8 @@ static void createForAllDimensions(OpBuilder &builder, Location loc,
 /// entry block of `launchOpBody`, to the corresponding result value of the
 /// added operations.
 static void injectSodaIndexOperations(Location loc, Region &launchFuncOpBody,
-                                     Region &launchOpBody,
-                                     BlockAndValueMapping &map) {
+                                      Region &launchOpBody,
+                                      BlockAndValueMapping &map) {
   OpBuilder builder(loc->getContext());
   Block &firstBlock = launchOpBody.front();
   builder.setInsertionPointToStart(&launchFuncOpBody.front());
@@ -103,7 +103,7 @@ extractBeneficiaryOps(Operation *op,
   }
   // We will sink the operation, mark its results as now available.
   beneficiaryOps.insert(op);
-  for (Value result: op->getResults())
+  for (Value result : op->getResults())
     availableValues.insert(result);
   return true;
 }
@@ -118,7 +118,7 @@ LogicalResult mlir::sinkOperationsIntoLaunchOp(soda::LaunchOp launchOp) {
 
   llvm::SetVector<Operation *> toBeSunk;
   llvm::SmallPtrSet<Value, 4> availableValues;
-  for(Value operand : sinkCandidates) {
+  for (Value operand : sinkCandidates) {
     Operation *operandOp = operand.getDefiningOp();
     if (!operandOp)
       continue;
@@ -160,15 +160,16 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
   for (Value operand : operands) {
     kernelOperandTypes.push_back(operand.getType());
   }
-  FunctionType type = 
-    FunctionType::get(kernelOperandTypes, {}, launchOp.getContext());
+  FunctionType type =
+      FunctionType::get(kernelOperandTypes, {}, launchOp.getContext());
   auto outlinedFunc = builder.create<soda::SODAFuncOp>(loc, kernelFnName, type);
   outlinedFunc.setAttr(soda::SODADialect::getKernelFuncAttrName(),
                        builder.getUnitAttr());
   BlockAndValueMapping map;
 
   // TODO(NICO): remove this part
-  // Map the arguments corresponding to the launch parameter like blockIdx, threadIdx, etc.
+  // Map the arguments corresponding to the launch parameter like blockIdx,
+  // threadIdx, etc.
   Region &outlinedFuncBody = outlinedFunc.body();
   injectSodaIndexOperations(loc, outlinedFuncBody, launchOpBody, map);
 
@@ -182,7 +183,7 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
   // TODO: If cloneInto can be modified such that if a mapping for a block
   // exists, that block will be used to clone operations into (at the end of the
   // block), instead of creating a new block this would be much cleaner.
-  launchOpBody.cloneInto(&outlinedFuncBody,map);
+  launchOpBody.cloneInto(&outlinedFuncBody, map);
 
   // Branch from entry of the soda.func operation to the block that is cloned
   // from the entry block of the gpu.launch operation
@@ -291,13 +292,34 @@ private:
                          soda::SODAModuleOp::getOperationName());
     soda::SODAModuleOp::build(builder, state, kernelFunc.getName());
     auto kernelModule = cast<soda::SODAModuleOp>(Operation::create(state));
-    // TODO!
+    SymbolTable symbolTable(kernelModule);
+    symbolTable.insert(kernelFunc);
+
+    SmallVector<Operation *, 8> symbolDefWorklist = {kernelFunc};
+    while (!symbolDefWorklist.empty()) {
+      if (Optional<SymbolTable::UseRange> symbolUses =
+              SymbolTable::getSymbolUses(symbolDefWorklist.pop_back_val())) {
+        for (SymbolTable::SymbolUse symbolUse : *symbolUses) {
+          StringRef symbolName =
+              symbolUse.getSymbolRef().cast<FlatSymbolRefAttr>().getValue();
+          if (symbolTable.lookup(symbolName))
+            continue;
+
+          Operation *symbolDefClone =
+              parentSymbolTable.lookup(symbolName)->clone();
+          symbolDefWorklist.push_back(symbolDefClone);
+          symbolTable.insert(symbolDefClone);
+        }
+      }
+    }
+
     return kernelModule;
   }
 };
 
 } // namespace
 
-std::unique_ptr<OperationPass<ModuleOp>> mlir::createSodaKernelOutliningPass() {
+std::unique_ptr<OperationPass<ModuleOp>>
+mlir::soda::createSodaKernelOutliningPass() {
   return std::make_unique<SodaKernelOutliningPass>();
 }

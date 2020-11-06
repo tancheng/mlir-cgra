@@ -18,6 +18,7 @@
 #include "mlir/Pass/Pass.h"
 
 namespace mlir {
+namespace soda {
 std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelOutliningPass();
 
 /// Collect a set of patterns to rewrite all-reduce ops within the SODA dialect.
@@ -38,6 +39,7 @@ inline void populateSodaRewritePatterns(MLIRContext *context,
 #define GEN_PASS_REGISTRATION
 #include "soda/Dialect/SODA/Passes.h.inc"
 
+} // namespace soda
 } // namespace mlir
 
 #endif // MLIR_DIALECT_SODA_PASSES_H_

@@ -275,7 +275,7 @@ static LogicalResult verify(LaunchOp op) {
   }
 
   // Block terminators without successors are expected to exit the kernel region
-  // and must be `soda.terminal`.
+  // and must be `soda.terminator`.
   for (Block &block : op.body()) {
     if (block.empty())
       continue;
