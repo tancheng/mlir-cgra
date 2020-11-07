@@ -26,39 +26,6 @@
 
 using namespace mlir;
 
-// TODO(NICO): remove
-template <typename OpTy>
-static void createForAllDimensions(OpBuilder &builder, Location loc,
-                                   SmallVectorImpl<Value> &values) {
-  for (StringRef dim : {"x", "y", "z"}) {
-    Value v = builder.create<OpTy>(loc, builder.getIndexType(),
-                                   builder.getStringAttr(dim));
-    values.push_back(v);
-  }
-}
-
-// TODO(NICO): remove
-/// Adds operations generating block/thread ids and grid/block dimensions at the
-/// beginning of the `launchFuncOpBody` region. Add mapping from argument in
-/// entry block of `launchOpBody`, to the corresponding result value of the
-/// added operations.
-static void injectSodaIndexOperations(Location loc, Region &launchFuncOpBody,
-                                      Region &launchOpBody,
-                                      BlockAndValueMapping &map) {
-  OpBuilder builder(loc->getContext());
-  Block &firstBlock = launchOpBody.front();
-  builder.setInsertionPointToStart(&launchFuncOpBody.front());
-  SmallVector<Value, 12> indexOps;
-  createForAllDimensions<soda::BlockIdOp>(builder, loc, indexOps);
-  createForAllDimensions<soda::ThreadIdOp>(builder, loc, indexOps);
-  createForAllDimensions<soda::GridDimOp>(builder, loc, indexOps);
-  createForAllDimensions<soda::BlockDimOp>(builder, loc, indexOps);
-  // Replace the leading 12 function args with the respective thread/block index
-  // operations. Iterate backwards since args are erased and indices change.
-  for (auto indexOp : enumerate(indexOps))
-    map.map(firstBlock.getArgument(indexOp.index()), indexOp.value());
-}
-
 /// Identifies operations that are beneficial to sink into kernels. These
 /// operations may not have side-effects, as otherwise sinking (and hence
 /// duplicating them) is not legal.
@@ -167,11 +134,10 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
                        builder.getUnitAttr());
   BlockAndValueMapping map;
 
-  // TODO(NICO): remove this part
   // Map the arguments corresponding to the launch parameter like blockIdx,
   // threadIdx, etc.
   Region &outlinedFuncBody = outlinedFunc.body();
-  injectSodaIndexOperations(loc, outlinedFuncBody, launchOpBody, map);
+  // This is a good area to add preamble operations
 
   // Map arguments from soda.launch region to the argument of the soda.func
   // operation.
@@ -221,9 +187,7 @@ static void convertToLaunchFuncOp(soda::LaunchOp launchOp,
                                   soda::SODAFuncOp kernelFunc,
                                   ValueRange operands) {
   OpBuilder builder(launchOp);
-  builder.create<soda::LaunchFuncOp>(
-      launchOp.getLoc(), kernelFunc, launchOp.getGridSizeOperandValues(),
-      launchOp.getBlockSizeOperandValues(), operands);
+  builder.create<soda::LaunchFuncOp>(launchOp.getLoc(), kernelFunc, operands);
   launchOp.erase();
 }
 

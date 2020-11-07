@@ -146,45 +146,6 @@ static LogicalResult verifyIndexOp(T op) {
   return success();
 }
 
-static LogicalResult verifyShuffleOp(soda::ShuffleOp shuffleOp) {
-  auto type = shuffleOp.value().getType();
-  if (shuffleOp.result().getType() != type) {
-    return shuffleOp.emitOpError()
-           << "requires the same type for value operand and result";
-  }
-  if (!type.isSignlessIntOrFloat() || type.getIntOrFloatBitWidth() != 32) {
-    return shuffleOp.emitOpError()
-           << "requires value operand type to be f32 or i32";
-  }
-  return success();
-}
-
-static void printShuffleOp(OpAsmPrinter &p, ShuffleOp op) {
-  p << ShuffleOp::getOperationName() << ' ' << op.getOperands() << ' '
-    << op.mode() << " : " << op.value().getType();
-}
-
-static ParseResult parseShuffleOp(OpAsmParser &parser, OperationState &state) {
-  SmallVector<OpAsmParser::OperandType, 3> operandInfo;
-  if (parser.parseOperandList(operandInfo, 3))
-    return failure();
-
-  StringRef mode;
-  if (parser.parseKeyword(&mode))
-    return failure();
-  state.addAttribute("mode", parser.getBuilder().getStringAttr(mode));
-
-  Type valueType;
-  Type int32Type = parser.getBuilder().getIntegerType(32);
-  Type int1Type = parser.getBuilder().getI1Type();
-  if (parser.parseColonType(valueType) ||
-      parser.resolveOperands(operandInfo, {valueType, int32Type, int32Type},
-                             parser.getCurrentLocation(), state.operands) ||
-      parser.addTypesToList({valueType, int1Type}, state.types))
-    return failure();
-  return success();
-}
-
 //===----------------------------------------------------------------------===//
 // AsyncOpInterface
 //===----------------------------------------------------------------------===//
@@ -209,16 +170,14 @@ void soda::addAsyncDependency(Operation *op, Value token) {
 // LaunchOp
 //===----------------------------------------------------------------------===//
 
-// TODO(NICO): remove gpu meta information
-void LaunchOp::build(OpBuilder &builder, OperationState &result,
-                     Value gridSizeX, Value gridSizeY, Value gridSizeZ,
-                     Value blockSizeX, Value blockSizeY, Value blockSizeZ) {
+void LaunchOp::build(OpBuilder &builder, OperationState &result
 
-  // Add grid and block sizes as op operands, followed by the data operands.
-  result.addOperands(
-      {gridSizeX, gridSizeY, gridSizeZ, blockSizeX, blockSizeY, blockSizeZ});
+) {
 
-  // TODO(NICO): modify kNumConfigRegionAttributes
+  // Add the data operands.
+
+  // This is a good area to add static operands.
+
   // Create a kernel body region with kNumConfigRegionAttributes + N arguments,
   // where the first kNumConfigRegionAttributes arguments have `index` type and
   // the rest have the same types as the data operands.
@@ -229,50 +188,16 @@ void LaunchOp::build(OpBuilder &builder, OperationState &result,
   kernelRegion->push_back(body);
 }
 
-// TODO(NICO): remove all these calls, from here
-KernelDim3 LaunchOp::getBlockIds() {
-  assert(!body().empty() && "LaunchOp body must not be empty.");
-  auto args = body().getArguments();
-  return KernelDim3{args[0], args[1], args[2]};
-}
-
-KernelDim3 LaunchOp::getThreadIds() {
-  assert(!body().empty() && "LaunchOp body must not be empty.");
-  auto args = body().getArguments();
-  return KernelDim3{args[3], args[4], args[5]};
-}
-
-KernelDim3 LaunchOp::getGridSize() {
-  assert(!body().empty() && "LaunchOp body must not be empty.");
-  auto args = body().getArguments();
-  return KernelDim3{args[6], args[7], args[8]};
-}
-
-KernelDim3 LaunchOp::getBlockSize() {
-  assert(!body().empty() && "LaunchOp body must not be empty.");
-  auto args = body().getArguments();
-  return KernelDim3{args[9], args[10], args[11]};
-}
-
-KernelDim3 LaunchOp::getGridSizeOperandValues() {
-  return KernelDim3{getOperand(0), getOperand(1), getOperand(2)};
-}
-
-KernelDim3 LaunchOp::getBlockSizeOperandValues() {
-  return KernelDim3{getOperand(3), getOperand(4), getOperand(5)};
-}
-// TODO(NICO): remove all these calls, until here
-
-// TODO(NICO) modify to suport other kind of arguments/attributes
 static LogicalResult verify(LaunchOp op) {
-  // Kernel launch takes KNumConfigOperands leading operands for grid/block
-  // sizes and transforms them into kNumConfigRegionAttributes region arguments
-  // for block/thread identifiers and grid/block sizes.
-  if (!op.body().empty()) {
-    if (op.body().getNumArguments() !=
-        LaunchOp::kNumConfigOperands + op.getNumOperands())
-      return op.emitOpError("unexpected number of region arguments");
-  }
+  //  Include this code if Kernel launch takes KNumConfigOperands leading
+  //  operands for grid/block sizes and transforms them into
+  //  kNumConfigRegionAttributes region arguments for block/thread identifiers
+  //  and grid/block sizes.
+  // if (!op.body().empty()) {
+  //   if (op.body().getNumArguments() !=
+  //       LaunchOp::kNumConfigOperands + op.getNumOperands())
+  //     return op.emitOpError("unexpected number of region arguments");
+  // }
 
   // Block terminators without successors are expected to exit the kernel region
   // and must be `soda.terminator`.
@@ -294,100 +219,23 @@ static LogicalResult verify(LaunchOp op) {
   return success();
 }
 
-// TODO(NICO): remove
-// Pretty-print the kernel grid/block size assignment as
-//   (%iter-x, %iter-y, %iter-z) in
-//   (%size-x = %ssa-use, %size-y = %ssa-use, %size-z = %ssa-use)
-// where %size-* and %iter-* will correspond to the body region arguments.
-static void printSizeAssignment(OpAsmPrinter &p, KernelDim3 size,
-                                KernelDim3 operands, KernelDim3 ids) {
-  p << '(' << ids.x << ", " << ids.y << ", " << ids.z << ") in (";
-  p << size.x << " = " << operands.x << ", ";
-  p << size.y << " = " << operands.y << ", ";
-  p << size.z << " = " << operands.z << ')';
-}
-
 static void printLaunchOp(OpAsmPrinter &p, LaunchOp op) {
   // Print the launch configuration.
-  // TODO(NICO): modify, remove blocks/threads info
-  p << LaunchOp::getOperationName() << ' ' << op.getBlocksKeyword();
-  printSizeAssignment(p, op.getGridSize(), op.getGridSizeOperandValues(),
-                      op.getBlockIds());
-  p << ' ' << op.getThreadsKeyword();
-  printSizeAssignment(p, op.getBlockSize(), op.getBlockSizeOperandValues(),
-                      op.getThreadIds());
+  p << LaunchOp::getOperationName();
 
   p.printRegion(op.body(), /*printEntryBlockArgs=*/false);
   p.printOptionalAttrDict(op.getAttrs());
 }
 
-// Parse the size assignment blocks for blocks and threads.  These have the form
-//   (%region_arg, %region_arg, %region_arg) in
-//   (%region_arg = %operand, %region_arg = %operand, %region_arg = %operand)
-// where %region_arg are percent-identifiers for the region arguments to be
-// introduced further (SSA defs), and %operand are percent-identifiers for the
-// SSA value uses.
-static ParseResult
-parseSizeAssignment(OpAsmParser &parser,
-                    MutableArrayRef<OpAsmParser::OperandType> sizes,
-                    MutableArrayRef<OpAsmParser::OperandType> regionSizes,
-                    MutableArrayRef<OpAsmParser::OperandType> indices) {
-  // TODO(NICO): modify, probably not using this info
-  assert(indices.size() == 3 && "space for three indices expected");
-  SmallVector<OpAsmParser::OperandType, 3> args;
-  if (parser.parseRegionArgumentList(args, /*requiredOperandCount=*/3,
-                                     OpAsmParser::Delimiter::Paren) ||
-      parser.parseKeyword("in") || parser.parseLParen())
-    return failure();
-  std::move(args.begin(), args.end(), indices.begin());
-
-  for (int i = 0; i < 3; ++i) {
-    if (i != 0 && parser.parseComma())
-      return failure();
-    if (parser.parseRegionArgument(regionSizes[i]) || parser.parseEqual() ||
-        parser.parseOperand(sizes[i]))
-      return failure();
-  }
-
-  return parser.parseRParen();
-}
-
-// TODO(NICO): skip blocks/threads dependency
 // Parses a Launch operation.
-// operation ::= `gpu.launch` `blocks` `(` ssa-id-list `)` `in` ssa-reassignment
-//                           `threads` `(` ssa-id-list `)` `in` ssa-reassignment
-//                            region attr-dict?
+// operation ::= `gpu.launch` region attr-dict?
 // ssa-reassignment ::= `(` ssa-id `=` ssa-use (`,` ssa-id `=` ssa-use)* `)`
 static ParseResult parseLaunchOp(OpAsmParser &parser, OperationState &result) {
-  // Sizes of the grid and block.
-  SmallVector<OpAsmParser::OperandType, LaunchOp::kNumConfigOperands> sizes(
-      LaunchOp::kNumConfigOperands);
-  MutableArrayRef<OpAsmParser::OperandType> sizesRef(sizes);
-
-  // Actual (data) operands passed to the kernel.
-  SmallVector<OpAsmParser::OperandType, 4> dataOperands;
 
   // Region arguments to be created.
   SmallVector<OpAsmParser::OperandType, 16> regionArgs(
       LaunchOp::kNumConfigRegionAttributes);
   MutableArrayRef<OpAsmParser::OperandType> regionArgsRef(regionArgs);
-
-  // Parse the size assignment segments: the first segment assigns grid sizes
-  // and defines values for block identifiers; the second segment assigns block
-  // sizes and defines values for thread identifiers.  In the region argument
-  // list, identifiers precede sizes, and block-related values precede
-  // thread-related values.
-  if (parser.parseKeyword(LaunchOp::getBlocksKeyword().data()) ||
-      parseSizeAssignment(parser, sizesRef.take_front(3),
-                          regionArgsRef.slice(6, 3),
-                          regionArgsRef.slice(0, 3)) ||
-      parser.parseKeyword(LaunchOp::getThreadsKeyword().data()) ||
-      parseSizeAssignment(parser, sizesRef.drop_front(3),
-                          regionArgsRef.slice(9, 3),
-                          regionArgsRef.slice(3, 3)) ||
-      parser.resolveOperands(sizes, parser.getBuilder().getIndexType(),
-                             result.operands))
-    return failure();
 
   // Introduce the body region and parse it. The region has
   // kNumConfigRegionAttributes arguments that correspond to
@@ -405,11 +253,10 @@ static ParseResult parseLaunchOp(OpAsmParser &parser, OperationState &result) {
 //===----------------------------------------------------------------------===//
 
 void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
-                         SODAFuncOp kernelFunc, KernelDim3 gridSize,
-                         KernelDim3 blockSize, ValueRange kernelOperands) {
-  // Add grid and block sizes as operands, followed by the data operands.
-  result.addOperands({gridSize.x, gridSize.y, gridSize.z, blockSize.x,
-                      blockSize.y, blockSize.z});
+                         SODAFuncOp kernelFunc, ValueRange kernelOperands) {
+  // This is a good area to add static operands.
+
+  // Add the data operands.
   result.addOperands(kernelOperands);
   auto kernelModule = kernelFunc.getParentOfType<SODAModuleOp>();
   auto kernelSymbol = builder.getSymbolRefAttr(
@@ -429,14 +276,6 @@ StringRef LaunchFuncOp::getKernelName() { return kernel().getLeafReference(); }
 
 Value LaunchFuncOp::getKernelOperand(unsigned i) {
   return getOperation()->getOperand(i + kNumConfigOperands);
-}
-
-KernelDim3 LaunchFuncOp::getGridSizeOperandValues() {
-  return KernelDim3{getOperand(0), getOperand(1), getOperand(2)};
-}
-
-KernelDim3 LaunchFuncOp::getBlockSizeOperandValues() {
-  return KernelDim3{getOperand(3), getOperand(4), getOperand(5)};
 }
 
 static LogicalResult verify(LaunchFuncOp op) {

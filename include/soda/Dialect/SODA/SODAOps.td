@@ -33,103 +33,6 @@ class SODA_IndexOp<string mnemonic, list<OpTrait> traits = []> :
   let verifier = [{ return ::verifyIndexOp(*this); }];
 }
 
-def SODA_BlockDimOp : SODA_IndexOp<"block_dim"> {
-  let description = [{
-    Returns the number of threads in the thread block (aka the block size) along
-    the x, y, or z `dimension`.
-
-    Example:
-
-    ```mlir
-    %bDimX = "soda.block_dim"() {dimension = "x"} : () -> (index)
-    ```
-  }];
-}
-def SODA_BlockIdOp : SODA_IndexOp<"block_id"> {
-  let description = [{
-    Returns the block id, i.e. the index of the current block within the grid
-    along the x, y, or z `dimension`.
-
-    Example:
-
-    ```mlir
-    %bIdY = "soda.block_id"() {dimension = "y"} : () -> (index)
-    ```
-  }];
-}
-def SODA_GridDimOp : SODA_IndexOp<"grid_dim"> {
-  let description = [{
-    Returns the number of thread blocks in the grid along the x, y, or z
-    `dimension`.
-
-    Example:
-
-    ```mlir
-    %gDimZ = "soda.grid_dim"() {dimension = "z"} : () -> (index)
-    ```
-  }];
-}
-def SODA_ThreadIdOp : SODA_IndexOp<"thread_id"> {
-  let description = [{
-    Returns the thread id, i.e. the index of the current thread within the block
-    along the x, y, or z `dimension`.
-
-    Example:
-
-    ```mlir
-    %tIdX = "soda.thread_id"() {dimension = "x"} : () -> (index)
-    ```
-  }];
-}
-
-def SODA_SubgroupIdOp : SODA_Op<"subgroup_id", [NoSideEffect]>,
-    Arguments<(ins)>, Results<(outs Index:$result)> {
-  let description = [{
-    Returns the subgroup id, i.e. the index of the current subgroup within the
-    workgroup.
-
-    Example:
-
-    ```mlir
-    %sgId = soda.subgroup_id : index
-    ```
-  }];
-
-  let assemblyFormat = "attr-dict `:` type($result)";
-  let verifier = [{ return success(); }];
-}
-
-def SODA_NumSubgroupsOp : SODA_Op<"num_subgroups", [NoSideEffect]>,
-    Arguments<(ins)>, Results<(outs Index:$result)> {
-  let description = [{
-    Returns the number of subgroups within a workgroup.
-
-    Example:
-
-    ```mlir
-    %numSg = soda.num_subgroups : index
-    ```
-  }];
-
-  let assemblyFormat = "attr-dict `:` type($result)";
-  let verifier = [{ return success(); }];
-}
-
-def SODA_SubgroupSizeOp : SODA_Op<"subgroup_size", [NoSideEffect]>,
-    Arguments<(ins)>, Results<(outs Index:$result)> {
-  let description = [{
-    Returns the number of threads within a subgroup.
-
-    Example:
-
-    ```mlir
-    %sgSz = soda.subgroup_size : index
-    ```
-  }];
-
-  let assemblyFormat = "attr-dict `:` type($result)";
-  let verifier = [{ return success(); }];
-}
 
 def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
                                     AutomaticAllocationScope, FunctionLike,
@@ -150,12 +53,8 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
 
     The operation has one attached region that corresponds to the body of the
     function. The region arguments consist of the function arguments without
-    modification, followed by buffers defined in memory annotations. The body of
-    a SODA function, when launched, is executed by multiple work items. There are
-    no guarantees on the order in which work items execute, or on the connection
-    between them. In particular, work items are not necessarily executed in
-    lock-step. Synchronization ops such as "soda.barrier" should be used to
-    coordinate work items. Declarations of SODA functions, i.e. not having the
+    modification, followed by buffers defined in memory annotations.
+    Declarations of SODA functions, i.e. not having the
     body region, are not supported.
 
     Syntax:
@@ -296,14 +195,12 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
 
 def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
     Arguments<(ins SymbolRefAttr:$kernel,
-               Index:$gridSizeX, Index:$gridSizeY, Index:$gridSizeZ,
-               Index:$blockSizeX, Index:$blockSizeY, Index:$blockSizeZ,
                Variadic<AnyType>:$operands)>,
     Results<(outs)> {
   let summary = "Launches a function as a SODA kernel";
 
   let description = [{
-    Launch a kernel function on the specified grid of thread blocks.
+    Launch a kernel function.
     `soda.launch` operations are lowered to `soda.launch_func` operations by
     outlining the kernel body into a function in a dedicated module, which
     reflects the separate compilation process. The kernel function is required
@@ -314,11 +211,12 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
     operation has a symbol attribute named `kernel` to identify the fully 
     specified kernel function to launch (both the soda.module and func).
 
-    The operation takes at least six operands, with the first three operands
-    being grid sizes along x,y,z dimensions and the following three being block
-    sizes along x,y,z dimensions. When a lower-dimensional kernel is required,
-    unused sizes must be explicitly set to `1`. The remaining operands are
-    passed as arguments to the kernel function.
+    The operands are
+    passed as arguments to the kernel function. 
+    
+    During outlining transformation, any variables needed by the kernel
+    function, that were created outside of the `soda.launch` operation are
+    transformed into arguments of the kernel function.
 
     Example:
 
@@ -330,34 +228,15 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
         func @kernel_1(%arg0 : f32, %arg1 : memref<?xf32, 1>)
             attributes { nvvm.kernel = true } {
 
-          // Operations that produce block/thread IDs and dimensions are
-          // injected when outlining the `soda.launch` body to a function called
-          // by `soda.launch_func`.
-          %tIdX = "soda.thread_id"() {dimension = "x"} : () -> (index)
-          %tIdY = "soda.thread_id"() {dimension = "y"} : () -> (index)
-          %tIdZ = "soda.thread_id"() {dimension = "z"} : () -> (index)
-
-          %bDimX = "soda.block_dim"() {dimension = "x"} : () -> (index)
-          %bDimY = "soda.block_dim"() {dimension = "y"} : () -> (index)
-          %bDimZ = "soda.block_dim"() {dimension = "z"} : () -> (index)
-
-          %bIdX = "soda.block_id"() {dimension = "x"} : () -> (index)
-          %bIdY = "soda.block_id"() {dimension = "y"} : () -> (index)
-          %bIdZ = "soda.block_id"() {dimension = "z"} : () -> (index)
-
-          %gDimX = "soda.grid_dim"() {dimension = "x"} : () -> (index)
-          %gDimY = "soda.grid_dim"() {dimension = "y"} : () -> (index)
-          %gDimZ = "soda.grid_dim"() {dimension = "z"} : () -> (index)
-
-          "some_op"(%bx, %tx) : (index, index) -> ()
-          %42 = load %arg1[%bx] : memref<?xf32, 1>
+          %idx0 = constant 1 : index
+          %idx1 = constant 2 : index
+          "some_op"(%idx0, idx1) : (index, index) -> ()
+          %42 = load %arg1[idx0] : memref<?xf32, 1>
         }
       }
 
       soda.launch_func
           @kernels::@kernel_1                          // Kernel function.
-          blocks in (%cst, %cst, %cst)                 // Grid size.
-          threads in (%cst, %cst, %cst)                // Block size.
           args(%arg0 : f32, %arg1 : memref<?xf32, 1>)  // Kernel arguments.
     }
     ```
@@ -366,8 +245,7 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilderDAG<(ins "SODAFuncOp":$kernelFunc, "KernelDim3":$gridSize,
-      "KernelDim3":$blockSize, "ValueRange":$kernelOperands)>
+    OpBuilderDAG<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands)>
   ];
 
   let extraClassDeclaration = [{
@@ -383,15 +261,10 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
     /// The i-th operand passed to the kernel function.
     Value getKernelOperand(unsigned i);
 
-    /// Get the SSA values passed as operands to specify the grid size.
-    KernelDim3 getGridSizeOperandValues();
-
-    /// Get the SSA values passed as operands to specify the block size.
-    KernelDim3 getBlockSizeOperandValues();
-
     /// The number of launch configuration operands, placed at the leading
     /// positions of the operand list.
-    static constexpr unsigned kNumConfigOperands = 6;
+    /// Parameter inherited from GPU dialect.
+    static constexpr unsigned kNumConfigOperands = 0;
 
     // This needs to quietly verify if attributes with names defined below are
     // present since it is run before the verifier of this op.
@@ -405,78 +278,39 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
   let verifier = [{ return ::verify(*this); }];
   let assemblyFormat = [{
       $kernel
-      `blocks` `in` ` ` `(`$gridSizeX`,` $gridSizeY`,` $gridSizeZ`)`
-      `threads` `in` ` ` `(`$blockSizeX`,` $blockSizeY`,` $blockSizeZ`)`
       custom<LaunchFuncOperands>($operands, type($operands))
       attr-dict
   }];
 }
 
 def SODA_LaunchOp : SODA_Op<"launch">,
-    Arguments<(ins Index:$gridSizeX, Index:$gridSizeY, Index:$gridSizeZ,
-               Index:$blockSizeX, Index:$blockSizeY, Index:$blockSizeZ)>,
+    Arguments<(ins)>,
     Results<(outs)> {
   let summary = "SODA kernel launch operation";
 
   let description = [{
-    Launch a kernel on the specified grid of thread blocks. The body of the
-    kernel is defined by the single region that this operation contains. The
-    operation takes six operands, with first three operands being grid sizes
-    along x,y,z dimensions and the following three arguments being block sizes
-    along x,y,z dimension. When a lower-dimensional kernel is required,
-    unused sizes must be explicitly set to `1`.
-
-    The body region has _twelve_ arguments, grouped as follows:
-
-    -   three arguments that contain block identifiers along x,y,z dimensions;
-    -   three arguments that contain thread identifiers along x,y,z dimensions;
-    -   operands of the `soda.launch` operation as is (i.e. the operands for
-        grid and block sizes).
+    Launch a kernel. The body of the kernel is defined by the single region
+    that this operation contains.
 
     Syntax:
 
     ```
-    operation ::= `soda.launch` `block` `(` ssa-id-list `)` `in` ssa-reassignment
-                             `threads` `(` ssa-id-list `)` `in` ssa-reassignment
-                               region attr-dict?
+    operation ::= `soda.launch` region attr-dict?
     ssa-reassignment ::= `(` ssa-id `=` ssa-use (`,` ssa-id `=` ssa-use)* `)`
     ```
 
     Example:
 
+    // TODO
+
     ```mlir
-    soda.launch blocks(%bx, %by, %bz) in (%sz_bx = %0, %sz_by = %1, %sz_bz = %2)
-               threads(%tx, %ty, %tz) in (%sz_tx = %3, %sz_ty = %4, %sz_tz = %5) {
-      // Block and thread identifiers, as well as block/grid sizes are
-      // immediately usable inside body region.
+    soda.launch {
       "some_op"(%bx, %tx) : (index, index) -> ()
       // Assuming %val1 is defined outside the soda.launch region.
       %42 = load %val1[%bx] : memref<?xf32, 1>
     }
-
-    // Generic syntax explains how the pretty syntax maps to the IR structure.
-    "soda.launch"(%cst, %cst, %c1,  // Grid sizes.
-                 %cst, %c1, %c1)   // Block sizes.
-
-        {/*attributes*/}
-        // All sizes and identifiers have "index" size.
-        : (index, index, index, index, index, index) -> () {
-    // The operation passes block and thread identifiers, followed by grid and
-    // block sizes.
-    ^bb0(%bx : index, %by : index, %bz : index,
-         %tx : index, %ty : index, %tz : index,
-         %num_bx : index, %num_by : index, %num_bz : index,
-         %num_tx : index, %num_ty : index, %num_tz : index)
-      "some_op"(%bx, %tx) : (index, index) -> ()
-      %3 = "std.load"(%val1, %bx) : (memref<?xf32, 1>, index) -> f32
-    }
     ```
 
-    Rationale: using operation/block arguments gives analyses a clear way of
-    understanding that a value has additional semantics (e.g., we will need to
-    know what value corresponds to threadIdx.x for coalescing). We can recover
-    these properties by analyzing the operations producing values, but it is
-    easier just to have that information by construction.
   }];
 
   let regions = (region AnyRegion:$body);
@@ -484,37 +318,20 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilderDAG<(ins "Value":$gridSizeX, "Value":$gridSizeY,
-      "Value":$gridSizeZ, "Value":$blockSizeX, "Value":$blockSizeY,
-      "Value":$blockSizeZ)>
+    OpBuilderDAG<(ins)>
   ];
-
+  
   let extraClassDeclaration = [{
-    // TODO(NICO): Removed unecessary dcls
-    /// Get the SSA values corresponding to kernel block identifiers.
-    KernelDim3 getBlockIds();
-    /// Get the SSA values corresponding to kernel thread identifiers.
-    KernelDim3 getThreadIds();
-    /// Get the SSA values corresponding to kernel grid size.
-    KernelDim3 getGridSize();
-    /// Get the SSA values corresponding to kernel block size.
-    KernelDim3 getBlockSize();
-
-    /// Get the SSA values passed as operands to specify the grid size.
-    KernelDim3 getGridSizeOperandValues();
-    /// Get the SSA values passed as operands to specify the block size.
-    KernelDim3 getBlockSizeOperandValues();
-
-    static StringRef getBlocksKeyword() { return "blocks"; }
-    static StringRef getThreadsKeyword() { return "threads"; }
 
     /// The number of launch configuration operands, placed at the leading
     /// positions of the operand list.
-    static constexpr unsigned kNumConfigOperands = 6;
+    /// Legacy from copying GPU dialect.
+    static constexpr unsigned kNumConfigOperands = 0;
 
     /// The number of region attributes containing the launch configuration,
     /// placed in the leading positions of the argument list.
-    static constexpr unsigned kNumConfigRegionAttributes = 12;
+    /// Legacy from copying GPU dialect.
+    static constexpr unsigned kNumConfigRegionAttributes = 0;
   }];
 
   let parser = [{ return parseLaunchOp(parser, result); }];
@@ -568,46 +385,13 @@ def SODA_YieldOp : SODA_Op<"yield", [NoSideEffect, Terminator]>,
   }];
 }
 
-def SODA_ShuffleOpXor : StrEnumAttrCase<"xor">;
 
-def SODA_ShuffleModeAttr : StrEnumAttr<"ShuffleModeAttr",
-    "Indexing modes supported by soda.shuffle.",
-    [
-      SODA_ShuffleOpXor,
-    ]>;
-//TODO(NICO) - Remove arguments
-def SODA_ShuffleOp : SODA_Op<"shuffle", [NoSideEffect]>,
-    Arguments<(ins AnyType:$value, I32:$offset, I32:$width,
-               SODA_ShuffleModeAttr:$mode)>,
-    Results<(outs AnyType:$result, I1:$valid)> {
-  let summary = "Shuffles values within a subgroup.";
-  let description = [{
-    The "shuffle" op moves values to a different invocation within the same
-    subgroup.
-
-    Example:
-
-    ```mlir
-    %1, %2 = soda.shuffle %0, %offset, %width xor : f32
-    ```
-
-    For lane k returns the value from lane `k ^ offset` and `true` if that lane
-    is smaller than %width. Otherwise it returns an unspecified value and
-    `false`. A lane is the index of an invocation relative to its subgroup.
-
-    The width specifies the number of invocations that participate in the
-    shuffle. The width needs to be the same for all invocations that participate
-    in the shuffle. Exactly the first `width` invocations of a subgroup need to
-    execute this op in convergence.
-  }];
-  let verifier = [{ return ::verifyShuffleOp(*this); }];
-  let printer = [{ printShuffleOp(p, *this); }];
-  let parser = [{ return parseShuffleOp(parser, result); }];
-}
 
 def SODA_BarrierOp : SODA_Op<"barrier"> {
   let summary = "Synchronizes all work items of a workgroup.";
   let description = [{
+    TODO: Inherited from the GPU dialect. Maybe it will change in the future.
+
     The "barrier" op synchronizes all work items of a workgroup. It is used
     to coordinate communication between the work items of the workgroup.
 
@@ -629,17 +413,16 @@ def SODA_BarrierOp : SODA_Op<"barrier"> {
 }
 
 
-//TODO(NICO) - Single block
 def SODA_SODAModuleOp : SODA_Op<"module", [
   IsolatedFromAbove, SymbolTable, Symbol,
   SingleBlockImplicitTerminator<"ModuleEndOp">
 ]> {
   let summary = "A top level compilation unit to be run on a SODA enabled device.";
   let description = [{
-    SODA module contains code that is intended to be run on a SODA. A host
-    device can launch this code through a soda.launc_func that creates a
-    fully qualified symbol through the soda.module's symbol and a soda.func
-    symbol contained in the soda.module.
+    SODA module contains code that is intended to be run on a SODA enabled
+    device. A host device can launch this code through a soda.launc_func that
+    creates a fully qualified symbol through the soda.module's symbol and a
+    soda.func symbol contained in the soda.module.
 
     The module's top-level scope is modeled by a single region with a single
     block. SODA modules are required to have a name that is used for symbol
@@ -685,6 +468,8 @@ def SODA_HostRegisterOp : SODA_Op<"host_register">,
     Arguments<(ins AnyUnrankedMemRef:$value)> {
   let summary = "Registers a memref for access from device.";
   let description = [{
+    TODO: Inherited from the GPU dialect. Maybe it will change in the future.
+
     This op maps the provided host buffer into the device address space.
 
     This operation may not be supported in every environment, there is not yet a
@@ -702,6 +487,8 @@ def SODA_HostRegisterOp : SODA_Op<"host_register">,
 def SODA_WaitOp : SODA_Op<"wait", [SODA_AsyncOpInterface]> {
   let summary = "Wait for async soda ops to complete.";
   let description = [{
+    TODO: Inherited from the GPU dialect. Maybe it will change in the future.
+
     This op synchronizes the host or the device with a list of dependent ops.
 
     If the op contains the `async` keyword, it returns a new async token which

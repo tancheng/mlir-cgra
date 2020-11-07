@@ -40,15 +40,9 @@ def SODA_Dialect : Dialect {
     /// 'soda.kernel' attribute.
     static bool isKernel(Operation *op);
 
-    /// Returns the number of workgroup (thread, block) dimensions supported in
-    /// the SODA dialect.
-    // TODO: consider generalizing this.
-    //TODO(NICO): Remove
-    static unsigned getNumWorkgroupDimensions() { return 3; }
-
     /// Returns the numeric value used to identify the workgroup memory address
     /// space.
-    //TODO(NICO): Remove
+    // TODO: Inherited from the GPU dialect. Maybe it will change in the future.
     static unsigned getWorkgroupAddressSpace() { return 3; }
 
     /// Returns the numeric value used to identify the private memory address

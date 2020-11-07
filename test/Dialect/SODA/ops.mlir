@@ -4,9 +4,8 @@ module attributes {soda.container_module} {
 
   // CHECK-LABEL:func @no_args(%{{.*}}: index)
   func @no_args(%sz : index) {
-    // CHECK: soda.launch blocks(%{{.*}}, %{{.*}}, %{{.*}}) in (%{{.*}} = %{{.*}}, %{{.*}} = %{{.*}}, %{{.*}} = %{{.*}}) threads(%{{.*}}, %{{.*}}, %{{.*}}) in (%{{.*}} = %{{.*}}, %{{.*}} = %{{.*}}, %{{.*}} = %{{.*}})
-    soda.launch blocks(%bx, %by, %bz) in (%grid_x = %sz, %grid_y = %sz, %grid_z = %sz)
-               threads(%tx, %ty, %tz) in (%block_x = %sz, %block_y = %sz, %block_z = %sz) {
+    // CHECK: soda.launch
+    soda.launch {
       // CHECK: soda.terminator
       soda.terminator
     }
@@ -15,9 +14,8 @@ module attributes {soda.container_module} {
 
   // CHECK-LABEL:func @args(%{{.*}}: index, %{{.*}}: index, %{{.*}}: f32, %{{.*}}: memref<?xf32, 1>) {
   func @args(%blk : index, %thrd : index, %float : f32, %data : memref<?xf32,1>) {
-    // CHECK: soda.launch blocks(%{{.*}}, %{{.*}}, %{{.*}}) in (%{{.*}} = %{{.*}}, %{{.*}} = %{{.*}}, %{{.*}} = %{{.*}}) threads(%{{.*}}, %{{.*}}, %{{.*}}) in (%{{.*}} = %{{.*}}, %{{.*}} = %{{.*}}, %{{.*}} = %{{.*}})
-    soda.launch blocks(%bx, %by, %bz) in (%grid_x = %blk, %grid_y = %blk, %grid_z = %blk)
-               threads(%tx, %ty, %tz) in (%block_x = %thrd, %block_y = %thrd, %block_z = %thrd) {
+    // CHECK: soda.launch
+    soda.launch {
       "use"(%float) : (f32) -> ()
       "use"(%data) : (memref<?xf32,1>) -> ()
       // CHECK: soda.terminator
@@ -27,42 +25,23 @@ module attributes {soda.container_module} {
   }
 
   soda.module @kernels {
+    // CHECK: soda.func @kernel_1
     soda.func @kernel_1(%arg0 : f32, %arg1 : memref<?xf32, 1>) kernel {
-      %tIdX = "soda.thread_id"() {dimension = "x"} : () -> (index)
-      %tIdY = "soda.thread_id"() {dimension = "y"} : () -> (index)
-      %tIdZ = "soda.thread_id"() {dimension = "z"} : () -> (index)
 
-      %bDimX = "soda.block_dim"() {dimension = "x"} : () -> (index)
-      %bDimY = "soda.block_dim"() {dimension = "y"} : () -> (index)
-      %bDimZ = "soda.block_dim"() {dimension = "z"} : () -> (index)
-
-      %bIdX = "soda.block_id"() {dimension = "x"} : () -> (index)
-      %bIdY = "soda.block_id"() {dimension = "y"} : () -> (index)
-      %bIdZ = "soda.block_id"() {dimension = "z"} : () -> (index)
-
-      %gDimX = "soda.grid_dim"() {dimension = "x"} : () -> (index)
-      %gDimY = "soda.grid_dim"() {dimension = "y"} : () -> (index)
-      %gDimZ = "soda.grid_dim"() {dimension = "z"} : () -> (index)
-
-      %sgId = soda.subgroup_id : index
-      %numSg = soda.num_subgroups : index
-      %SgSi = soda.subgroup_size : index
-
+      %bIdX = constant 1 : index
       %one = constant 1.0 : f32
       %sum = "another_op"(%one) : (f32) -> (f32)
 
       %width = constant 7 : i32
       %offset = constant 3 : i32
-      // CHECK: soda.shuffle %{{.*}}, %{{.*}}, %{{.*}} xor : f32
-      %shfl, %pred = soda.shuffle %arg0, %offset, %width xor : f32
 
       "soda.barrier"() : () -> ()
 
-      "some_op"(%bIdX, %tIdX) : (index, index) -> ()
       %42 = load %arg1[%bIdX] : memref<?xf32, 1>
       soda.return
     }
 
+    // CHECK: soda.func @kernel_2
     soda.func @kernel_2() kernel {
       soda.return
     }
@@ -74,11 +53,11 @@ module attributes {soda.container_module} {
     // CHECK: %{{.*}} = constant 8
     %cst = constant 8 : index
 
-    // CHECK: soda.launch_func @kernels::@kernel_1 blocks in (%{{.*}}, %{{.*}}, %{{.*}}) threads in (%{{.*}}, %{{.*}}, %{{.*}}) args(%{{.*}} : f32, %{{.*}} : memref<?xf32, 1>)
-    soda.launch_func @kernels::@kernel_1 blocks in (%cst, %cst, %cst) threads in (%cst, %cst, %cst) args(%0 : f32, %1 : memref<?xf32, 1>)
+    // CHECK: soda.launch_func @kernels::@kernel_1 args(%{{.*}} : f32, %{{.*}} : memref<?xf32, 1>)
+    soda.launch_func @kernels::@kernel_1 args(%0 : f32, %1 : memref<?xf32, 1>)
 
-    // CHECK: soda.launch_func @kernels::@kernel_2 blocks in (%{{.*}}, %{{.*}}, %{{.*}}) threads in (%{{.*}}, %{{.*}}, %{{.*}})
-    soda.launch_func @kernels::@kernel_2 blocks in (%cst, %cst, %cst) threads in (%cst, %cst, %cst)
+    // CHECK: soda.launch_func @kernels::@kernel_2
+    soda.launch_func @kernels::@kernel_2
 
     return
   }
