@@ -5,6 +5,7 @@
 // CHECK: linalg
 // CHECK: llvm
 // CHECK: scf
+// CHECK: soda
 // CHECK: std
 // CHECK: vector
 // CHECKHELP: soda-test-opt-pipeline
