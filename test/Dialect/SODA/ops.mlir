@@ -52,12 +52,16 @@ module attributes {soda.container_module} {
     %1 = "op"() : () -> (memref<?xf32, 1>)
     // CHECK: %{{.*}} = constant 8
     %cst = constant 8 : index
+    %t0 = soda.wait async
 
     // CHECK: soda.launch_func @kernels::@kernel_1 args(%{{.*}} : f32, %{{.*}} : memref<?xf32, 1>)
     soda.launch_func @kernels::@kernel_1 args(%0 : f32, %1 : memref<?xf32, 1>)
 
     // CHECK: soda.launch_func @kernels::@kernel_2
     soda.launch_func @kernels::@kernel_2
+    
+    // CHECK: %{{.*}} = soda.launch_func async [%{{.*}}] @kernels::@kernel_2
+    %t1 = soda.launch_func async [%t0] @kernels::@kernel_2
 
     return
   }

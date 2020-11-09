@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 //
 // This header file defines prototypes that expose pass constructors.
-// 
+//
 // It was strongly inspired by the GPU dialect.
 //
 //===----------------------------------------------------------------------===//
@@ -19,15 +19,17 @@
 
 namespace mlir {
 namespace soda {
+
+/// Replaces `soda.launch` with `soda.launch_func` by moving the region into a
+/// separate kernel function.
 std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelOutliningPass();
 
-/// Collect a set of patterns to rewrite all-reduce ops within the SODA dialect.
-// void populateSodaAllReducePatterns(MLIRContext *context,
-//                                   OwningRewritePatternList &patterns);
+/// Rewrites a function region so that SODA ops execute async.
+std::unique_ptr<OperationPass<FuncOp>> createSodaAsyncRegionPass();
 
 /// Collect all patterns to rewrite ops within the SODA dialect.
 inline void populateSodaRewritePatterns(MLIRContext *context,
-                                       OwningRewritePatternList &patterns) {
+                                        OwningRewritePatternList &patterns) {
   // populateSodaAllReducePatterns(context, patterns);
 }
 

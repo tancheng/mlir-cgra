@@ -193,10 +193,12 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
   let parser = [{ return parseSODAFuncOp(parser, result); }];
 }
 
-def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
-    Arguments<(ins SymbolRefAttr:$kernel,
-               Variadic<AnyType>:$operands)>,
-    Results<(outs)> {
+def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
+                                                AttrSizedOperandSegments]>,
+    Arguments<(ins Variadic<SODA_AsyncToken>:$asyncDependencies,
+                   SymbolRefAttr:$kernel,
+                   Variadic<AnyType>:$operands)>,
+    Results<(outs Optional<SODA_AsyncToken>:$asyncToken)> {
   let summary = "Launches a function as a SODA kernel";
 
   let description = [{
@@ -211,8 +213,14 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
     operation has a symbol attribute named `kernel` to identify the fully 
     specified kernel function to launch (both the soda.module and func).
 
-    The operands are
-    passed as arguments to the kernel function. 
+    The `gpu.launch_func` supports async dependencies: the kernel does not
+    start executing until the ops that produce those async dependencies have
+    completed.
+
+    By the default, the host implicitly blocks until kernel execution has
+    completed. If the `async` keyword is present, the host does not block but
+    instead a `!gpu.async.token` is returned. Other async GPU ops can take this
+    token as dependency.
     
     During outlining transformation, any variables needed by the kernel
     function, that were created outside of the `soda.launch` operation are
@@ -238,6 +246,14 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
       soda.launch_func
           @kernels::@kernel_1                          // Kernel function.
           args(%arg0 : f32, %arg1 : memref<?xf32, 1>)  // Kernel arguments.
+      
+      %t0 = soda.wait async
+      soda.launch_func
+          async                           // (Optional) Don't block host, return token.
+          [%t0]                           // (Optional) Execute only after %t0 has completed.
+          @kernels::@kernel_1             // Kernel function.
+          args(%arg0 : f32,               // (Optional) Kernel arguments.
+               %arg1 : memref<?xf32, 1>)
     }
     ```
   }];
@@ -277,6 +293,7 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func">,
 
   let verifier = [{ return ::verify(*this); }];
   let assemblyFormat = [{
+      custom<AsyncDependencies>(type($asyncToken), $asyncDependencies)
       $kernel
       custom<LaunchFuncOperands>($operands, type($operands))
       attr-dict

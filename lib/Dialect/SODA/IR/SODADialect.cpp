@@ -262,10 +262,15 @@ void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
   auto kernelSymbol = builder.getSymbolRefAttr(
       kernelModule.getName(), {builder.getSymbolRefAttr(kernelFunc.getName())});
   result.addAttribute(getKernelAttrName(), kernelSymbol);
+  SmallVector<int32_t, 2> segmentSizes(2, 1);
+  segmentSizes.front() = 0; // Initially no async dependencies.
+  segmentSizes.back() = static_cast<int32_t>(kernelOperands.size());
+  result.addAttribute(getOperandSegmentSizeAttr(),
+                      builder.getI32VectorAttr(segmentSizes));
 }
 
 unsigned LaunchFuncOp::getNumKernelOperands() {
-  return getNumOperands() - kNumConfigOperands;
+  return getNumOperands() - asyncDependencies().size() - kNumConfigOperands;
 }
 
 StringRef LaunchFuncOp::getKernelModuleName() {
@@ -275,7 +280,7 @@ StringRef LaunchFuncOp::getKernelModuleName() {
 StringRef LaunchFuncOp::getKernelName() { return kernel().getLeafReference(); }
 
 Value LaunchFuncOp::getKernelOperand(unsigned i) {
-  return getOperation()->getOperand(i + kNumConfigOperands);
+  return getOperand(asyncDependencies().size() + kNumConfigOperands + i);
 }
 
 static LogicalResult verify(LaunchFuncOp op) {

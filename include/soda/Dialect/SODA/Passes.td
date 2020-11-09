@@ -22,4 +22,9 @@ def SodaKernelOutlining : Pass<"soda-kernel-outlining", "ModuleOp"> {
   let constructor = "mlir::soda::createSodaKernelOutliningPass()";
 }
 
+def SodaAsyncRegionPass : FunctionPass<"soda-async-region"> {
+  let summary = "Make SODA ops async.";
+  let constructor = "mlir::soda::createSodaAsyncRegionPass()";
+}
+
 #endif // MLIR_DIALECT_SODA_PASSES
