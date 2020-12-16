@@ -18,7 +18,7 @@ goal, `soda-opt` could later be merged into the main `llvm-project` codebase.
 This setup assumes that you have built LLVM and MLIR in `$BUILD_DIR` and
 installed it to `$PREFIX`. 
 The current version of the project was tested with `llvm-project` commit:
-`a41ea782c8e1273af4a39a647e41d6f0f42c3411`.
+`b7905e81fc3d7b045a5346442ce92ee87bdb7b21`.
 Make sure you have the correct commit checked-out.
 
 **Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM/MLIR 

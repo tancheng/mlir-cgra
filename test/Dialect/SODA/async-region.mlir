@@ -7,7 +7,7 @@ module attributes {soda.container_module} {
     soda.func @kernel() kernel { soda.return }
   }
 
-  func @foo() -> ()
+  func private @foo() -> ()
 
   // CHECK-LABEL:func @async(%{{.*}}: index)
   func @async(%sz : index) {
