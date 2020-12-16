@@ -65,7 +65,7 @@ cmake --build . --target mlir-doc
 
 ## How to use this project?
 
-After successfull build, available passes can be displayed with:
+After successful build, available passes can be displayed with:
 
 ```sh
 $PROJ_BUILD_DIR/bin/soda-opt -h
