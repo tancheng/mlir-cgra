@@ -22,12 +22,17 @@
 using namespace mlir;
 using namespace mlir::scf;
 
+//===----------------------------------------------------------------------===//
+// AffineToSODA
+//===----------------------------------------------------------------------===//
+
 namespace {
 // A pass that traverses top-level loops in the function and converts them to
 // SODA launch operations.  Nested launches are not allowed, so this does not
 // walk the function recursively to avoid considering nested loops.
-struct ForLoopMapper : public ConvertAffineForToSODABase<ForLoopMapper> {
-  ForLoopMapper() = default;
+struct AffineForLoopMapper
+    : public ConvertAffineForToSODABase<AffineForLoopMapper> {
+  AffineForLoopMapper() = default;
 
   void runOnFunction() override {
     for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
@@ -39,8 +44,32 @@ struct ForLoopMapper : public ConvertAffineForToSODABase<ForLoopMapper> {
   }
 };
 
+//===----------------------------------------------------------------------===//
+// SCFToSODA
+//===----------------------------------------------------------------------===//
+
+// A pass that traverses top-level loops in the function and converts them to
+// SODA launch operations.  Nested launches are not allowed, so this does not
+// walk the function recursively to avoid considering nested loops.
+struct SCFForLoopMapper : public ConvertSCFForToSODABase<SCFForLoopMapper> {
+  SCFForLoopMapper() = default;
+
+  void runOnFunction() override {
+    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+      if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
+        if (failed(convertSCFLoopNestToSODALaunch(forOp)))
+          signalPassFailure();
+      }
+    }
+  }
+};
+
 } // namespace
 
 std::unique_ptr<OperationPass<FuncOp>> mlir::createAffineForToSODAPass() {
-  return std::make_unique<ForLoopMapper>();
+  return std::make_unique<AffineForLoopMapper>();
+}
+
+std::unique_ptr<OperationPass<FuncOp>> mlir::createSCFForToSODAPass() {
+  return std::make_unique<SCFForLoopMapper>();
 }

@@ -1,4 +1,4 @@
-//===- SCFToSODA.h - Convert loop nests to SODA kernels -----------*- C++ -*-===//
+//===- SCFToSODA.h - Convert loop nests to SODA kernels ---------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -14,9 +14,17 @@ namespace mlir {
 class AffineForOp;
 struct LogicalResult;
 
+namespace scf {
+class ForOp;
+}
+
 /// Convert a perfect affine loop nest with the outermost loop identified by
 /// `forOp` into a soda::Launch operation.
 LogicalResult convertAffineLoopNestToSODALaunch(AffineForOp forOp);
+
+/// Convert a scf loop nest with the outermost loop identified by
+/// `forOp` into a soda::Launch operation.
+LogicalResult convertSCFLoopNestToSODALaunch(scf::ForOp forOp);
 
 } // namespace mlir
 

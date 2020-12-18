@@ -25,7 +25,10 @@ def ConvertAffineForToSODA : FunctionPass<"convert-affine-for-to-soda"> {
 // SCFToSODA
 //===----------------------------------------------------------------------===//
 
-// TODO
-
+def ConvertSCFForToSODA : FunctionPass<"convert-scf-for-to-soda"> {
+  let summary = "Convert top-level scf::for Ops to SODA kernels";
+  let constructor = "mlir::createSCFForToSODAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
 
 #endif // SODA_CONVERSION_PASSES
