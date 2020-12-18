@@ -31,4 +31,14 @@ def ConvertSCFForToSODA : FunctionPass<"convert-scf-for-to-soda"> {
   let dependentDialects = ["soda::SODADialect"];
 }
 
+//===----------------------------------------------------------------------===//
+// LinalgToSODA
+//===----------------------------------------------------------------------===//
+
+def ConvertLinalgMatmulToSODA : FunctionPass<"convert-linalg-matmul-to-soda"> {
+  let summary = "Convert top-level linalg::matmul Ops to SODA kernels";
+  let constructor = "mlir::createLinalgMatmulToSODAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
 #endif // SODA_CONVERSION_PASSES

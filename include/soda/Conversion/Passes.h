@@ -9,6 +9,7 @@
 #ifndef SODA_CONVERSION_PASSES_H
 #define SODA_CONVERSION_PASSES_H
 
+#include "soda/Conversion/KernelsToSODA/LinalgToSODAPass.h"
 #include "soda/Conversion/KernelsToSODA/SCFToSODAPass.h"
 
 namespace mlir {
