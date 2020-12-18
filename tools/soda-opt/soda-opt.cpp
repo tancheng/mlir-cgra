@@ -21,6 +21,7 @@
 
 #include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Dialect/SODA/Passes.h"
+#include "soda/Conversion/Passes.h"
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
@@ -68,6 +69,9 @@ int main(int argc, char **argv) {
   mlir::soda::registerTestPrintOpNestingPass();
   mlir::soda::registerSodaKernelOutliningPass();
   mlir::soda::registerSodaAsyncRegionPassPass();
+
+  // Outlining passes
+  mlir::soda::registerConvertAffineForToSODAPass();
 
   // Optimization passes
   mlir::soda::registerPassManagerMiscPass(); // The one PM to rule them all

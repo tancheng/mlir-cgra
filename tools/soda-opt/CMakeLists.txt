@@ -34,6 +34,9 @@ set(LIBS
   MLIRLinalgToLLVM
   MLIRLinalgToStandard
 
+  # Conversion SODA
+  SODAKERNELToSODA
+
   # SODA
   SODAMisc
   MLIRSODA

@@ -15,23 +15,17 @@ include "mlir/Pass/PassBase.td"
 // AffineToSODA
 //===----------------------------------------------------------------------===//
 
-// TODO
-
-//===----------------------------------------------------------------------===//
-// SCFToSODA
-//===----------------------------------------------------------------------===//
-
 def ConvertAffineForToSODA : FunctionPass<"convert-affine-for-to-soda"> {
   let summary = "Convert top-level AffineFor Ops to SODA kernels";
   let constructor = "mlir::createAffineForToSODAPass()";
   let dependentDialects = ["soda::SODADialect"];
 }
 
-def ConvertParallelLoopToSoda : Pass<"convert-parallel-loops-to-soda"> {
-  let summary = "Convert mapped scf.parallel ops to soda launch operations";
-  let constructor = "mlir::createParallelLoopToSodaPass()";
-  let dependentDialects = ["AffineDialect", "soda::SODADialect"];
-}
+//===----------------------------------------------------------------------===//
+// SCFToSODA
+//===----------------------------------------------------------------------===//
+
+// TODO
 
 
 #endif // SODA_CONVERSION_PASSES
