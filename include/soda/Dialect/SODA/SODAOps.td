@@ -109,7 +109,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
     /// Returns `true` if the SODA function defined by this Op is a kernel, i.e.
     /// it is intended to be launched from host.
     bool isKernel() {
-      return getAttrOfType<UnitAttr>(SODADialect::getKernelFuncAttrName()) !=
+      return (*this)->getAttrOfType<UnitAttr>(SODADialect::getKernelFuncAttrName()) !=
              nullptr;
     }
 
@@ -125,7 +125,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
 
     /// Returns the number of buffers located in the workgroup memory.
     unsigned getNumWorkgroupAttributions() {
-      return getAttrOfType<IntegerAttr>(getNumWorkgroupAttributionsAttrName())
+      return (*this)->getAttrOfType<IntegerAttr>(getNumWorkgroupAttributionsAttrName())
           .getInt();
     }
 

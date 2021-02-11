@@ -80,13 +80,13 @@ LogicalResult SODADialect::verifyOperationAttribute(Operation *op,
   auto walkResult = module.walk([&module](LaunchFuncOp launchOp) -> WalkResult {
     // Ignore launches that are nested more or less deep than functions in the
     // module we are currently checking.
-    if (!launchOp.getParentOp() ||
-        launchOp.getParentOp()->getParentOp() != module)
+    if (!launchOp->getParentOp() ||
+        launchOp->getParentOp()->getParentOp() != module)
       return success();
 
     // Ignore launch ops with missing attributes here. The errors will be
     // reported by the verifiers of those ops.
-    if (!launchOp.getAttrOfType<SymbolRefAttr>(
+    if (!launchOp->getAttrOfType<SymbolRefAttr>(
             LaunchFuncOp::getKernelAttrName()))
       return success();
 
@@ -257,7 +257,7 @@ void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
 
   // Add the data operands.
   result.addOperands(kernelOperands);
-  auto kernelModule = kernelFunc.getParentOfType<SODAModuleOp>();
+  auto kernelModule = kernelFunc->getParentOfType<SODAModuleOp>();
   auto kernelSymbol = builder.getSymbolRefAttr(
       kernelModule.getName(), {builder.getSymbolRefAttr(kernelFunc.getName())});
   result.addAttribute(getKernelAttrName(), kernelSymbol);
@@ -283,15 +283,15 @@ Value LaunchFuncOp::getKernelOperand(unsigned i) {
 }
 
 static LogicalResult verify(LaunchFuncOp op) {
-  auto module = op.getParentOfType<ModuleOp>();
+  auto module = op->getParentOfType<ModuleOp>();
   if (!module)
     return op.emitOpError("expected to belong to a module");
-  if (!module.getAttrOfType<UnitAttr>(
+  if (!module->getAttrOfType<UnitAttr>(
           SODADialect::getContainerModuleAttrName()))
     return op.emitOpError(
         "expected the closest surrounding module to have the '" +
         SODADialect::getContainerModuleAttrName() + "'attribute");
-  auto kernelAttr = op.getAttrOfType<SymbolRefAttr>(op.getKernelAttrName());
+  auto kernelAttr = op->getAttrOfType<SymbolRefAttr>(op.getKernelAttrName());
   if (!kernelAttr)
     return op.emitOpError("symbol reference attribute '" +
                           op.getKernelAttrName() + "' must be specified");
@@ -334,8 +334,8 @@ static void printLaunchFuncOperands(OpAsmPrinter &printer, Operation *,
 /// workgroup memory.
 BlockArgument SODAFuncOp::addWorkgroupAttribution(Type type) {
   auto attrName = getNumWorkgroupAttributionsAttrName();
-  auto attr = getAttrOfType<IntegerAttr>(attrName);
-  setAttr(attrName, IntegerAttr::get(attr.getType(), attr.getValue() + 1));
+  auto attr = (*this)->getAttrOfType<IntegerAttr>(attrName);
+  (*this)->setAttr(attrName, IntegerAttr::get(attr.getType(), attr.getValue() + 1));
   return getBody().insertArgument(getType().getNumInputs() + attr.getInt(),
                                   type);
 }
@@ -513,7 +513,7 @@ void SODAFuncOp::setType(FunctionType newType) {
   for (int i = newType.getNumInputs(), e = oldType.getNumInputs(); i < e; i++)
     removeAttr(getArgAttrName(i, nameBuf));
 
-  setAttr(getTypeAttrName(), TypeAttr::get(newType));
+  (*this)->setAttr(getTypeAttrName(), TypeAttr::get(newType));
 }
 
 /// Hook for FunctionLike verifier.
@@ -592,7 +592,7 @@ static ParseResult parseReturnOp(OpAsmParser &parser, OperationState &result) {
 }
 
 static LogicalResult verify(soda::ReturnOp returnOp) {
-  SODAFuncOp function = returnOp.getParentOfType<SODAFuncOp>();
+  SODAFuncOp function = returnOp->getParentOfType<SODAFuncOp>();
 
   FunctionType funType = function.getType();
 

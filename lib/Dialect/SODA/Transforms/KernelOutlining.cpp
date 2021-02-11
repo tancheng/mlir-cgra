@@ -128,9 +128,9 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
     kernelOperandTypes.push_back(operand.getType());
   }
   FunctionType type =
-      FunctionType::get(kernelOperandTypes, {}, launchOp.getContext());
+      FunctionType::get(launchOp.getContext(),kernelOperandTypes, {});
   auto outlinedFunc = builder.create<soda::SODAFuncOp>(loc, kernelFnName, type);
-  outlinedFunc.setAttr(soda::SODADialect::getKernelFuncAttrName(),
+  outlinedFunc->setAttr(soda::SODADialect::getKernelFuncAttrName(),
                        builder.getUnitAttr());
   BlockAndValueMapping map;
 
@@ -213,7 +213,7 @@ public:
       auto funcWalkResult = func.walk([&](soda::LaunchOp op) {
         llvm::SetVector<Value> operands;
         std::string kernelFnName =
-            Twine(op.getParentOfType<FuncOp>().getName(), "_kernel").str();
+            Twine(op->getParentOfType<FuncOp>().getName(), "_kernel").str();
 
         // Pull in instructions that can be sunk
         if (failed(sinkOperationsIntoLaunchOp(op)))
@@ -238,7 +238,7 @@ public:
     // If any new module was inserted in this module, annotate this module as
     // a container module.
     if (modified)
-      getOperation().setAttr(soda::SODADialect::getContainerModuleAttrName(),
+      getOperation()->setAttr(soda::SODADialect::getContainerModuleAttrName(),
                              UnitAttr::get(&getContext()));
   }
 

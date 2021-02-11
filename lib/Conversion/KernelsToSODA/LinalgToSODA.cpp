@@ -50,7 +50,7 @@ void LinalgToSodaConverter::createLaunch(linalg::MatmulOp rootMatmulOp) {
   auto *newOp = Operation::create(
       rootMatmulOp->getLoc(), rootMatmulOp->getName(),
       rootMatmulOp->getResultTypes(), rootMatmulOp->getOperands(),
-      rootMatmulOp->getMutableAttrDict(), rootMatmulOp->getSuccessors(),
+      rootMatmulOp->getAttrDictionary(), rootMatmulOp->getSuccessors(),
       rootMatmulOp->getRegions());
 
   // Insert the clone into the soda launch.

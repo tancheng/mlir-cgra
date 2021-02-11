@@ -83,7 +83,7 @@ struct SodaAsyncRegionPass::Callback {
     resultTypes.reserve(1 + op->getNumResults());
     copy(op->getResultTypes(), std::back_inserter(resultTypes));
     auto *newOp = Operation::create(op->getLoc(), op->getName(), resultTypes,
-                                    op->getOperands(), op->getMutableAttrDict(),
+                                    op->getOperands(), op->getAttrDictionary(),
                                     op->getSuccessors());
 
     // Replace the op with the async clone.
