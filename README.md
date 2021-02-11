@@ -96,4 +96,4 @@ Exceptions. See the `LICENSE.txt` file for more details.
 This project was build on top of the mlir out-of-tree template available here:
 
 - Original author: https://github.com/jmgorius/mlir-standalone-template
-- LLVM Mirror: https://github.com/llvm/llvm-project/tree/master/mlir/examples/standalone
+- LLVM Mirror: https://github.com/llvm/llvm-project/tree/main/mlir/examples/standalone
