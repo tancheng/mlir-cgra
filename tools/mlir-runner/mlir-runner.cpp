@@ -12,6 +12,8 @@
 #include "mlir/ExecutionEngine/JitRunner.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
 #include "mlir/IR/Dialect.h"
+#include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
+
 #include "llvm/Support/InitLLVM.h"
 #include "llvm/Support/TargetSelect.h"
 
@@ -23,6 +25,6 @@ int main(int argc, char **argv) {
   mlir::initializeLLVMPasses();
 
   mlir::DialectRegistry registry;
-  registry.insert<mlir::LLVM::LLVMDialect>();
+  mlir::registerLLVMDialectTranslation(registry);
   return mlir::JitRunnerMain(argc, argv, registry);
 }

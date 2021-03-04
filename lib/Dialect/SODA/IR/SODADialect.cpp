@@ -223,7 +223,7 @@ static void printLaunchOp(OpAsmPrinter &p, LaunchOp op) {
   p << LaunchOp::getOperationName();
 
   p.printRegion(op.body(), /*printEntryBlockArgs=*/false);
-  p.printOptionalAttrDict(op.getAttrs());
+  p.printOptionalAttrDict(op->getAttrs());
 }
 
 // Parses a Launch operation.
@@ -511,7 +511,7 @@ void SODAFuncOp::setType(FunctionType newType) {
 
   SmallVector<char, 16> nameBuf;
   for (int i = newType.getNumInputs(), e = oldType.getNumInputs(); i < e; i++)
-    removeAttr(getArgAttrName(i, nameBuf));
+    (*this)->removeAttr(getArgAttrName(i, nameBuf));
 
   (*this)->setAttr(getTypeAttrName(), TypeAttr::get(newType));
 }
@@ -537,7 +537,7 @@ static LogicalResult verifyAttributions(Operation *op,
     if (!type)
       return op->emitOpError() << "expected memref type in attribution";
 
-    if (type.getMemorySpace() != memorySpace) {
+    if (type.getMemorySpaceAsInt() != memorySpace) {
       return op->emitOpError()
              << "expected memory space " << memorySpace << " in attribution";
     }
@@ -649,7 +649,7 @@ static ParseResult parseSODAModuleOp(OpAsmParser &parser,
 static void print(OpAsmPrinter &p, SODAModuleOp op) {
   p << op.getOperationName() << ' ';
   p.printSymbolName(op.getName());
-  p.printOptionalAttrDictWithKeyword(op.getAttrs(),
+  p.printOptionalAttrDictWithKeyword(op->getAttrs(),
                                      {SymbolTable::getSymbolAttrName()});
   p.printRegion(op.getOperation()->getRegion(0), /*printEntryBlockArgs=*/false,
                 /*printBlockTerminators=*/false);

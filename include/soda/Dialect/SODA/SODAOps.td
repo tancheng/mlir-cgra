@@ -99,7 +99,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilderDAG<(ins "StringRef":$name, "FunctionType":$type,
+    OpBuilder<(ins "StringRef":$name, "FunctionType":$type,
       CArg<"TypeRange", "{}">:$workgroupAttributions,
       CArg<"TypeRange", "{}">:$privateAttributions,
       CArg<"ArrayRef<NamedAttribute>", "{}">:$attrs)>
@@ -261,7 +261,7 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilderDAG<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands)>
+    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands)>
   ];
 
   let extraClassDeclaration = [{
@@ -335,7 +335,7 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilderDAG<(ins)>
+    OpBuilder<(ins)>
   ];
   
   let extraClassDeclaration = [{
@@ -366,7 +366,7 @@ def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, NoSideEffect,
     by an invocation of the `soda.func`.
   }];
 
-  let builders = [OpBuilderDAG<(ins), [{ // empty}]>];
+  let builders = [OpBuilder<(ins), [{ // empty}]>];
 
   let parser = [{ return parseReturnOp(parser, result); }];
   let printer = [{ p << getOperationName(); }];
@@ -459,7 +459,7 @@ def SODA_SODAModuleOp : SODA_Op<"module", [
 
     ```
   }];
-  let builders = [OpBuilderDAG<(ins "StringRef":$name)>];
+  let builders = [OpBuilder<(ins "StringRef":$name)>];
   let parser = [{ return ::parseSODAModuleOp(parser, result); }];
   let printer = [{ return ::print(p, *this); }];
   let regions = (region SizedRegion<1>:$body);
