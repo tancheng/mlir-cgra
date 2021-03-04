@@ -50,12 +50,13 @@ int main(int argc, char **argv) {
   // Add the following to selectively include the necessary dialects. You only
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
-  registry.insert<mlir::StandardOpsDialect>();
-  registry.insert<mlir::LLVM::LLVMDialect>();
-  registry.insert<mlir::linalg::LinalgDialect>();
-  registry.insert<mlir::scf::SCFDialect>();
-  registry.insert<mlir::vector::VectorDialect>();
-  registry.insert<mlir::AffineDialect>();
+  registry.insert<mlir::StandardOpsDialect,
+                  mlir::LLVM::LLVMDialect,
+                  mlir::linalg::LinalgDialect,
+                  mlir::math::MathDialect,
+                  mlir::scf::SCFDialect,
+                  mlir::vector::VectorDialect,
+                  mlir::AffineDialect>();
   // mlir::registerAllDialects(registry);
 
   //===--------------------------------------------------------------------===//
