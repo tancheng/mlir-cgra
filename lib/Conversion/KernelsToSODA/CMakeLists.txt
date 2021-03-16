@@ -18,6 +18,7 @@ add_mlir_conversion_library(SODAKERNELToSODA
   MLIRGPU
   MLIRIR
   MLIRLinalg
+  MLIRMemRef
   MLIRPass
   MLIRStandard
   MLIRSupport

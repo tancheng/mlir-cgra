@@ -8,12 +8,12 @@ func @one_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
 
   // CHECK: soda.launch
   // CHECK-NEXT: scf.for
-  // CHECK-NEXT: load
-  // CHECK-NEXT: store
+  // CHECK-NEXT: memref.load
+  // CHECK-NEXT: memref.store
   // CHECK: soda.terminator
   scf.for %arg2 = %c0 to %c42 step %c1 {
-    %0 = load %arg0[%arg2] : memref<?xf32>
-    store %0, %arg1[%arg2] : memref<?xf32>
+    %0 = memref.load %arg0[%arg2] : memref<?xf32>
+    memref.store %0, %arg1[%arg2] : memref<?xf32>
   }
   return
 }
@@ -33,11 +33,11 @@ func @two_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
     // CHECK-NEXT: constant
     // CHECK-NEXT: constant
     // CHECK-NEXT: scf.for
-    // CHECK-NEXT: load
-    // CHECK-NEXT: store
+    // CHECK-NEXT: memref.load
+    // CHECK-NEXT: memref.store
     scf.for %arg3 = %c0_0 to %c42_1 step %c1_2 {
-      %0 = load %arg0[%arg2] : memref<?xf32>
-      store %0, %arg1[%arg2] : memref<?xf32>
+      %0 = memref.load %arg0[%arg2] : memref<?xf32>
+      memref.store %0, %arg1[%arg2] : memref<?xf32>
     }
   }
   // CHECK: soda.terminator

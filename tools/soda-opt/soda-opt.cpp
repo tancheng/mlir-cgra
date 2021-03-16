@@ -51,6 +51,7 @@ int main(int argc, char **argv) {
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
   registry.insert<mlir::StandardOpsDialect,
+                  mlir::memref::MemRefDialect,
                   mlir::LLVM::LLVMDialect,
                   mlir::linalg::LinalgDialect,
                   mlir::math::MathDialect,

@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/IR/BlockAndValueMapping.h"
 #include "mlir/IR/Builders.h"
@@ -30,7 +31,7 @@ using namespace mlir;
 /// operations may not have side-effects, as otherwise sinking (and hence
 /// duplicating them) is not legal.
 static bool isSinkingBeneficiary(Operation *op) {
-  return isa<ConstantOp, DimOp, SelectOp, CmpIOp>(op);
+  return isa<ConstantOp, memref::DimOp, SelectOp, CmpIOp>(op);
 }
 
 /// For a given operation `op`, computes whether it is beneficial to sink the

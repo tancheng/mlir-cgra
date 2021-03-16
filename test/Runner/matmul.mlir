@@ -20,8 +20,8 @@ func @alloc_filled_f32(%s : index, %f : f32) -> memref<?xi8> {
   %c1 = constant 1 : index
   %c4 = constant 4 : index // 4 bytes in one f32 value
   %s4 = muli %s, %c4: index
-  %buf = alloc(%s4) {alignment = 256} : memref<?xi8>
-  %V = view %buf[%c0][%s] : memref<?xi8> to memref<?xf32>
+  %buf = memref.alloc(%s4) {alignment = 256} : memref<?xi8>
+  %V = memref.view %buf[%c0][%s] : memref<?xi8> to memref<?xf32>
   linalg.fill(%V, %f) : memref<?xf32>, f32
   return %buf : memref<?xi8>
 }
@@ -57,19 +57,19 @@ func @matmul_driver() -> f32 {
   %bC = call @alloc_filled_f32(%c4, %f10) : (index, f32) -> (memref<?xi8>)
 
   // View bytes as a f32 2D array, starting from element 0
-  %A = view %bA[%c0][%c2, %c16] : memref<?xi8> to memref<?x?xf32>
-  %B = view %bB[%c0][%c16, %c2] : memref<?xi8> to memref<?x?xf32>
-  %C = view %bC[%c0][%c2, %c2] : memref<?xi8> to memref<?x?xf32>
+  %A = memref.view %bA[%c0][%c2, %c16] : memref<?xi8> to memref<?x?xf32>
+  %B = memref.view %bB[%c0][%c16, %c2] : memref<?xi8> to memref<?x?xf32>
+  %C = memref.view %bC[%c0][%c2, %c2] : memref<?xi8> to memref<?x?xf32>
 
   // linalg.matmul ins(%A, %B : memref<?x?xf32>, memref<?x?xf32>)
   //               outs(%C : memref<?x?xf32>)
   call @matmul_kernel(%A, %B, %C) : (memref<?x?xf32>, memref<?x?xf32>,  memref<?x?xf32>)  -> ()
 
-  %res = load %C[%c0, %c1] : memref<?x?xf32>
+  %res = memref.load %C[%c0, %c1] : memref<?x?xf32>
 
-  dealloc %bC : memref<?xi8>
-  dealloc %bB : memref<?xi8>
-  dealloc %bA : memref<?xi8>
+  memref.dealloc %bC : memref<?xi8>
+  memref.dealloc %bB : memref<?xi8>
+  memref.dealloc %bA : memref<?xi8>
 
   return %res : f32
 }

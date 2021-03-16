@@ -5,12 +5,12 @@ func @one_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {
   
   // CHECK-NEXT: soda.launch 
   // CHECK-NEXT: affine.for
-  // CHECK-NEXT: load
-  // CHECK-NEXT: store
+  // CHECK-NEXT: memref.load
+  // CHECK-NEXT: memref.store
   // CHECK: soda.terminator
   affine.for %i = 0 to 42 {
-    %0 = load %A[%i] : memref<?xf32>
-    store %0, %B[%i] : memref<?xf32>
+    %0 = memref.load %A[%i] : memref<?xf32>
+    memref.store %0, %B[%i] : memref<?xf32>
   }
   return
 }
@@ -22,13 +22,13 @@ func @two_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {
   // CHECK-NEXT: soda.launch 
   // CHECK-NEXT: affine.for
   // CHECK-NEXT: affine.for
-  // CHECK-NEXT: load
-  // CHECK-NEXT: store
+  // CHECK-NEXT: memref.load
+  // CHECK-NEXT: memref.store
   // CHECK: soda.terminator
   affine.for %i = 0 to 42 {
     affine.for %j = 0 to 42 {
-      %0 = load %A[%i] : memref<?xf32>
-      store %0, %B[%i] : memref<?xf32>
+      %0 = memref.load %A[%i] : memref<?xf32>
+      memref.store %0, %B[%i] : memref<?xf32>
     }
   }
   return

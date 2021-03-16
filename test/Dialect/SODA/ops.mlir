@@ -37,7 +37,7 @@ module attributes {soda.container_module} {
 
       "soda.barrier"() : () -> ()
 
-      %42 = load %arg1[%bIdX] : memref<?xf32, 1>
+      %42 = memref.load %arg1[%bIdX] : memref<?xf32, 1>
       soda.return
     }
 

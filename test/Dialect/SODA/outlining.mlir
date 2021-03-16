@@ -19,7 +19,7 @@ func @launch() {
   soda.launch {
     "use"(%0): (f32) -> ()
     "some_op"(%idx0, %idx1) : (index, index) -> ()
-    %42 = load %1[%idx0] : memref<?xf32, 1>
+    %42 = memref.load %1[%idx0] : memref<?xf32, 1>
     soda.terminator
   }
   return
@@ -33,7 +33,7 @@ func @launch() {
 // CHECK-NEXT: ^[[BLOCK]]:
 // CHECK: "use"(%[[KERNEL_ARG0]]) : (f32) -> ()
 // CHECK-NEXT: "some_op"(%[[IDX0]], %[[IDX1]]) : (index, index) -> ()
-// CHECK-NEXT: = load %[[KERNEL_ARG1]][%[[IDX0]]] : memref<?xf32, 1>
+// CHECK-NEXT: = memref.load %[[KERNEL_ARG1]][%[[IDX0]]] : memref<?xf32, 1>
 
 // -----
 
@@ -82,7 +82,7 @@ func @extra_constants(%arg0: memref<?xf32>) {
   %cst = constant 8 : index
   %cst2 = constant 2 : index
   %c0 = constant 0 : index
-  %cst3 = dim %arg0, %c0 : memref<?xf32>
+  %cst3 = memref.dim %arg0, %c0 : memref<?xf32>
   // CHECK: soda.launch_func @extra_constants_kernel::@extra_constants_kernel args(%[[ARG0]] : memref<?xf32>)
   soda.launch {
     "use"(%cst2, %arg0, %cst3) : (index, memref<?xf32>, index) -> ()
@@ -95,7 +95,7 @@ func @extra_constants(%arg0: memref<?xf32>) {
 // CHECK-SAME: %[[KARG0:.*]]: memref<?xf32>
 // CHECK: constant 2
 // CHECK: constant 0
-// CHECK: dim %[[KARG0]]
+// CHECK: memref.dim %[[KARG0]]
 
 // -----
 
@@ -104,8 +104,8 @@ func @extra_constants(%arg0: memref<?xf32>) {
 func @extra_constants_noarg(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
   %cst2 = constant 2 : index
   %c0 = constant 0 : index
-  // CHECK: dim %[[ARG1]]
-  %cst3 = dim %arg1, %c0 : memref<?xf32>
+  // CHECK: memref.dim %[[ARG1]]
+  %cst3 = memref.dim %arg1, %c0 : memref<?xf32>
   // CHECK: soda.launch_func @extra_constants_noarg_kernel::@extra_constants_noarg_kernel args(%[[ARG0]] : memref<?xf32>, {{.*}} : index)
   soda.launch {
     "use"(%cst2, %arg0, %cst3) : (index, memref<?xf32>, index) -> ()
@@ -145,10 +145,10 @@ func @multiple_uses(%arg0 : memref<?xf32>) {
 func @multiple_uses2(%arg0 : memref<*xf32>) {
   %c1 = constant 1 : index
   %c2 = constant 2 : index
-  %d = dim %arg0, %c2 : memref<*xf32>
+  %d = memref.dim %arg0, %c2 : memref<*xf32>
   // CHECK: soda.func {{.*}} {
   // CHECK:   %[[C2:.*]] = constant 2 : index
-  // CHECK:   %[[D:.*]] = dim %[[ARG:.*]], %[[C2]]
+  // CHECK:   %[[D:.*]] = memref.dim %[[ARG:.*]], %[[C2]]
   // CHECK:   "use1"(%[[D]])
   // CHECK:   "use2"(%[[C2]], %[[C2]])
   // CHECK:   "use3"(%[[ARG]])

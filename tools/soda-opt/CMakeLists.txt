@@ -18,6 +18,7 @@ set(LIBS
   # Dialects
   MLIRLLVMIR
   MLIRLinalg
+  MLIRMemRef
   MLIRAffine
   MLIRStandard
   MLIRSCF
@@ -51,5 +52,6 @@ add_llvm_executable(soda-opt ${SOURCES})
 
 llvm_update_compile_flags(soda-opt)
 target_link_libraries(soda-opt PRIVATE ${LIBS})
+llvm_update_compile_flags(soda-opt)
 
 mlir_check_link_libraries(soda-opt)
