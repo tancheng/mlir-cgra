@@ -22,7 +22,7 @@
 #include "mlir/IR/FunctionImplementation.h"
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/IR/PatternMatch.h"
-#include "mlir/IR/StandardTypes.h"
+#include "mlir/IR/TypeUtilities.h"
 #include "llvm/ADT/TypeSwitch.h"
 
 using namespace mlir;
