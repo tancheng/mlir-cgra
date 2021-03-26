@@ -8,4 +8,8 @@
 // CHECK: soda
 // CHECK: std
 // CHECK: vector
-// CHECKHELP: soda-test-opt-pipeline
+// CHECKHELP: convert-linalg-matmul-to-soda
+// CHECKHELP: soda-generate-bambu-accelcode
+// CHECKHELP: soda-generate-bambu-hostcode
+// CHECKHELP: soda-outline-bambu-code
+// CHECKHELP: soda-opt-pipeline

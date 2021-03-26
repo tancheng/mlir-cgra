@@ -74,13 +74,52 @@ $PROJ_BUILD_DIR/bin/soda-opt -h
 Search passes can be executed with the following command:
 
 ```sh
-# With loop tiling to fit 512KiB "L1" memory
 $PROJ_BUILD_DIR/bin/soda-opt \
   $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
   --convert-linalg-matmul-to-soda
 
-# Other patterns can be marked for outlining with passes following the template:
+# Other patterns can be marked for outlining with passes following the
+# template:
 # --convert-<dialect_name>-<op_name>-to-soda
+```
+
+Kernel outlining pass can be executed with the following command:
+
+```sh
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/Dialect/SODA/outlining-matmul.mlir \
+  --soda-outline-bambu-code
+
+# In the future, searched coded can be outlined for other architectures
+# following the pass template: 
+# --soda-outline-<target_name>-code
+```
+
+Generation/extraction of kernel code exclusive for bambu can be obtained with
+the following command:
+
+```sh
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/Dialect/SODA/outlining-matmul.mlir \
+  --soda-generate-bambu-accelcode
+
+# In the future, outlined code can be extracted for other target architectures
+# following the pass template:
+# --soda-generate-<target_name>-accelcode
+```
+
+Generation of host code calls to the target accelerator api can be obtained
+with the following command:
+
+```sh
+# Note this is still under development
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/Dialect/SODA/outlining-matmul.mlir \
+  --soda-generate-bambu-hostcode
+
+# In the future, additional host code generation for other accelerator apis
+# will be performed by the following pass template:
+# --soda-generate-<target_name>-hostcode
 ```
 
 Optimizations passes and lowerings can be executed on a `.mlir` file with the
@@ -90,12 +129,12 @@ following command:
 # With loop tiling to fit 512KiB "L1" memory
 $PROJ_BUILD_DIR/bin/soda-opt \
   $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
-  --soda-test-opt-pipeline="cache-size=512"
+  --soda-opt-pipeline="cache-size=512"
 
 # Without loop tiling
 $PROJ_BUILD_DIR/bin/soda-opt \
   $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
-  --soda-test-opt-pipeline
+  --soda-opt-pipeline
 ```
 
 ## License

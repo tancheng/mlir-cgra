@@ -31,8 +31,9 @@ namespace mlir {
 namespace soda {
 void registerPassManagerMiscPass() {
   PassPipelineRegistration<MyOptions> registerOptionsPassPipeline(
-      "soda-test-opt-pipeline",
-      "Run the full pass pipeline to optimize key linalg OPs",
+      "soda-opt-pipeline",
+      "Run the full pass pipeline to optimize previously outlined key "
+      "operations",
       [](OpPassManager &pm, const MyOptions &options) {
         pm.addPass(createConvertLinalgToAffineLoopsPass());
         pm.addPass(createConvertLinalgToStandardPass());

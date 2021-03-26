@@ -1,4 +1,4 @@
-// RUN: soda-opt -allow-unregistered-dialect -soda-kernel-outlining -split-input-file -verify-diagnostics %s | FileCheck %s
+// RUN: soda-opt -allow-unregistered-dialect -soda-outline-bambu-code -split-input-file -verify-diagnostics %s | FileCheck %s
 
 // CHECK: module attributes {soda.container_module}
 

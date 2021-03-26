@@ -24,6 +24,14 @@ namespace soda {
 /// separate kernel function.
 std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelOutliningPass();
 
+/// Extract code called by `soda.launch_func` into isolated mlir module/file,
+/// with no host code information. This file can be later lowered and consumed
+/// by bambu
+std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelGenerationPass();
+
+/// Transform `soda.launch_func` into calls to the bambu accelerator API
+std::unique_ptr<OperationPass<ModuleOp>> createSodaHostGenerationPass();
+
 /// Rewrites a function region so that SODA ops execute async.
 std::unique_ptr<OperationPass<FuncOp>> createSodaAsyncRegionPass();
 

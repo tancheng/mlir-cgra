@@ -70,6 +70,8 @@ int main(int argc, char **argv) {
   // Misc passes
   mlir::soda::registerTestPrintOpNestingPass();
   mlir::soda::registerSodaKernelOutliningPass();
+  mlir::soda::registerSodaKernelGenerationPass();
+  mlir::soda::registerSodaHostGenerationPass();
   mlir::soda::registerSodaAsyncRegionPassPass();
 
   // Outlining passes
