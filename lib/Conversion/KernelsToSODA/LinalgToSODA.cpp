@@ -26,7 +26,8 @@ namespace {
 // Helper structure that holds common state of the loop to SODA kernel
 // conversion.
 struct LinalgToSodaConverter {
-  void createLaunch(linalg::MatmulOp rootMatmulOp);
+  template <class T>
+  void createLaunch(T rootMatmulOp);
 };
 
 } // namespace
@@ -36,7 +37,8 @@ struct LinalgToSodaConverter {
 //===----------------------------------------------------------------------===//
 
 /// Add a SODA launch operation around the "linalg.matmul" op.
-void LinalgToSodaConverter::createLaunch(linalg::MatmulOp rootMatmulOp) {
+template <class T>
+void LinalgToSodaConverter::createLaunch(T rootMatmulOp) {
   OpBuilder builder(rootMatmulOp.getOperation());
 
   // Create a launch op and move target op into the region
@@ -60,14 +62,38 @@ void LinalgToSodaConverter::createLaunch(linalg::MatmulOp rootMatmulOp) {
   rootMatmulOp->erase();
 }
 
-static LogicalResult convertLinalgMatmulToSODALaunch(linalg::MatmulOp matmulOp) {
+static LogicalResult convertLinalgMatmulToSODALaunch(linalg::MatmulOp op) {
 
   LinalgToSodaConverter converter;
-  converter.createLaunch(matmulOp);
+  converter.createLaunch(op);
 
   return success();
 }
 
-LogicalResult mlir::convertLinalgMatmulToSODALaunch(linalg::MatmulOp matmulOp) {
-  return ::convertLinalgMatmulToSODALaunch(matmulOp);
+LogicalResult mlir::convertLinalgMatmulToSODALaunch(linalg::MatmulOp op) {
+  return ::convertLinalgMatmulToSODALaunch(op);
+}
+
+static LogicalResult convertLinalgConvToSODALaunch(linalg::ConvOp op) {
+
+  LinalgToSodaConverter converter;
+  converter.createLaunch(op);
+
+  return success();
+}
+
+LogicalResult mlir::convertLinalgConvToSODALaunch(linalg::ConvOp op) {
+  return ::convertLinalgConvToSODALaunch(op);
+}
+
+static LogicalResult convertLinalgGenericToSODALaunch(linalg::GenericOp op) {
+
+  LinalgToSodaConverter converter;
+  converter.createLaunch(op);
+
+  return success();
+}
+
+LogicalResult mlir::convertLinalgGenericToSODALaunch(linalg::GenericOp op) {
+  return ::convertLinalgGenericToSODALaunch(op);
 }

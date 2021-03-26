@@ -15,12 +15,19 @@ struct LogicalResult;
 
 namespace linalg {
 class MatmulOp;
+class ConvOp;
+class GenericOp;
 // TODO: add more ops
-// class ConvOp;
 } // namespace linalg
 
 /// Convert linalg Matmul op into soda.
 LogicalResult convertLinalgMatmulToSODALaunch(linalg::MatmulOp matmulOp);
+
+/// Convert linalg Conv op into soda.
+LogicalResult convertLinalgConvToSODALaunch(linalg::ConvOp convOp);
+
+/// Convert linalg Generic op into soda.
+LogicalResult convertLinalgGenericToSODALaunch(linalg::GenericOp genericOp);
 
 } // namespace mlir
 

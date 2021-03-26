@@ -76,6 +76,8 @@ int main(int argc, char **argv) {
   mlir::soda::registerConvertAffineForToSODAPass();
   mlir::soda::registerConvertSCFForToSODAPass();
   mlir::soda::registerConvertLinalgMatmulToSODAPass();
+  mlir::soda::registerConvertLinalgConvToSODAPass();
+  mlir::soda::registerConvertLinalgGenericToSODAPass();
 
   // Optimization passes
   mlir::soda::registerPassManagerMiscPass(); // The one PM to rule them all

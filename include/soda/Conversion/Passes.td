@@ -41,4 +41,16 @@ def ConvertLinalgMatmulToSODA : FunctionPass<"convert-linalg-matmul-to-soda"> {
   let dependentDialects = ["soda::SODADialect"];
 }
 
+def ConvertLinalgConvToSODA : FunctionPass<"convert-linalg-conv-to-soda"> {
+  let summary = "Convert top-level linalg::conv Ops to SODA kernels";
+  let constructor = "mlir::createLinalgConvToSODAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
+def ConvertLinalgGenericToSODA : FunctionPass<"convert-linalg-generic-to-soda"> {
+  let summary = "Convert top-level linalg::generic Ops to SODA kernels";
+  let constructor = "mlir::createLinalgGenericToSODAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
 #endif // SODA_CONVERSION_PASSES

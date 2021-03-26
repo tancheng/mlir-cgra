@@ -71,6 +71,18 @@ After successful build, available passes can be displayed with:
 $PROJ_BUILD_DIR/bin/soda-opt -h
 ```
 
+Search passes can be executed with the following command:
+
+```sh
+# With loop tiling to fit 512KiB "L1" memory
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
+  --convert-linalg-matmul-to-soda
+
+# Other patterns can be marked for outlining with passes following the template:
+# --convert-<dialect_name>-<op_name>-to-soda
+```
+
 Optimizations passes and lowerings can be executed on a `.mlir` file with the
 following command:
 
