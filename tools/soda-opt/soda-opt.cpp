@@ -38,6 +38,7 @@ int main(int argc, char **argv) {
   mlir::registerCanonicalizerPass();
   mlir::registerCSEPass();
   mlir::registerAffineLoopFusionPass();
+  mlir::registerAffineLoopUnrollPass();
   mlir::registerMemRefDataFlowOptPass();
 
   mlir::registerConvertLinalgToStandardPass();
