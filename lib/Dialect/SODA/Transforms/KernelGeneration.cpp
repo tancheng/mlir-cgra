@@ -88,8 +88,6 @@ void SodaKernelGenerationPass::runOnOperation() {
   oldBlock->erase();
 
   mop.walk([](soda::ModuleEndOp endOp) {
-    OpBuilder replacer(endOp);
-    replacer.create<mlir::ModuleTerminatorOp>(endOp.getLoc());
     endOp.erase();
   });
 
