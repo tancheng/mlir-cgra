@@ -70,6 +70,9 @@ int main(int argc, char **argv) {
 
   // Misc passes
   mlir::soda::registerTestPrintOpNestingPass();
+  mlir::soda::registerTestArgumentsToXMLPass();
+
+  // SODA Passes
   mlir::soda::registerSodaKernelOutliningPass();
   mlir::soda::registerSodaKernelGenerationPass();
   mlir::soda::registerSodaHostGenerationPass();

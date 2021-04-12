@@ -27,6 +27,7 @@ namespace soda {
 // Misc
 //===----------------------------------------------------------------------===//
 std::unique_ptr<mlir::Pass> createTestPrintOpNestingPass();
+std::unique_ptr<mlir::Pass> createTestArgumentsToXMLPass();
 
 //===----------------------------------------------------------------------===//
 // Optimizations

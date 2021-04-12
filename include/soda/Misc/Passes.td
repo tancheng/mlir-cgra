@@ -32,6 +32,16 @@ def TestPrintOpNesting : FunctionPass<"soda-test-print-nesting"> {
   ];
 }
 
+def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
+  let summary = "Generate a xml file based on memref arguments of a function";
+  let description = [{
+      Traverses the arguments of a function and generates a xml file
+      that can be read by bambu. The generated file contains random inputs with
+      the correct sizes supporting the llvm function arguments.
+  }];
+  let constructor = "mlir::soda::createTestArgumentsToXMLPass()";
+}
+
 /// Note: The DRR definition used for defining patterns is shown below:
 ///
 /// class Pattern<
