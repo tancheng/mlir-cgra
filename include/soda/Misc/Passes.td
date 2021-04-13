@@ -46,7 +46,7 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
   let constructor = "mlir::soda::createTestArgumentsToXMLPass()";
   let options = [
     Option<"writeToTerminal", "write-to-terminal", "bool", /*default=*/"false",
-           "If set, write to terminal instead of a file (default: false">,
+           "If set, write to terminal instead of a file (default: false)">,
   ];
 }
 

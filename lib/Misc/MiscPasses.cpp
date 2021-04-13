@@ -111,11 +111,17 @@ class TestArgumentsToXMLPass
       auto output = openOutputFile(filename, &errorMessage);
       outputStream = &output->os();
 
-      // Populate the file with the xml vector
+      if (writeToTerminal) {
+        outputStream = &llvm::outs();
+      }
+
+      // Populate the stream with the xml vector
       resetIndent();
       generateXMLforLaunchFunc(op);
 
-      output->keep();
+      if (!writeToTerminal) {
+        output->keep();
+      }
     });
 
     // TODO: Handle case for C interface
@@ -160,7 +166,6 @@ class TestArgumentsToXMLPass
           // };
 
           // TODO
-
           // soda.launch_func should not have anything else but memrefs as args
           // if (a.isa<MemRefType, UnrankedMemRefType>()) {
           if (MemRefType mr = a.dyn_cast<MemRefType>()) {
