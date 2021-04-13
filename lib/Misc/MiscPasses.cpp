@@ -16,7 +16,10 @@
 #include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Misc/Passes.h"
 
+#include "mlir/Support/FileUtilities.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/Support/ToolOutputFile.h"
+#include "llvm/Support/raw_ostream.h"
 
 #define DEBUG_TYPE "misc-passes"
 
@@ -98,12 +101,21 @@ struct TestPrintOpNestingPass
 
 class TestArgumentsToXMLPass
     : public TestArgumentsToXMLBase<TestArgumentsToXMLPass> {
-  // Entry point for the pass.
+
   void runOnOperation() override {
 
     getOperation().walk([this](mlir::soda::LaunchFuncOp op) {
+      // Prepare the output stream
+      std::string errorMessage;
+      std::string filename = op.getKernelName().str() + "_test.xml";
+      auto output = openOutputFile(filename, &errorMessage);
+      outputStream = &output->os();
+
+      // Populate the file with the xml vector
       resetIndent();
       generateXMLforLaunchFunc(op);
+
+      output->keep();
     });
 
     // TODO: Handle case for C interface
@@ -148,12 +160,13 @@ class TestArgumentsToXMLPass
           // };
 
           // TODO
-          // assert(a.hasRank() && "expected only ranked shapes");
-          // return MemRefType::get(a.getShape(), a.getElementType());
 
           // soda.launch_func should not have anything else but memrefs as args
           // if (a.isa<MemRefType, UnrankedMemRefType>()) {
           if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+
+            assert(mr.hasRank() && "expected only ranked shapes");
+
             StringRef v;
             if (mr.getElementType().isa<FloatType>()) {
               v = "1.0";
@@ -219,7 +232,6 @@ class TestArgumentsToXMLPass
 
   void printClosure() { printIndent() << "</function>\n"; }
 
-  
   /// Manages the indentation as we traverse the IR nesting.
   int indent;
   struct IndentRAII {
@@ -230,13 +242,17 @@ class TestArgumentsToXMLPass
   void resetIndent() { indent = 0; }
   IndentRAII pushIndent() { return IndentRAII(++indent); }
 
+  /// Output stream to the generated XML file or terminal output
+  raw_ostream *outputStream;
+  raw_ostream &xmlOut() { return *outputStream; }
+
   llvm::raw_ostream &printIndent() {
     for (int i = 0; i < indent; ++i)
-      llvm::outs() << " ";
-    return llvm::outs();
+      xmlOut() << " ";
+    return xmlOut();
   }
 
-  llvm::raw_ostream &print() { return llvm::outs(); }
+  llvm::raw_ostream &print() { return xmlOut(); }
 };
 
 } // end anonymous namespace

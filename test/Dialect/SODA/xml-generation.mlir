@@ -1,4 +1,5 @@
-// RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml %s | FileCheck %s
+// RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml %s
+// RUN: FileCheck %s -input-file=driver_kernel_test.xml
 
 
 module attributes {soda.container_module}  {
