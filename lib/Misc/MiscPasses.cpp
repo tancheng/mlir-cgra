@@ -147,11 +147,12 @@ class TestArgumentsToXMLPass
       {
         auto indent = pushIndent();
 
-        printIndent() << "<!-- Function arguments: -->\n";
-        printIndent() << "<!-- ";
-        for (auto a : op.getOperandTypes())
-          print() << a << " ";
-        print() << "-->\n";
+        // XML comment
+        // printIndent() << "<!-- Function arguments: -->\n";
+        // printIndent() << "<!-- ";
+        // for (auto a : op.getOperandTypes())
+        //   print() << a << " ";
+        // print() << "-->\n";
 
         for (auto a : op.getOperandTypes()) {
           // According to the MLIR doc memref argument is converted into a
