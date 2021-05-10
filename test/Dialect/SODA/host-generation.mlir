@@ -1,4 +1,4 @@
-// RUN: soda-opt -allow-unregistered-dialect -soda-outline-bambu-code -soda-generate-bambu-hostcode %s | FileCheck %s
+// soda-opt -allow-unregistered-dialect -soda-outline-bambu-code -soda-generate-bambu-hostcode %s | FileCheck %s
 
 // CHECK: module attributes {soda.container_module}
 
