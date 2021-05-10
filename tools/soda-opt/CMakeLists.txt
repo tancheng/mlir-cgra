@@ -27,6 +27,9 @@ set(LIBS
   MLIRLinalgTransforms
   MLIRAffineTransforms
   MLIRSCFTransforms
+
+  # Test Passes
+  MLIRAffineTransformsTestPasses
   
   # Conversion
   MLIRAffineToStandard

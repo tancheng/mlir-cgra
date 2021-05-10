@@ -25,6 +25,11 @@
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
+// Defined in the test directory, no public header.
+namespace mlir {
+void registerTestLoopPermutationPass();
+}
+
 int main(int argc, char **argv) {
   // mlir::registerAllDialects();
   // mlir::registerAllPasses();
@@ -40,6 +45,9 @@ int main(int argc, char **argv) {
   mlir::registerAffineLoopFusionPass();
   mlir::registerAffineLoopUnrollPass();
   mlir::registerMemRefDataFlowOptPass();
+
+  // Test passes
+  mlir::registerTestLoopPermutationPass();
 
   mlir::registerConvertLinalgToStandardPass();
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
