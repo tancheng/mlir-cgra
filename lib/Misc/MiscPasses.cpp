@@ -200,7 +200,12 @@ class TestArgumentsToXMLPass
             // Offset
             SmallVector<int64_t> strides;
             int64_t offset;
-            getStridesAndOffset(mr, strides, offset);
+            // TODO(NICO): Must handle aborting testbench gen
+            if (failed(getStridesAndOffset(mr, strides, offset))) {
+              llvm::outs() << "MemRefType " << mr << " cannot be converted to "
+                           << "strided form\n";
+              return;
+            }
             printIndent() << "P" << incPointerId() << "=\"" << offset << "\" ";
 
             if (mr.getRank() == 0) {
