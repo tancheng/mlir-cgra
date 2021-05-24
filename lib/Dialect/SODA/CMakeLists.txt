@@ -14,7 +14,6 @@ add_mlir_dialect_library(MLIRSODA
   MLIRSODAPassIncGen
 
   LINK_LIBS PUBLIC
-  MLIREDSC
   MLIRIR
   MLIRLLVMIR
   MLIRSCF

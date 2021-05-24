@@ -11,7 +11,6 @@ add_llvm_executable(mlir-runner
 llvm_update_compile_flags(mlir-runner)
 target_link_libraries(mlir-runner PRIVATE
   MLIRAnalysis
-  MLIREDSC
   MLIRExecutionEngine
   MLIRIR
   MLIRJitRunner
