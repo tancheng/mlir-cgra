@@ -58,3 +58,5 @@ target_link_libraries(soda-opt PRIVATE ${LIBS})
 llvm_update_compile_flags(soda-opt)
 
 mlir_check_link_libraries(soda-opt)
+
+install(TARGETS soda-opt)

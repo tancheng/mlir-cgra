@@ -52,7 +52,7 @@ Alternatively it is possible to use the helper script
 
 ```sh
 # To configure, build, and install
-./build_tools/build_soda.sh <source_dir> <build_dir> <path/to/llvm/build/dir> <path/to/llvm/install/dir>
+./build_tools/build_soda.sh <source_dir> <install_dir> <build_dir> <path/to/llvm/build/dir> <path/to/llvm/install/dir>
 ```
 
 ## How to generate the docs?

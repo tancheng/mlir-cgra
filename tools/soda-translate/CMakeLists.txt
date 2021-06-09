@@ -21,3 +21,5 @@ target_link_libraries(soda-translate
   )
 
 mlir_check_link_libraries(soda-translate)
+
+install(TARGETS soda-translate)
