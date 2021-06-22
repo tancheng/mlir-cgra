@@ -20,7 +20,7 @@ include "mlir/Pass/PassBase.td"
 // Basic analysis passes
 //===----------------------------------------------------------------------===//
 
-def TestPrintOpNesting : FunctionPass<"soda-test-print-nesting"> {
+def TestPrintOpNesting : Pass<"soda-test-print-nesting"> {
   let summary = "Print op nesting information";
   let description = [{
       Print nested intructure and metadata info associated with mlir operations.

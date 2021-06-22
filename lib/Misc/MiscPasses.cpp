@@ -28,8 +28,8 @@ using namespace soda;
 
 namespace {
 
-struct TestPrintOpNestingPass
-    : public mlir::PassWrapper<TestPrintOpNestingPass, OperationPass<>> {
+class TestPrintOpNestingPass
+    : public mlir::soda::TestPrintOpNestingBase<TestPrintOpNestingPass> {
   // Entry point for the pass.
   void runOnOperation() override {
     Operation *op = getOperation();
@@ -100,7 +100,7 @@ struct TestPrintOpNestingPass
 };
 
 class TestArgumentsToXMLPass
-    : public TestArgumentsToXMLBase<TestArgumentsToXMLPass> {
+    : public mlir::soda::TestArgumentsToXMLBase<TestArgumentsToXMLPass> {
 
   void runOnOperation() override {
 
