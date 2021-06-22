@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   mlir::registerCSEPass();
   mlir::registerAffineLoopFusionPass();
   mlir::registerAffineLoopUnrollPass();
-  mlir::registerMemRefDataFlowOptPass();
+  mlir::registerAffineScalarReplacementPass();
 
   // Test passes
   mlir::registerTestLoopPermutationPass();
