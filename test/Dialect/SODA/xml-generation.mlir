@@ -1,6 +1,7 @@
 // RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml %s
 // RUN:   FileCheck %s -input-file=driver_kernel_test.xml --check-prefixes=CHECK_FILE
 // RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml="write-to-terminal" %s | FileCheck %s --check-prefixes=CHECK_TERMINAL
+// RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml="write-to-terminal using-bare-ptr" %s | FileCheck %s --check-prefixes=CHECK_BARE
 
 module attributes {soda.container_module}  {
   func @driver() {
@@ -49,3 +50,12 @@ module attributes {soda.container_module}  {
 // CHECK_TERMINAL:   P16="0" P17="4" P18="3" P19="3" P20="1" 
 // CHECK_TERMINAL:  />
 // CHECK_TERMINAL:  </function>
+
+// CHECK_BARE: <?xml version="1.0"?>
+// CHECK_BARE: <function>
+// CHECK_BARE:  <testbench
+// CHECK_BARE:   P0="{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0}"
+// CHECK_BARE:   P1="{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0}"
+// CHECK_BARE:   P2="{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0}"
+// CHECK_BARE:  />
+// CHECK_BARE:  </function>

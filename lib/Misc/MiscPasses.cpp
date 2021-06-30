@@ -117,7 +117,11 @@ class TestArgumentsToXMLPass
 
       // Populate the stream with the xml vector
       resetIndent();
-      generateXMLforLaunchFunc(op);
+
+      if (usingBarePtr)
+        generateXMLforBareLaunchFunc(op);
+      else
+        generateXMLforLaunchFunc(op);
 
       if (!writeToTerminal) {
         output->keep();
@@ -221,6 +225,58 @@ class TestArgumentsToXMLPass
 
               print() << "\n";
             }
+          }
+        }
+      }
+      closeTestbench();
+    }
+    printClosure();
+  };
+
+    void generateXMLforBareLaunchFunc(soda::LaunchFuncOp op) {
+    printPreamble();
+    {
+      auto indent = pushIndent();
+      initTestbench();
+      {
+        auto indent = pushIndent();
+
+        for (auto a : op.getOperandTypes()) {
+          // According to the MLIR doc memref argument is converted into a
+          // pointer-to-struct argument of type:
+          // template <typename Elem, size_t Rank>
+          // struct {
+          //   Elem *allocated;
+          //   Elem *aligned;
+          //   int64_t offset;
+          //   int64_t sizes[Rank]; // omitted when rank == 0
+          //   int64_t strides[Rank]; // omitted when rank == 0
+          // };
+
+          // But with `--convert-std-to-llvm=use-bare-ptr-memref-call-conv` we
+          // only have one pointer per memref, thus we only use need the number
+          // of elements to generate the array and we can ignore the other
+          // members
+
+          if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+
+            assert(mr.hasRank() && "expected only ranked shapes");
+
+            StringRef v;
+            if (mr.getElementType().isa<FloatType>()) {
+              v = "1.0";
+            } else {
+              v = "1";
+            }
+
+            long numElements = mr.getNumElements();
+
+            // Allocated bare pointers
+            printIndent() << "P" << incPointerId() << "=\"{";
+            for (long i = 0; i < numElements - 1; ++i) {
+              print() << v << ",";
+            }
+            print() << v << "}\"\n";
           }
         }
       }

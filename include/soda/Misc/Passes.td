@@ -39,6 +39,12 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
       that can be read by bambu. The generated file contains random inputs with
       the correct sizes supporting the llvm function arguments.
 
+      If option `="using-bare-ptr"` is used, output xml file ignores the memref
+      struct members and only generates simple C arrays with the correct size.
+      This option is meant to be used with a lowering pipeline that finishes
+      with:
+        `--convert-std-to-llvm=use-bare-ptr-memref-call-conv`
+
       Note that the generated file is created at the binary execution
       location and will replace any xml files that have the same name based
       on the kernel name of the soda.launch_func.
@@ -47,6 +53,8 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
   let options = [
     Option<"writeToTerminal", "write-to-terminal", "bool", /*default=*/"false",
            "If set, write to terminal instead of a file (default: false)">,
+    Option<"usingBarePtr", "using-bare-ptr", "bool", /*default=*/"false",
+           "If set, generate test vectors assuming bare ptrs (default: false)">,
   ];
 }
 
