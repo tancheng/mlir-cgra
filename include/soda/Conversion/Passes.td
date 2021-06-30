@@ -35,6 +35,12 @@ def ConvertSCFForToSODA : FunctionPass<"convert-scf-for-to-soda"> {
 // LinalgToSODA
 //===----------------------------------------------------------------------===//
 
+def ConvertLinalgDotToSODA : FunctionPass<"convert-linalg-dot-to-soda"> {
+  let summary = "Convert top-level linalg::dot Ops to SODA kernels";
+  let constructor = "mlir::createLinalgDotToSODAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
 def ConvertLinalgMatmulToSODA : FunctionPass<"convert-linalg-matmul-to-soda"> {
   let summary = "Convert top-level linalg::matmul Ops to SODA kernels";
   let constructor = "mlir::createLinalgMatmulToSODAPass()";

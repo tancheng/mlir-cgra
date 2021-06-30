@@ -36,13 +36,13 @@ struct LinalgToSodaConverter {
 // LinalgToSODA
 //===----------------------------------------------------------------------===//
 
-/// Add a SODA launch operation around the "linalg.matmul" op.
+/// Add a SODA launch operation around the "linalg.<operation>" op.
 template <class T>
-void LinalgToSodaConverter::createLaunch(T rootMatmulOp) {
-  OpBuilder builder(rootMatmulOp.getOperation());
+void LinalgToSodaConverter::createLaunch(T rootLinalgOp) {
+  OpBuilder builder(rootLinalgOp.getOperation());
 
   // Create a launch op and move target op into the region
-  Location loc = rootMatmulOp.getLoc();
+  Location loc = rootLinalgOp.getLoc();
   auto launchOp = builder.create<soda::LaunchOp>(loc);
   builder.setInsertionPointToEnd(&launchOp.body().front());
   builder.create<soda::TerminatorOp>(loc);
@@ -50,16 +50,28 @@ void LinalgToSodaConverter::createLaunch(T rootMatmulOp) {
 
   // Clone the linalg op.
   auto *newOp = Operation::create(
-      rootMatmulOp->getLoc(), rootMatmulOp->getName(),
-      rootMatmulOp->getResultTypes(), rootMatmulOp->getOperands(),
-      rootMatmulOp->getAttrDictionary(), rootMatmulOp->getSuccessors(),
-      rootMatmulOp->getRegions());
+      rootLinalgOp->getLoc(), rootLinalgOp->getName(),
+      rootLinalgOp->getResultTypes(), rootLinalgOp->getOperands(),
+      rootLinalgOp->getAttrDictionary(), rootLinalgOp->getSuccessors(),
+      rootLinalgOp->getRegions());
 
   // Insert the clone into the soda launch.
   auto results = newOp->getResults();
   builder.insert(newOp);
-  rootMatmulOp->replaceAllUsesWith(results);
-  rootMatmulOp->erase();
+  rootLinalgOp->replaceAllUsesWith(results);
+  rootLinalgOp->erase();
+}
+
+static LogicalResult convertLinalgDotToSODALaunch(linalg::DotOp op) {
+
+  LinalgToSodaConverter converter;
+  converter.createLaunch(op);
+
+  return success();
+}
+
+LogicalResult mlir::convertLinalgDotToSODALaunch(linalg::DotOp op) {
+  return ::convertLinalgDotToSODALaunch(op);
 }
 
 static LogicalResult convertLinalgMatmulToSODALaunch(linalg::MatmulOp op) {

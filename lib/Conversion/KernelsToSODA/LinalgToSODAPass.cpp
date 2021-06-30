@@ -23,8 +23,25 @@ using namespace mlir;
 
 namespace {
 //===----------------------------------------------------------------------===//
-// LinalgMatmulToSODA
+// Linalg<Operation>ToSODA
 //===----------------------------------------------------------------------===//
+
+// A pass that traverses top-level dots in the function and converts them to
+// SODA launch operations.  Nested launches are not allowed, so this does not
+// walk the function recursively to avoid considering nested dots.
+struct LinalgDotMapper
+    : public ConvertLinalgDotToSODABase<LinalgDotMapper> {
+  LinalgDotMapper() = default;
+
+  void runOnFunction() override {
+    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+      if (auto dotOp = dyn_cast<linalg::DotOp>(&op)) {
+        if (failed(convertLinalgDotToSODALaunch(dotOp)))
+          signalPassFailure();
+      }
+    }
+  }
+};
 
 // A pass that traverses top-level matmuls in the function and converts them to
 // SODA launch operations.  Nested launches are not allowed, so this does not
@@ -79,6 +96,9 @@ struct LinalgGenericMapper
 
 } // namespace
 
+std::unique_ptr<OperationPass<FuncOp>> mlir::createLinalgDotToSODAPass() {
+  return std::make_unique<LinalgDotMapper>();
+}
 
 std::unique_ptr<OperationPass<FuncOp>> mlir::createLinalgMatmulToSODAPass() {
   return std::make_unique<LinalgMatmulMapper>();

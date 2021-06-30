@@ -89,6 +89,7 @@ int main(int argc, char **argv) {
   // Outlining passes
   mlir::soda::registerConvertAffineForToSODAPass();
   mlir::soda::registerConvertSCFForToSODAPass();
+  mlir::soda::registerConvertLinalgDotToSODAPass();
   mlir::soda::registerConvertLinalgMatmulToSODAPass();
   mlir::soda::registerConvertLinalgConvToSODAPass();
   mlir::soda::registerConvertLinalgGenericToSODAPass();

@@ -14,11 +14,15 @@ namespace mlir {
 struct LogicalResult;
 
 namespace linalg {
+class DotOp;
 class MatmulOp;
 class ConvOp;
 class GenericOp;
 // TODO: add more ops
 } // namespace linalg
+
+/// Convert linalg Dot op into soda.
+LogicalResult convertLinalgDotToSODALaunch(linalg::DotOp dotOp);
 
 /// Convert linalg Matmul op into soda.
 LogicalResult convertLinalgMatmulToSODALaunch(linalg::MatmulOp matmulOp);

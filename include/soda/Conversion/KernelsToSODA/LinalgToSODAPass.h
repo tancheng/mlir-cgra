@@ -19,7 +19,8 @@ template <typename T>
 class OperationPass;
 class Pass;
 
-/// Create a pass that converts linalg matmuls into soda launch ops.
+/// Create a pass that converts linalg ops into soda launch ops.
+std::unique_ptr<OperationPass<FuncOp>> createLinalgDotToSODAPass();
 std::unique_ptr<OperationPass<FuncOp>> createLinalgMatmulToSODAPass();
 std::unique_ptr<OperationPass<FuncOp>> createLinalgConvToSODAPass();
 std::unique_ptr<OperationPass<FuncOp>> createLinalgGenericToSODAPass();
