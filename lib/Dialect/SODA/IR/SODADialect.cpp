@@ -28,6 +28,8 @@
 using namespace mlir;
 using namespace mlir::soda;
 
+#include "soda/Dialect/SODA/SODAOpsDialect.cpp.inc"
+
 //===----------------------------------------------------------------------===//
 // SODADialect
 //===----------------------------------------------------------------------===//
