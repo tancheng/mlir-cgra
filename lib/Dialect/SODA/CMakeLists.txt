@@ -1,5 +1,23 @@
-add_mlir_dialect_library(MLIRSODA
+add_mlir_dialect_library(MLIRSODAOps
   IR/SODADialect.cpp
+
+  ADDITIONAL_HEADER_DIRS
+  ${PROJ_INCLUDE_DIR}/mlir/Dialect/SODA
+
+  DEPENDS
+  MLIRSODAOpsIncGen
+  MLIRSODAOpInterfacesIncGen
+
+  LINK_LIBS PUBLIC
+  MLIRDLTI
+  MLIRIR
+  MLIRMemRef
+  MLIRSideEffectInterfaces
+  MLIRSupport
+  )
+
+add_mlir_dialect_library(MLIRSODATransforms
+
   Transforms/KernelOutlining.cpp
   Transforms/KernelGeneration.cpp
   Transforms/HostGeneration.cpp
@@ -8,17 +26,22 @@ add_mlir_dialect_library(MLIRSODA
   ADDITIONAL_HEADER_DIRS
   ${PROJ_INCLUDE_DIR}/soda/Dialect/SODA
 
+  LINK_COMPONENTS
+  Core
+  MC
+
   DEPENDS
-  MLIRSODAOpsIncGen
-  MLIRSODAOpInterfacesIncGen
   MLIRSODAPassIncGen
 
   LINK_LIBS PUBLIC
+  #MLIRAsync
+  MLIRSODAOps
   MLIRIR
-  MLIRLLVMIR
-  MLIRSCF
+  #MLIRLLVMIR
+  #MLIRLLVMToLLVMIRTranslation
+  #MLIRMemRef
   MLIRPass
-  MLIRSideEffectInterfaces
+  MLIRSCF
   MLIRStandard
   MLIRSupport
   MLIRTransformUtils

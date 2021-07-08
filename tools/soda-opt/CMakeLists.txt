@@ -43,7 +43,8 @@ set(LIBS
 
   # SODA
   SODAMisc
-  MLIRSODA
+  MLIRSODAOps
+  MLIRSODATransforms
 
 )
 
