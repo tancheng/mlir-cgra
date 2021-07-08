@@ -15,7 +15,6 @@ add_mlir_conversion_library(SODAKERNELToSODA
   LINK_LIBS PUBLIC
   MLIRAffine
   MLIRAffineToStandard
-  MLIRGPU
   MLIRIR
   MLIRLinalg
   MLIRMemRef
