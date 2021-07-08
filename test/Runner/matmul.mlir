@@ -22,7 +22,7 @@ func @alloc_filled_f32(%s : index, %f : f32) -> memref<?xi8> {
   %s4 = muli %s, %c4: index
   %buf = memref.alloc(%s4) {alignment = 256} : memref<?xi8>
   %V = memref.view %buf[%c0][%s] : memref<?xi8> to memref<?xf32>
-  linalg.fill(%V, %f) : memref<?xf32>, f32
+  linalg.fill(%f, %V) : f32, memref<?xf32>
   return %buf : memref<?xi8>
 }
 
