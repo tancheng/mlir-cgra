@@ -53,12 +53,14 @@ int main(int argc, char **argv) {
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
   mlir::registerLinalgLowerToAffineLoopsPass();
   mlir::registerConvertStandardToLLVMPass();
+  mlir::registerConvertMemRefToLLVMPass();
   mlir::registerSCFToStandardPass();
   mlir::registerConvertAffineToStandardPass();
 
   // Add the following to selectively include the necessary dialects. You only
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
+  // clang-format off
   registry.insert<mlir::StandardOpsDialect,
                   mlir::memref::MemRefDialect,
                   mlir::LLVM::LLVMDialect,
@@ -67,6 +69,7 @@ int main(int argc, char **argv) {
                   mlir::scf::SCFDialect,
                   mlir::vector::VectorDialect,
                   mlir::AffineDialect>();
+  // clang-format on
   // mlir::registerAllDialects(registry);
 
   //===--------------------------------------------------------------------===//

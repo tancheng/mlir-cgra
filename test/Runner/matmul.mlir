@@ -1,6 +1,7 @@
 // RUN: soda-opt %s --convert-linalg-to-affine-loops --convert-linalg-to-std \
 // RUN: --lower-affine --canonicalize --cse \ 
-// RUN: --convert-scf-to-std  --canonicalize  --cse --convert-std-to-llvm \
+// RUN: --convert-scf-to-std --canonicalize --cse  \
+// RUN: --convert-memref-to-llvm --convert-std-to-llvm \
 // RUN: | mlir-runner -e matmul_driver -entry-point-result=f32 \
 // RUN: | FileCheck %s
 

@@ -34,6 +34,7 @@ set(LIBS
   # Conversion
   MLIRAffineToStandard
   MLIRSCFToStandard
+  MLIRMemRefToLLVM
   MLIRStandardToLLVM
   MLIRLinalgToLLVM
   MLIRLinalgToStandard
