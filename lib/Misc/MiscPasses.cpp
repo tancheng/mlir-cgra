@@ -226,6 +226,18 @@ class TestArgumentsToXMLPass
               print() << "\n";
             }
           }
+
+          if (FloatType value = a.dyn_cast<FloatType>()) {
+            StringRef v;
+            v = "1.0";
+            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
+          }
+
+          if (IntegerType value = a.dyn_cast<IntegerType>()) {
+            StringRef v;
+            v = "1";
+            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
+          }
         }
       }
       closeTestbench();
@@ -233,7 +245,7 @@ class TestArgumentsToXMLPass
     printClosure();
   };
 
-    void generateXMLforBareLaunchFunc(soda::LaunchFuncOp op) {
+  void generateXMLforBareLaunchFunc(soda::LaunchFuncOp op) {
     printPreamble();
     {
       auto indent = pushIndent();
@@ -277,6 +289,18 @@ class TestArgumentsToXMLPass
               print() << v << ",";
             }
             print() << v << "}\"\n";
+          }
+
+          if (FloatType value = a.dyn_cast<FloatType>()) {
+            StringRef v;
+            v = "1.0";
+            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
+          }
+
+          if (IntegerType value = a.dyn_cast<IntegerType>()) {
+            StringRef v;
+            v = "1";
+            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
         }
       }
