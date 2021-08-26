@@ -55,4 +55,4 @@ cmake -GNinja \
   -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
   -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir
 
-cmake --build "$MY_BUILD_DIR" --target soda-opt soda-translate mlir-runner install
+cmake --build "$MY_BUILD_DIR" --target opt soda-opt soda-translate mlir-runner install
