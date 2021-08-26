@@ -62,4 +62,4 @@ cmake -GNinja \
  # TODO check what these options do :
  # -DLLVM_OPTIMIZED_TABLEGEN=ON -DLLVM_ENABLE_OCAMLDOC=OFF -DLLVM_ENABLE_BINDINGS=OFF 
 
-cmake --build "$build_dir" --target mlir-opt --target mlir-translate --target mlir-cpu-runner --target install
+cmake --build "$build_dir" --target opt mlir-opt --target mlir-translate --target mlir-cpu-runner --target install
