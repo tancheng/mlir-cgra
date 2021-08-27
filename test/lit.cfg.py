@@ -21,7 +21,7 @@ config.name = 'SODA_PROJ'
 config.test_format = lit.formats.ShTest(not llvm_config.use_lit_shell)
 
 # suffixes: A list of file extensions to treat as test files.
-config.suffixes = ['.mlir']
+config.suffixes = ['.mlir','.ll']
 
 # test_source_root: The root path where tests are located.
 config.test_source_root = os.path.dirname(__file__)
@@ -30,6 +30,7 @@ config.test_source_root = os.path.dirname(__file__)
 config.test_exec_root = os.path.join(config.soda_obj_root, 'test')
 
 config.substitutions.append(('%PATH%', config.environment['PATH']))
+config.substitutions.append(('%sodashlibdir', config.soda_lib_root))
 config.substitutions.append(('%shlibext', config.llvm_shlib_ext))
 
 llvm_config.with_system_environment(
@@ -52,11 +53,12 @@ config.soda_tools_dir = os.path.join(config.soda_obj_root, 'bin')
 # Tweak the PATH to include the tools dir.
 llvm_config.with_environment('PATH', config.llvm_tools_dir, append_path=True)
 
-tool_dirs = [config.soda_tools_dir, config.llvm_tools_dir]
+tool_dirs = [config.soda_tools_dir, config.mlir_tools_dir, config.llvm_tools_dir]
 tools = [
     'soda-opt',
     'soda-translate',
-    'mlir-runner'
+    'mlir-runner',
+    'opt'
 ]
 
 llvm_config.add_tool_substitutions(tools, tool_dirs)

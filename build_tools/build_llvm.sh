@@ -52,7 +52,7 @@ cmake -GNinja \
   -DLLVM_ENABLE_PROJECTS="mlir"   \
   -DLLVM_TARGETS_TO_BUILD="host"   \
   -DLLVM_INCLUDE_TOOLS=ON   \
-  -DLLVM_BUILD_TOOLS=OFF   \
+  -DLLVM_BUILD_TOOLS=ON   \
   -DLLVM_INCLUDE_TESTS=ON   \
   -DMLIR_INCLUDE_TESTS=ON   \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -62,4 +62,4 @@ cmake -GNinja \
  # TODO check what these options do :
  # -DLLVM_OPTIMIZED_TABLEGEN=ON -DLLVM_ENABLE_OCAMLDOC=OFF -DLLVM_ENABLE_BINDINGS=OFF 
 
-cmake --build "$build_dir" --target opt mlir-opt --target mlir-translate --target mlir-cpu-runner --target install
+cmake --build "$build_dir" --target opt mlir-opt mlir-translate mlir-cpu-runner install

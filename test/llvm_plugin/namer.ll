@@ -1,6 +1,5 @@
-; RUN: opt %s -load llvmshlibdir/BugpointPasses%pluginext \
-; RUN: -S -debug-pass-manager -enable-new-pm=0 -namer
-; RUN: -disable-output 2>&1 | FileCheck %s
+; RUN: opt -load %sodashlibdir/LLVMNamer%shlibext -namer \
+; RUN:     -S -enable-new-pm=0 -disable-output < %s 2>&1 | FileCheck %s
 
 ; ModuleID = '<stdin>'
 source_filename = "LLVMDialectModule"

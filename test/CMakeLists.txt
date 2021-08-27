@@ -10,6 +10,7 @@ set(STANDALONE_TEST_DEPENDS
         soda-opt
         soda-translate
         mlir-runner
+        LLVMNamer
         )
 
 add_lit_testsuite(check-soda "Running the soda-opt regression tests"
