@@ -23,17 +23,17 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
   %24 = insertvalue { float*, float*, i64 } undef, float* %10, 0, !dbg !18
   %25 = insertvalue { float*, float*, i64 } %24, float* %11, 1, !dbg !19
   %26 = insertvalue { float*, float*, i64 } %25, i64 %12, 2, !dbg !20
-  %27 = alloca float, i64 mul (i64 ptrtoint (float* getelementptr (float, float* null, i32 1) to i64), i64 8), align 4, !dbg !21
+  %27 = alloca float, i64 ptrtoint (float* getelementptr (float, float* null, i64 32) to i64), align 4, !dbg !21
   %28 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } undef, float* %27, 0, !dbg !22
   %29 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %28, float* %27, 1, !dbg !23
   %30 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %29, i64 0, 2, !dbg !24
-  %31 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %30, i64 8, 3, 0, !dbg !25
+  %31 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %30, i64 32, 3, 0, !dbg !25
   %32 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %31, i64 1, 4, 0, !dbg !26
-  %33 = alloca float, i64 mul (i64 ptrtoint (float* getelementptr (float, float* null, i32 1) to i64), i64 8), align 4, !dbg !27
+  %33 = alloca float, i64 ptrtoint (float* getelementptr (float, float* null, i64 32) to i64), align 4, !dbg !27
   %34 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } undef, float* %33, 0, !dbg !28
   %35 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %34, float* %33, 1, !dbg !29
   %36 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %35, i64 0, 2, !dbg !30
-  %37 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %36, i64 8, 3, 0, !dbg !31
+  %37 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %36, i64 32, 3, 0, !dbg !31
   %38 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %37, i64 1, 4, 0, !dbg !32
   %39 = alloca float, i64 ptrtoint (float* getelementptr (float, float* null, i64 1) to i64), align 4, !dbg !33
   %40 = insertvalue { float*, float*, i64 } undef, float* %39, 0, !dbg !34
@@ -47,7 +47,7 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
 
 46:                                               ; preds = %49, %13
   %47 = phi i64 [ %60, %49 ], [ 0, %13 ]
-  %48 = icmp slt i64 %47, 8, !dbg !42
+  %48 = icmp slt i64 %47, 32, !dbg !42
   br i1 %48, label %49, label %61, !dbg !43
 
 49:                                               ; preds = %46
@@ -71,7 +71,7 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
 
 62:                                               ; preds = %65, %61
   %63 = phi i64 [ %77, %65 ], [ 0, %61 ]
-  %64 = icmp slt i64 %63, 8, !dbg !59
+  %64 = icmp slt i64 %63, 32, !dbg !59
   br i1 %64, label %65, label %78, !dbg !60
 
 65:                                               ; preds = %62
@@ -182,5 +182,5 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
 !78 = !DILocation(line: 108, column: 5, scope: !8)
 !79 = !DILocation(line: 109, column: 5, scope: !8)
 
-; CHECK: !mem.name
-; CHECK: !{!"mem1"}
+; CHECK: !annotation
+; CHECK: !{!"memfloat"}

@@ -15,28 +15,31 @@ struct Namer : public FunctionPass {
   Namer() : FunctionPass(ID) {}
 
   bool runOnFunction(Function &F) override {
-    LLVMContext& C = F.getContext();
     if (!F.isDeclaration()) {
       for (auto I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         if(isa<AllocaInst>(*I))
 		    {
+          // errs() << *I << "\n";
           // base name
-          std::string mem = "mem";
-          // add information about type and size
-          std::string my_name = mem + "1";
-          MDNode* N1 = MDNode::get(C, MDString::get(C, my_name));
-          I->setMetadata("mem.name", N1);
-          // Type* t = cast<AllocaInst>(*I).getAllocatedType();
-          // errs() << t->str() << "\n";
-          // errs() << cast<AllocaInst>(*I).getAllocatedType() << "\n";
-          // char* ty = LLVMPrintTypeToString(cast<LLVMTypeRef>(t));
+          std::string my_base = "mem";
+          // https://www.youtube.com/watch?v=IyVPyKrx0Xo
+          std::string my_type;
+          Type* t = cast<AllocaInst>(*I).getAllocatedType();
+          raw_string_ostream temps(my_type);
+          t->print(temps, false, false);
+          // add information about size and instruction number
+          std::string my_name = my_base + my_type;
+          I->addAnnotationMetadata(my_name);
+          // further information can be appended with further calls to addAnnotationMetadata
       	}
       }
     }
 
       for(auto I = inst_begin(F), E = inst_end(F); I != E; ++I) {
-        if (MDNode* N = (*I).getMetadata("mem.name")) {
+        if (MDNode* N = (*I).getMetadata("annotation")) {
           errs() << cast<MDString>(N->getOperand(0))->getString() << "\n";
+          // if there is a second string in the same annotation:
+          // errs() << cast<MDString>(N->getOperand(1))->getString() << "\n";
         }
       }
 
