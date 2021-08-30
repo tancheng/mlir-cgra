@@ -107,7 +107,7 @@ class TestArgumentsToXMLPass
     getOperation().walk([this](mlir::soda::LaunchFuncOp op) {
       // Prepare the output stream
       std::string errorMessage;
-      std::string filename = op.getKernelName().str() + "_test.xml";
+      std::string filename = op.getKernelName().getValue().str() + "_test.xml";
       auto output = openOutputFile(filename, &errorMessage);
       outputStream = &output->os();
 
