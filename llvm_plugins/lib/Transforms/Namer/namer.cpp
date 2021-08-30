@@ -19,16 +19,9 @@ struct Namer : public FunctionPass {
       for (auto I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         if(isa<AllocaInst>(*I))
 		    {
-          // errs() << *I << "\n";
-          // base name
           std::string my_base = "mem";
-          // https://www.youtube.com/watch?v=IyVPyKrx0Xo
-          std::string my_type;
-          Type* t = cast<AllocaInst>(*I).getAllocatedType();
-          raw_string_ostream temps(my_type);
-          t->print(temps, false, false);
-          // add information about size and instruction number
-          std::string my_name = my_base + my_type;
+          std::string my_ID = std::to_string(reinterpret_cast<uintptr_t>(&cast<Instruction>(*I)));
+          std::string my_name = my_base + my_ID;
           I->addAnnotationMetadata(my_name);
           // further information can be appended with further calls to addAnnotationMetadata
       	}
