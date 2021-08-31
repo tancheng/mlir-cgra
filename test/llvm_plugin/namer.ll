@@ -182,5 +182,6 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
 !78 = !DILocation(line: 108, column: 5, scope: !8)
 !79 = !DILocation(line: 109, column: 5, scope: !8)
 
-; CHECK: !annotation
-; CHECK: !{!"memfloat"}
+; CHECK: !annotation !22
+; CHECK: !annotation !29
+; CHECK: !annotation !36
