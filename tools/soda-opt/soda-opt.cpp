@@ -22,6 +22,8 @@
 #include "soda/Conversion/Passes.h"
 #include "soda/Dialect/SODA/Passes.h"
 #include "soda/Dialect/SODA/SODADialect.h"
+#include "soda/Dialect/SNN/Transforms/Passes.h"
+#include "soda/Dialect/SNN/IR/SNN.h"
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
@@ -78,7 +80,9 @@ int main(int argc, char **argv) {
 
   // Dialects
   registry.insert<mlir::soda::SODADialect>();
+  registry.insert<mlir::snn::SNNDialect>();
 
+  // ----- SODA -----
   // Misc passes
   mlir::soda::registerTestPrintOpNestingPass();
   mlir::soda::registerTestArgumentsToXMLPass();
@@ -101,6 +105,9 @@ int main(int argc, char **argv) {
   mlir::soda::registerPassManagerMiscPass(); // The one PM to rule them all
 
   // Conversion passes
+
+  // ----- SNN -----
+  mlir::snn::registerSNNPrintPass();
 
   return failed(
       mlir::MlirOptMain(argc, argv, "SODA optimizer driver\n", registry));

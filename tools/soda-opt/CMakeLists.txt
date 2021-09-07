@@ -47,6 +47,9 @@ set(LIBS
   MLIRSODAOps
   MLIRSODATransforms
 
+  # SNN
+  MLIRSNNOps
+  MLIRSNNTransforms
 )
 
 set(SOURCES
