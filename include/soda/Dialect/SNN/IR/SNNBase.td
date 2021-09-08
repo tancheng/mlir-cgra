@@ -28,6 +28,8 @@ def SNN_Dialect : Dialect {
 
   let description = [{
   }];
+
+  let dependentDialects = ["tensor::TensorDialect"];
 }
 
 #endif // SNN_BASE

@@ -14,6 +14,7 @@
 #define SNN_OPS
 
 include "soda/Dialect/SNN/IR/SNNBase.td"
+include "soda/Dialect/SNN/IR/SNNTypesBase.td"
 include "mlir/Dialect/LLVMIR/LLVMOpBase.td"
 include "mlir/IR/SymbolInterfaces.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
@@ -30,7 +31,7 @@ class SNN_Op<string mnemonic, list<OpTrait> traits = []> :
 }
 
 //===----------------------------------------------------------------------===//
-// CastOp
+// DummyOp
 //===----------------------------------------------------------------------===//
 
 def SNN_DummyOp : SNN_Op<"dummy", [ NoSideEffect
@@ -48,6 +49,31 @@ def SNN_DummyOp : SNN_Op<"dummy", [ NoSideEffect
 
   let arguments = (ins AnyType:$source);
   let results = (outs AnyType:$dest);
+  let assemblyFormat = "$source attr-dict `:` type($source) `to` type($dest)";
+
+  let hasCanonicalizer = 1;
+  let verifier = ?;
+}
+
+//===----------------------------------------------------------------------===//
+// EncodeSpikeTrainOp
+//===----------------------------------------------------------------------===//
+
+def SNN_EncodeSpikeTrainOp : SNN_Op<"encode_spike_train", [ NoSideEffect
+  ]> {
+  let summary = "Transform a tensor of times into a spike train";
+  let description = [{
+    Description...
+
+    Example:
+
+    ```mlir
+    // TODO
+    ```
+  }];
+
+  let arguments = (ins SNN_AnyNumber:$source);
+  let results = (outs SNN_AnyNumber:$dest);
   let assemblyFormat = "$source attr-dict `:` type($source) `to` type($dest)";
 
   let hasCanonicalizer = 1;

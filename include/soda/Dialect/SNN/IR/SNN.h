@@ -9,6 +9,7 @@
 #ifndef SODA_DIALECT_SNN_IR_SNN_H_
 #define SODA_DIALECT_SNN_IR_SNN_H_
 
+#include "mlir/Dialect/Tensor/IR/Tensor.h"
 #include "mlir/IR/BuiltinTypes.h"
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpDefinition.h"

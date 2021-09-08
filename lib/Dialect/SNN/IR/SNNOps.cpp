@@ -25,6 +25,10 @@ void DummyOp::getCanonicalizationPatterns(RewritePatternSet &results,
   //   results.add<SimplifyDummyOp<DummyOp>>(context);
 }
 
+void EncodeSpikeTrainOp::getCanonicalizationPatterns(RewritePatternSet &results,
+                                          MLIRContext *context) {
+}
+
 //===----------------------------------------------------------------------===//
 // TableGen'd op method definitions
 //===----------------------------------------------------------------------===//

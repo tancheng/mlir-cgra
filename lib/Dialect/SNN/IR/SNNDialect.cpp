@@ -12,14 +12,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "mlir/Transforms/InliningUtils.h"
 #include "soda/Dialect/SNN/IR/SNN.h"
+#include "mlir/Dialect/Tensor/IR/Tensor.h"
 
 using namespace mlir;
 using namespace mlir::snn;
 
 #include "soda/Dialect/SNN/IR/SNNOpsDialect.cpp.inc"
-// #include "mlir/Dialect/Tensor/IR/TensorOpsDialect.cpp.inc"
 
 //===----------------------------------------------------------------------===//
 // SNNDialect
