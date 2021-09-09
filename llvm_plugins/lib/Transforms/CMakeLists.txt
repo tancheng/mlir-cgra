@@ -1,1 +1,2 @@
 add_subdirectory(Namer)
+add_subdirectory(XMLWriter)
