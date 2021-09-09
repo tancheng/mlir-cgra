@@ -19,7 +19,7 @@ struct Namer : public FunctionPass {
       for (auto I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         if(isa<AllocaInst>(*I))
 		    {
-          std::string my_base = "mem";
+          std::string my_base = "alloca";
           std::string my_ID = std::to_string(reinterpret_cast<uintptr_t>(&cast<Instruction>(*I)));
           std::string my_name = my_base + my_ID;
           I->addAnnotationMetadata(my_name);
@@ -27,14 +27,6 @@ struct Namer : public FunctionPass {
       	}
       }
     }
-
-      for(auto I = inst_begin(F), E = inst_end(F); I != E; ++I) {
-        if (MDNode* N = (*I).getMetadata("annotation")) {
-          errs() << cast<MDString>(N->getOperand(0))->getString() << "\n";
-          // if there is a second string in the same annotation:
-          // errs() << cast<MDString>(N->getOperand(1))->getString() << "\n";
-        }
-      }
 
     return true;
   }
