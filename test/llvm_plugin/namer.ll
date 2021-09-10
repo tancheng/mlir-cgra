@@ -184,3 +184,6 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
 ; CHECK: !annotation !22
 ; CHECK: !annotation !29
 ; CHECK: !annotation !36
+; CHECK: !22 = !{!"alloca_main0"}
+; CHECK: !29 = !{!"alloca_main1"}
+; CHECK: !36 = !{!"alloca_main2"}
