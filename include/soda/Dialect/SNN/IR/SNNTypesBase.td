@@ -14,6 +14,51 @@
 #define SNN_TYPES_BASE
 
 include "mlir/IR/OpBase.td"
+include "mlir/IR/BuiltinDialect.td"
+include "mlir/IR/BuiltinTypeInterfaces.td"
+include "mlir/IR/SubElementInterfaces.td"
+
+// Base class for Builtin dialect types.
+class Builtin_Type<string name, list<Trait> traits = [],
+                   string baseCppClass = "::mlir::Type">
+    : TypeDef<Builtin_Dialect, name, traits, baseCppClass> {
+  let mnemonic = ?;
+}
+
+def SNN_UnrankedTensor : Builtin_Type<"UnrankedSpikeTrain", [
+    DeclareTypeInterfaceMethods<SubElementTypeInterface>
+  ], "SpikeTrainType"> {
+  let summary = "Multi-dimensional array with unknown dimensions";
+  let description = [{
+    Syntax:
+
+    ```
+    tensor-type ::= `spike_train_type` `<` `*` `x` type `>`
+    ```
+
+    An unranked tensor is a type of tensor in which the set of dimensions have
+    unknown rank. See [RankedTensorType](#builtin_rankedtensor-rankedtensortype)
+    for more information on tensor types.
+
+    Examples:
+
+    ```mlir
+    tensor<*f32>
+    ```
+  }];
+  let parameters = (ins "Type":$elementType);
+
+  let builders = [
+    TypeBuilderWithInferredContext<(ins "Type":$elementType), [{
+      return $_get(elementType.getContext(), elementType);
+    }]>
+  ];
+  let extraClassDeclaration = [{
+    ArrayRef<int64_t> getShape() const { return llvm::None; }
+  }];
+  let skipDefaultBuilders = 1;
+  let genVerifyDecl = 1;
+}
 
 //===----------------------------------------------------------------------===//
 // SNN Type Definitions.
@@ -120,7 +165,7 @@ class SNN_TensorOfOrNone<list<Type> allowedTypes, string description = ""> :
 // Tensors as unranked does not guarantee invalid. If unranked tensors exist
 // they should be shape propagate used SNN's shape inference pass and verified
 // to not include any remaining unranked tensors.
-def SNN_UnrankedTensor : UnrankedTensorOf<[SNN_AnyNumber]>;
+// def SNN_UnrankedTensor : UnrankedTensorOf<[SNN_AnyNumber]>;
 
 def SNN_Tensor1D : AnyTypeOf<[SNN_UnrankedTensor, 1DTensorOf<[SNN_AnyNumber]>]>;
 def SNN_Tensor2D : AnyTypeOf<[SNN_UnrankedTensor, 2DTensorOf<[SNN_AnyNumber]>]>;
