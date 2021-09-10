@@ -16,13 +16,16 @@ struct Namer : public FunctionPass {
 
   bool runOnFunction(Function &F) override {
     if (!F.isDeclaration()) {
+      int alloca_counter = 0;
       for (auto I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         if(isa<AllocaInst>(*I))
 		    {
-          std::string my_base = "alloca";
-          std::string my_ID = std::to_string(reinterpret_cast<uintptr_t>(&cast<Instruction>(*I)));
-          std::string my_name = my_base + my_ID;
+          std::string my_base = "alloca_";
+          std::string my_function = std::string(F.getName());
+          std::string my_ID = std::to_string(alloca_counter);
+          std::string my_name = my_base + my_function + my_ID;
           I->addAnnotationMetadata(my_name);
+          alloca_counter++;
           // further information can be appended with further calls to addAnnotationMetadata
       	}
       }
