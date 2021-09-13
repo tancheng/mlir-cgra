@@ -261,8 +261,9 @@ void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
   // Add the data operands.
   result.addOperands(kernelOperands);
   auto kernelModule = kernelFunc->getParentOfType<SODAModuleOp>();
-  auto kernelSymbol = builder.getSymbolRefAttr(
-      kernelModule.getName(), {builder.getSymbolRefAttr(kernelFunc.getName())});
+  auto kernelSymbol =
+      SymbolRefAttr::get(kernelModule.getNameAttr(),
+                         {SymbolRefAttr::get(kernelFunc.getNameAttr())});
   result.addAttribute(getKernelAttrName(), kernelSymbol);
   SmallVector<int32_t, 2> segmentSizes(2, 1);
   segmentSizes.front() = 0; // Initially no async dependencies.

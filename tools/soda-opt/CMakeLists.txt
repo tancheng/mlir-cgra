@@ -27,6 +27,7 @@ set(LIBS
   MLIRLinalgTransforms
   MLIRAffineTransforms
   MLIRSCFTransforms
+  MLIRReconcileUnrealizedCasts
 
   # Test Passes
   MLIRAffineTransformsTestPasses

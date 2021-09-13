@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
   mlir::registerConvertMemRefToLLVMPass();
   mlir::registerSCFToStandardPass();
   mlir::registerConvertAffineToStandardPass();
+  mlir::registerReconcileUnrealizedCastsPass();
 
   // Add the following to selectively include the necessary dialects. You only
   // need to register dialects that will be *parsed* by the tool, not the one
