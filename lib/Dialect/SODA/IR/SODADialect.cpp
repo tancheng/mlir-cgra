@@ -222,9 +222,6 @@ static LogicalResult verify(LaunchOp op) {
 }
 
 static void printLaunchOp(OpAsmPrinter &p, LaunchOp op) {
-  // Print the launch configuration.
-  p << LaunchOp::getOperationName();
-
   p.printRegion(op.body(), /*printEntryBlockArgs=*/false);
   p.printOptionalAttrDict(op->getAttrs());
 }
@@ -491,7 +488,7 @@ static void printAttributions(OpAsmPrinter &p, StringRef keyword,
 
 /// Prints a SODA Func op.
 static void printSODAFuncOp(OpAsmPrinter &p, SODAFuncOp op) {
-  p << SODAFuncOp::getOperationName() << ' ';
+  p << ' ';
   p.printSymbolName(op.getName());
 
   FunctionType type = op.getType();
@@ -574,18 +571,6 @@ LogicalResult SODAFuncOp::verifyBody() {
 // ReturnOp
 //===----------------------------------------------------------------------===//
 
-static ParseResult parseReturnOp(OpAsmParser &parser, OperationState &result) {
-  llvm::SmallVector<OpAsmParser::OperandType, 4> operands;
-  llvm::SmallVector<Type, 4> types;
-  if (parser.parseOperandList(operands) ||
-      parser.parseOptionalColonTypeList(types) ||
-      parser.resolveOperands(operands, types, parser.getCurrentLocation(),
-                             result.operands))
-    return failure();
-
-  return success();
-}
-
 static LogicalResult verify(soda::ReturnOp returnOp) {
   SODAFuncOp function = returnOp->getParentOfType<SODAFuncOp>();
 
@@ -642,7 +627,7 @@ static ParseResult parseSODAModuleOp(OpAsmParser &parser,
 }
 
 static void print(OpAsmPrinter &p, SODAModuleOp op) {
-  p << op.getOperationName() << ' ';
+  p << ' ';
   p.printSymbolName(op.getName());
   p.printOptionalAttrDictWithKeyword(op->getAttrs(),
                                      {SymbolTable::getSymbolAttrName()});
