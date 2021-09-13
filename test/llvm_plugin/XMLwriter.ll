@@ -2,7 +2,7 @@
 ; RUN: -S -debug-pass-manager -enable-new-pm=0 -XMLwriter
 ; RUN: FileCheck %s -input-file=memory_allocation.xml --check-prefixes=CHECK_FILE
 
-; ModuleID = '/working_dir/soda-opt/test/llvm_plugin/namer.ll'
+; ModuleID = 'LLVMDialectModule'
 source_filename = "LLVMDialectModule"
 
 declare i8* @malloc(i64)
@@ -23,13 +23,13 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
   %24 = insertvalue { float*, float*, i64 } undef, float* %10, 0, !dbg !18
   %25 = insertvalue { float*, float*, i64 } %24, float* %11, 1, !dbg !19
   %26 = insertvalue { float*, float*, i64 } %25, i64 %12, 2, !dbg !20
-  %27 = alloca float, i64 mul (i64 ptrtoint (float* getelementptr (float, float* null, i32 1) to i64), i64 32), align 4, !dbg !21, !annotation !22
+  %27 = alloca float, i64 ptrtoint (float* getelementptr (float, float* null, i64 32) to i64), align 4, !dbg !21, !annotation !22
   %28 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } undef, float* %27, 0, !dbg !23
   %29 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %28, float* %27, 1, !dbg !24
   %30 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %29, i64 0, 2, !dbg !25
   %31 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %30, i64 32, 3, 0, !dbg !26
   %32 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %31, i64 1, 4, 0, !dbg !27
-  %33 = alloca float, i64 mul (i64 ptrtoint (float* getelementptr (float, float* null, i32 1) to i64), i64 32), align 4, !dbg !28, !annotation !29
+  %33 = alloca float, i64 ptrtoint (float* getelementptr (float, float* null, i64 32) to i64), align 4, !dbg !28, !annotation !29
   %34 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } undef, float* %33, 0, !dbg !30
   %35 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %34, float* %33, 1, !dbg !31
   %36 = insertvalue { float*, float*, i64, [1 x i64], [1 x i64] } %35, i64 0, 2, !dbg !32
@@ -188,8 +188,8 @@ define void @main(float* %0, float* %1, i64 %2, i64 %3, i64 %4, float* %5, float
 ; CHECK_FILE: <?xml version="1.0"?>
 ; CHECK_FILE: <memory>
 ; CHECK_FILE:  <memory_allocation>
-; CHECK_FILE:   <object scope="main" name="alloca_main0" is_internal="T"/>
-; CHECK_FILE:   <object scope="main" name="alloca_main1" is_internal="T"/>
+; CHECK_FILE:   <object scope="main" name="alloca_main0" is_internal="F"/>
+; CHECK_FILE:   <object scope="main" name="alloca_main1" is_internal="F"/>
 ; CHECK_FILE:   <object scope="main" name="alloca_main2" is_internal="T"/>
 ; CHECK_FILE:  </memory_allocation>
 ; CHECK_FILE: </memory>

@@ -4,12 +4,13 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/InstIterator.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include <fcntl.h>
 
-#define MAGIC_THRESHOLD 0
+#define MAGIC_THRESHOLD 512
 
 using namespace llvm;
 
@@ -44,7 +45,6 @@ void printPreamble() {
 }
 
 void printClosure() { 
-  auto indent = pushIndent();
   printIndent() << "</memory_allocation>\n"; 
   resetIndent();
   printIndent() << "</memory>\n";
@@ -62,8 +62,9 @@ struct XMLWriter : public ModulePass {
 
     resetIndent();
     printPreamble();
-
-    for(auto f = M.begin(), fE = M.end(); f != fE; ++f) {
+    auto indent = pushIndent();  
+    {
+      for(auto f = M.begin(), fE = M.end(); f != fE; ++f) {
       if (!(*f).isDeclaration()) {
         for(auto I = inst_begin(*f), E = inst_end(*f); I != E; ++I) {
           if(isa<AllocaInst>(*I)){
@@ -71,9 +72,20 @@ struct XMLWriter : public ModulePass {
               auto indent = pushIndent();
               printIndent() << "<object scope=\"" << (*f).getName() << "\" ";
               xmlOut() << "name=\"" << cast<MDString>(N->getOperand(0))->getString() << "\" ";
-               xmlOut() << "is_internal=\"";              
-              int size = 0;
-              if(size > MAGIC_THRESHOLD)
+              xmlOut() << "is_internal=\"";              
+              uint64_t total_size = 0;
+              uint64_t array_size = 0;
+              DataLayout* d = new DataLayout(&M);
+              if(cast<AllocaInst>(*I).getAllocationSizeInBits(*d) == None)
+              {
+                Value* v = cast<AllocaInst>(*I).getArraySize();
+                Value* first_op = dyn_cast<ConstantExpr>(v)->getOperand(0);
+                Value* first_op_second_op = dyn_cast<ConstantExpr>(first_op)->getOperand(1);
+                array_size = dyn_cast<ConstantInt>(first_op_second_op)->getZExtValue();
+                Type* t = cast<AllocaInst>(*I).getAllocatedType();
+                total_size = uint64_t(d->getTypeAllocSizeInBits(t) * array_size);
+              }
+              if(total_size > MAGIC_THRESHOLD)
               {
                 xmlOut() << "F\"";
               }
@@ -82,16 +94,14 @@ struct XMLWriter : public ModulePass {
                 xmlOut() << "T\"";
               }
               xmlOut() << "/>\n";
-              errs() << cast<AllocaInst>(*I).getArraySize() << "\n";
-              errs() << cast<AllocaInst>(*I).getAllocatedType() << "\n";
             }
           }
         }
       }
+      }
     }
-
+    
     printClosure();
-
     return false;
   }
 }; // end of struct Namer
