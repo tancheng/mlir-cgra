@@ -83,7 +83,7 @@ struct XMLWriter : public ModulePass {
                 Value* first_op_second_op = dyn_cast<ConstantExpr>(first_op)->getOperand(1);
                 array_size = dyn_cast<ConstantInt>(first_op_second_op)->getZExtValue();
                 Type* t = cast<AllocaInst>(*I).getAllocatedType();
-                total_size = uint64_t(d->getTypeAllocSizeInBits(t) * array_size);
+                total_size = d->getTypeAllocSizeInBits(t) * array_size;
               }
               if(total_size > MAGIC_THRESHOLD)
               {
