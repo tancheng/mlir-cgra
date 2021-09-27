@@ -20,16 +20,30 @@
 #include "llvm/Support/ToolOutputFile.h"
 
 #include "soda/Conversion/Passes.h"
+#include "soda/Dialect/SNN/IR/SNN.h"
+#include "soda/Dialect/SNN/Transforms/Passes.h"
 #include "soda/Dialect/SODA/Passes.h"
 #include "soda/Dialect/SODA/SODADialect.h"
-#include "soda/Dialect/SNN/Transforms/Passes.h"
-#include "soda/Dialect/SNN/IR/SNN.h"
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
 // Defined in the test directory, no public header.
 namespace mlir {
 void registerTestLoopPermutationPass();
+}
+
+// Register important affine passes
+inline void registerAffinePassesForSoda() {
+
+  mlir::registerAffineDataCopyGenerationPass();
+  mlir::registerAffineLoopInvariantCodeMotionPass();
+  mlir::registerAffineLoopTilingPass();
+  mlir::registerAffineLoopFusionPass();
+  mlir::registerAffineLoopUnrollPass();
+  mlir::registerAffineScalarReplacementPass();
+
+  // Test passes
+  mlir::registerTestLoopPermutationPass();
 }
 
 int main(int argc, char **argv) {
@@ -44,12 +58,7 @@ int main(int argc, char **argv) {
   mlir::registerInlinerPass();
   mlir::registerCanonicalizerPass();
   mlir::registerCSEPass();
-  mlir::registerAffineLoopFusionPass();
-  mlir::registerAffineLoopUnrollPass();
-  mlir::registerAffineScalarReplacementPass();
-
-  // Test passes
-  mlir::registerTestLoopPermutationPass();
+  registerAffinePassesForSoda();
 
   mlir::registerConvertLinalgToStandardPass();
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
