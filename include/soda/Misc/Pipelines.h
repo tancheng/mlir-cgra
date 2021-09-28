@@ -50,6 +50,7 @@ void registerPassManagerMiscPass() {
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
         pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createLowerToLLVMPass());
+        pm.addPass(createReconcileUnrealizedCastsPass());
       });
 }
 
