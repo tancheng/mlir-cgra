@@ -51,6 +51,12 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
       *this, "max-rank-of-allocated-memref",
       ::llvm::cl::desc("Maximal memref rank to promote dynamic buffers."),
       ::llvm::cl::init(3)};
+
+  Option<unsigned> numberOfFullUnrolls{
+      *this, "number-of-full-unrolls",
+      ::llvm::cl::desc(
+          "The number of times to apply affine-loop-unrol=unroll-full."),
+      ::llvm::cl::init(3)};
 };
 } // end anonymous namespace
 
@@ -102,9 +108,16 @@ void registerOptimizedForBambuPass() {
         if (!options.noAllocaPromotion) {
           // --promote-buffers-to-stack=
           //   "max-rank-of-allocated-memref=4 max-alloc-size-in-bytes=4096"
-          mlir::createPromoteBuffersToStackPass(
+          pm.addPass(mlir::createPromoteBuffersToStackPass(
               options.maxAllocSizeInBytes, options.bitwidthOfIndexType,
-              options.maxRankOfAllocatedMemRef);
+              options.maxRankOfAllocatedMemRef));
+        }
+
+        for (size_t i = 0; i < options.numberOfFullUnrolls; i++)
+        {
+          // --affine-loop-unroll="unroll-full"
+          pm.addPass(mlir::createLoopUnrollPass(4, false, true, 0));
+          // const std::function<unsigned(AffineForOp)> &getUnrollFactor)
         }
       });
 }
