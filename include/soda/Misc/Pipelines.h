@@ -32,6 +32,25 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
       *this, "no-buffer-trick",
       llvm::cl::desc("Remove the buffer trick optimization"),
       llvm::cl::init(0)};
+
+  // options for the memref.alloc to memref.alloca promotion
+  Option<bool> noAllocaPromotion{
+      *this, "no-alloca-promotion",
+      llvm::cl::desc("Remove alloca promotion optimization"),
+      llvm::cl::init(0)};
+  Option<unsigned> maxAllocSizeInBytes{
+      *this, "max-alloc-size-in-bytes",
+      ::llvm::cl::desc(
+          "Maximal size in bytes to promote allocations to stack."),
+      ::llvm::cl::init(4096)};
+  Option<unsigned> bitwidthOfIndexType{
+      *this, "bitwidth-of-index-type",
+      ::llvm::cl::desc("Bitwidth of the index type. Used for size estimation."),
+      ::llvm::cl::init(64)};
+  Option<unsigned> maxRankOfAllocatedMemRef{
+      *this, "max-rank-of-allocated-memref",
+      ::llvm::cl::desc("Maximal memref rank to promote dynamic buffers."),
+      ::llvm::cl::init(3)};
 };
 } // end anonymous namespace
 
@@ -79,6 +98,14 @@ void registerOptimizedForBambuPass() {
           pm.addPass(mlir::soda::createEraseMemrefDeallocPass());
         }
         pm.addPass(createCSEPass());
+
+        if (!options.noAllocaPromotion) {
+          // --promote-buffers-to-stack=
+          //   "max-rank-of-allocated-memref=4 max-alloc-size-in-bytes=4096"
+          mlir::createPromoteBuffersToStackPass(
+              options.maxAllocSizeInBytes, options.bitwidthOfIndexType,
+              options.maxRankOfAllocatedMemRef);
+        }
       });
 }
 
