@@ -110,6 +110,7 @@ int main(int argc, char **argv) {
   // Misc passes
   mlir::soda::registerTestPrintOpNestingPass();
   mlir::soda::registerTestArgumentsToXMLPass();
+  mlir::soda::registerEraseMemrefDeallocPass();
 
   // SODA Passes
   mlir::soda::registerSodaKernelOutliningPass();
@@ -126,8 +127,8 @@ int main(int argc, char **argv) {
   mlir::soda::registerConvertLinalgGenericToSODAPass();
 
   // Optimization passes
-  mlir::soda::registerPassManagerMiscPass(); // The one PM to rule them all
-  mlir::soda::registerOptimizedForBambuPass(); // The one PM to rule them all
+  mlir::soda::registerPassManagerMiscPass();
+  mlir::soda::registerOptimizedForBambuPass();
 
   // Conversion passes
 

@@ -71,10 +71,14 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createConvertLinalgToAffineLoopsPass());
         pm.addPass(createConvertLinalgToStandardPass());
 
-        // -affine-data-copy-generate="generate-dma=false fast-mem-space=0
-        // fast-mem-capacity=0"
-        if (!options.noBufferTrick)
+        if (!options.noBufferTrick) {
+          // -affine-data-copy-generate=
+          //   "generate-dma=false fast-mem-space=0 fast-mem-capacity=0"
+          // -erase-buffer-deallocation
           pm.addPass(mlir::soda::createAffineDataCopyGenPass(0, 0));
+          pm.addPass(mlir::soda::createEraseMemrefDeallocPass());
+        }
+        pm.addPass(createCSEPass());
       });
 }
 

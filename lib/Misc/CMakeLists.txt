@@ -1,7 +1,7 @@
-file(GLOB globbed *.cpp)
-
 add_mlir_dialect_library(SODAMisc
-    ${globbed}
+    MiscPasses.cpp
+    AffineDataCopyGen.cpp
+    MemrefEraseDealloc.cpp
 
     ADDITIONAL_HEADER_DIRS
     ${PROJECT_SOURCE_DIR}/include/

@@ -22,6 +22,12 @@ class Pass;
 } // namespace mlir
 
 namespace mlir {
+namespace memref {
+class DeallocOp;
+} // namespace memref
+} // namespace mlir
+
+namespace mlir {
 namespace soda {
 
 //===----------------------------------------------------------------------===//
@@ -29,6 +35,9 @@ namespace soda {
 //===----------------------------------------------------------------------===//
 std::unique_ptr<mlir::Pass> createTestPrintOpNestingPass();
 std::unique_ptr<mlir::Pass> createTestArgumentsToXMLPass();
+
+std::unique_ptr<mlir::Pass> createEraseMemrefDeallocPass();
+void populateEraseMemrefDeallocPattern(RewritePatternSet &patterns);
 
 //===----------------------------------------------------------------------===//
 // Optimizations
