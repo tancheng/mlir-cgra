@@ -11,6 +11,7 @@
 
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassManager.h"
+#include "soda/Misc/Passes.h"
 
 // TODO include for soda custom passes
 // #include "soda/Misc/Passes.h"
@@ -23,6 +24,13 @@ struct MyOptions : public PassPipelineOptions<MyOptions> {
   Option<uint64_t> cacheSizeInKiB{
       *this, "cache-size",
       llvm::cl::desc("Set size of cache to tile for in KiB"),
+      llvm::cl::init(0)};
+};
+
+struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
+  Option<bool> noBufferTrick{
+      *this, "no-buffer-trick",
+      llvm::cl::desc("Remove the buffer trick optimization"),
       llvm::cl::init(0)};
 };
 } // end anonymous namespace
@@ -51,6 +59,22 @@ void registerPassManagerMiscPass() {
         pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createLowerToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
+      });
+}
+
+void registerOptimizedForBambuPass() {
+  PassPipelineRegistration<OptForBambuOptions> registerOptionsPassPipeline(
+      "soda-opt-pipeline-for-bambu",
+      "Run the full pass pipeline to optimize previously outlined key "
+      "operations for bambu target",
+      [](OpPassManager &pm, const OptForBambuOptions &options) {
+        pm.addPass(createConvertLinalgToAffineLoopsPass());
+        pm.addPass(createConvertLinalgToStandardPass());
+
+        // -affine-data-copy-generate="generate-dma=false fast-mem-space=0
+        // fast-mem-capacity=0"
+        if (!options.noBufferTrick)
+          pm.addPass(mlir::soda::createAffineDataCopyGenPass(0, 0));
       });
 }
 

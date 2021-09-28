@@ -127,6 +127,7 @@ int main(int argc, char **argv) {
 
   // Optimization passes
   mlir::soda::registerPassManagerMiscPass(); // The one PM to rule them all
+  mlir::soda::registerOptimizedForBambuPass(); // The one PM to rule them all
 
   // Conversion passes
 
