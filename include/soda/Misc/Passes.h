@@ -13,6 +13,7 @@
 #ifndef SODA_MISC_PASSES_H
 #define SODA_MISC_PASSES_H
 
+#include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassRegistry.h"
 #include <memory>
 
@@ -32,6 +33,15 @@ std::unique_ptr<mlir::Pass> createTestArgumentsToXMLPass();
 //===----------------------------------------------------------------------===//
 // Optimizations
 //===----------------------------------------------------------------------===//
+
+/// Performs packing (or explicit copying) of accessed memref regions into
+/// buffers in the specified faster memory space through either pointwise copies
+/// or DMA operations.
+std::unique_ptr<OperationPass<FuncOp>> createAffineDataCopyGenPass(
+    unsigned slowMemorySpace, unsigned fastMemorySpace,
+    unsigned tagMemorySpace = 0, int minDmaTransferSize = 1024,
+    uint64_t fastMemCapacityBytes = std::numeric_limits<uint64_t>::max(),
+    bool generateDma = false);
 
 //===----------------------------------------------------------------------===//
 // Lowerings

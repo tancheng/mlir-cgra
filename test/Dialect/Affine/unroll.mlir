@@ -1,4 +1,3 @@
-
  // RUN: soda-opt %s -affine-loop-unroll="unroll-full" | FileCheck %s
 
 func @unroll_inner(%A: memref<2x2xf32>, %B: memref<2x2xf32>, %C: memref<2x2xf32>) -> memref<2x2xf32> {
