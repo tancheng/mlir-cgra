@@ -58,6 +58,14 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
   ];
 }
 
+def EraseMemrefDealloc : Pass<"erase-buffer-deallocation"> {
+  let summary = "Erase all buffer deallocation ops in the IR";
+  let description = [{
+      Erase memref.dealloc ops.
+  }];
+  let constructor = "mlir::soda::createEraseMemrefDeallocPass()";
+}
+
 /// Note: The DRR definition used for defining patterns is shown below:
 ///
 /// class Pattern<
