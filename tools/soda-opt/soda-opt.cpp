@@ -30,6 +30,18 @@
 // Defined in the test directory, no public header.
 namespace mlir {
 void registerTestLoopPermutationPass();
+namespace test {
+
+int registerTestLinalgCodegenStrategy();
+} // namespace test
+} // namespace mlir
+
+// Register important linalg passes
+inline void registerLinalgPassesForSoda() {
+
+  mlir::registerLinalgPromotionPass();
+  // Test passes
+  mlir::test::registerTestLinalgCodegenStrategy();
 }
 
 // Register important affine passes
@@ -58,6 +70,8 @@ int main(int argc, char **argv) {
   mlir::registerInlinerPass();
   mlir::registerCanonicalizerPass();
   mlir::registerCSEPass();
+
+  registerLinalgPassesForSoda();
   registerAffinePassesForSoda();
 
   mlir::registerConvertLinalgToStandardPass();
