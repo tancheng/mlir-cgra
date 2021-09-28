@@ -40,23 +40,31 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
       llvm::cl::init(0)};
   Option<unsigned> maxAllocSizeInBytes{
       *this, "max-alloc-size-in-bytes",
-      ::llvm::cl::desc(
-          "Maximal size in bytes to promote allocations to stack."),
+      ::llvm::cl::desc("Alloca Promotion - Maximal size in bytes to promote "
+                       "allocations to stack. (default 4096)"),
       ::llvm::cl::init(4096)};
   Option<unsigned> bitwidthOfIndexType{
       *this, "bitwidth-of-index-type",
-      ::llvm::cl::desc("Bitwidth of the index type. Used for size estimation."),
+      ::llvm::cl::desc("Alloca Promotion - Bitwidth of the index type. Used "
+                       "for size estimation. (default 64)"),
       ::llvm::cl::init(64)};
   Option<unsigned> maxRankOfAllocatedMemRef{
       *this, "max-rank-of-allocated-memref",
-      ::llvm::cl::desc("Maximal memref rank to promote dynamic buffers."),
+      ::llvm::cl::desc("Alloca Promotion - Maximal memref rank to promote "
+                       "dynamic buffers. (default 3)"),
       ::llvm::cl::init(3)};
 
   Option<unsigned> numberOfFullUnrolls{
       *this, "number-of-full-unrolls",
-      ::llvm::cl::desc(
-          "The number of times to apply affine-loop-unrol=unroll-full."),
+      ::llvm::cl::desc("The number of times to apply "
+                       "affine-loop-unrol=unroll-full. (default 3)"),
       ::llvm::cl::init(3)};
+
+  Option<bool> noScalarReplacement{
+      *this, "no-scalar-replacement",
+      llvm::cl::desc("Remove optimization - scalar replacement of redundant "
+                     "affine memory operations."),
+      llvm::cl::init(0)};
 };
 } // end anonymous namespace
 
@@ -113,12 +121,26 @@ void registerOptimizedForBambuPass() {
               options.maxRankOfAllocatedMemRef));
         }
 
-        for (size_t i = 0; i < options.numberOfFullUnrolls; i++)
-        {
+        for (size_t i = 0; i < options.numberOfFullUnrolls; i++) {
           // --affine-loop-unroll="unroll-full"
           pm.addPass(mlir::createLoopUnrollPass(4, false, true, 0));
-          // const std::function<unsigned(AffineForOp)> &getUnrollFactor)
         }
+
+        if (!options.noScalarReplacement) {
+          // --affine-scalrep
+          pm.addPass(mlir::createAffineScalarReplacementPass());
+          pm.addPass(createCSEPass());
+        }
+
+        pm.addPass(createLowerAffinePass());
+        pm.addPass(createCanonicalizerPass());
+        pm.addPass(createCSEPass());
+        pm.addPass(createLowerToCFGPass());
+        pm.addPass(createCanonicalizerPass());
+        pm.addPass(createCSEPass());
+        pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createLowerToLLVMPass());
+        pm.addPass(createReconcileUnrealizedCastsPass());
       });
 }
 
