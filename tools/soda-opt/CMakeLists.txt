@@ -30,6 +30,7 @@ set(LIBS
   MLIRReconcileUnrealizedCasts
 
   # Test Passes
+  MLIRLinalgTestPasses
   MLIRAffineTransformsTestPasses
   
   # Conversion
