@@ -1,6 +1,7 @@
 add_mlir_dialect_library(SODAMisc
     MiscPasses.cpp
     AffineDataCopyGen.cpp
+    AffineLoopTiling.cpp
     MemrefEraseDealloc.cpp
 
     ADDITIONAL_HEADER_DIRS

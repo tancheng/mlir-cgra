@@ -28,6 +28,11 @@ struct MyOptions : public PassPipelineOptions<MyOptions> {
 };
 
 struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
+  Option<uint64_t> tileSize{
+      *this, "affine-tile-size",
+      llvm::cl::desc("Set the unified tiled size, used for all affine.for ops"),
+      llvm::cl::init(0)};
+
   Option<bool> noBufferTrick{
       *this, "no-buffer-trick",
       llvm::cl::desc("Remove the buffer trick optimization"),
@@ -104,9 +109,14 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createConvertLinalgToAffineLoopsPass());
         pm.addPass(createConvertLinalgToStandardPass());
 
+        if (options.tileSize > 0) {
+          // -affine-loop-tile="tile-size=2"
+          pm.addPass(mlir::soda::createAffineLoopTilingPass(options.tileSize));
+        }
+
         if (!options.noBufferTrick) {
           // -affine-data-copy-generate=
-          //   "generate-dma=false fast-mem-space=0 fast-mem-capacity=0"
+          //   "generate-dma=false fast-mem-space=0"
           // -erase-buffer-deallocation
           pm.addPass(mlir::soda::createAffineDataCopyGenPass(0, 0));
           pm.addPass(mlir::soda::createEraseMemrefDeallocPass());
