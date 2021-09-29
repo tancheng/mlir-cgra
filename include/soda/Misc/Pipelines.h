@@ -30,33 +30,37 @@ struct MyOptions : public PassPipelineOptions<MyOptions> {
 struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
   Option<uint64_t> tileSize{
       *this, "affine-tile-size",
-      llvm::cl::desc("Set the unified tiled size, used for all affine.for ops"),
+      llvm::cl::desc("Set the unified tiled size, used for all affine.for ops. "
+                     "(default 0 - don't tile)"),
       llvm::cl::init(0)};
 
   Option<bool> noBufferTrick{
       *this, "no-buffer-trick",
-      llvm::cl::desc("Remove the buffer trick optimization"),
+      llvm::cl::desc("Remove optimization - the buffer trick "),
       llvm::cl::init(0)};
 
   // options for the memref.alloc to memref.alloca promotion
   Option<bool> noAllocaPromotion{
       *this, "no-alloca-promotion",
-      llvm::cl::desc("Remove alloca promotion optimization"),
+      llvm::cl::desc("Remove optimization - alloca promotion"),
       llvm::cl::init(0)};
   Option<unsigned> maxAllocSizeInBytes{
       *this, "max-alloc-size-in-bytes",
       ::llvm::cl::desc("Alloca Promotion - Maximal size in bytes to promote "
-                       "allocations to stack. (default 4096)"),
+                       "allocations to stack. No effect if "
+                       "-no-alloca-promotion is used. (default 4096)"),
       ::llvm::cl::init(4096)};
   Option<unsigned> bitwidthOfIndexType{
       *this, "bitwidth-of-index-type",
       ::llvm::cl::desc("Alloca Promotion - Bitwidth of the index type. Used "
-                       "for size estimation. (default 64)"),
+                       "for size estimation. No effect if -no-alloca-promotion "
+                       "is used. (default 64)"),
       ::llvm::cl::init(64)};
   Option<unsigned> maxRankOfAllocatedMemRef{
       *this, "max-rank-of-allocated-memref",
-      ::llvm::cl::desc("Alloca Promotion - Maximal memref rank to promote "
-                       "dynamic buffers. (default 3)"),
+      ::llvm::cl::desc("Alloca Promotion - Max memref rank to promote "
+                       "dynamic buffers. No effect if -no-alloca-promotion is "
+                       "used. (default 3)"),
       ::llvm::cl::init(3)};
 
   Option<unsigned> numberOfFullUnrolls{
@@ -68,7 +72,7 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
   Option<bool> noScalarReplacement{
       *this, "no-scalar-replacement",
       llvm::cl::desc("Remove optimization - scalar replacement of redundant "
-                     "affine memory operations."),
+                     "affine memory operations"),
       llvm::cl::init(0)};
 };
 } // end anonymous namespace
