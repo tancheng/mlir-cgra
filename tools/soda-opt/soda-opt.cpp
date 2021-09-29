@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
 
   registerLinalgPassesForSoda();
   registerAffinePassesForSoda();
+  mlir::registerPromoteBuffersToStackPass();
 
   mlir::registerConvertLinalgToStandardPass();
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas

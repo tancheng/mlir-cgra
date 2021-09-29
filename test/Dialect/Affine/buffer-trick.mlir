@@ -1,5 +1,9 @@
 // RUN: soda-opt %s -affine-data-copy-generate="generate-dma=false fast-mem-space=0 fast-mem-capacity=1" | FileCheck %s
 
+// Alternativelly the buffer trick can be originated from the linalg dialect.
+// Buffer trick from linalg:
+// -linalg-promote-subviews="test-use-alloca"
+
 // CHECK-LABEL: func @buffer_trick
 // CHECK:        memref.alloc() : memref<4x4xf32>
 // CHECK-NEXT:   affine.for %{{.*}} = 0 to 4
