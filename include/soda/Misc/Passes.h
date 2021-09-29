@@ -52,6 +52,9 @@ std::unique_ptr<OperationPass<FuncOp>> createAffineDataCopyGenPass(
     uint64_t fastMemCapacityBytes = std::numeric_limits<uint64_t>::max(),
     bool generateDma = false);
 
+std::unique_ptr<OperationPass<FuncOp>>
+createAffineLoopTilingPass(unsigned tileSize);
+
 //===----------------------------------------------------------------------===//
 // Lowerings
 //===----------------------------------------------------------------------===//
