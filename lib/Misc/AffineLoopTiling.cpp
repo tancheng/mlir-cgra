@@ -8,7 +8,7 @@
 //
 // This file was modified based on:
 //   llvm-project/mlir/lib/Dialect/Affine/Transforms/LoopTiling.cpp
-// Adding the functionallity to create loop tiling passes based on a static
+// Adding the functionality to create loop tiling passes based on a static
 // number instead of size in KiB.
 //
 // This file implements a pass to tile loop nests.

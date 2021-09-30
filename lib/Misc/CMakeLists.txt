@@ -3,6 +3,7 @@ add_mlir_dialect_library(SODAMisc
     AffineDataCopyGen.cpp
     AffineLoopTiling.cpp
     MemrefEraseDealloc.cpp
+    StandardToLLVM.cpp
 
     ADDITIONAL_HEADER_DIRS
     ${PROJECT_SOURCE_DIR}/include/
