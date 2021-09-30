@@ -52,12 +52,24 @@ std::unique_ptr<OperationPass<FuncOp>> createAffineDataCopyGenPass(
     uint64_t fastMemCapacityBytes = std::numeric_limits<uint64_t>::max(),
     bool generateDma = false);
 
+/// Expose affine loop tiling creation with explicit tileSize selection
 std::unique_ptr<OperationPass<FuncOp>>
 createAffineLoopTilingPass(unsigned tileSize);
 
 //===----------------------------------------------------------------------===//
 // Lowerings
 //===----------------------------------------------------------------------===//
+
+// TODO: Move this pass out of the Misc directory into the Conversion directory
+/// Perform lowering from std operations to LLVM dialect.
+/// Exposing the options of barePtrCallConv or emitCWrappers without the need
+/// to know the mlir context during pass (pipeline) creation. MLIR context is
+/// obtained at runtime.
+///
+/// This pass is based on:
+///    https://github.com/llvm/llvm-project/blob/main/mlir/lib/Conversion/StandardToLLVM/StandardToLLVM.cpp#L1250
+std::unique_ptr<OperationPass<ModuleOp>>
+createStandardToLLVMPass(bool useBarePtrCallConv, bool emitCWrappers);
 
 //===----------------------------------------------------------------------===//
 // Register passes

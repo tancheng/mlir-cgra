@@ -74,6 +74,19 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
       llvm::cl::desc("Remove optimization - scalar replacement of redundant "
                      "affine memory operations"),
       llvm::cl::init(0)};
+
+  Option<bool> useBarePtrCallConv{
+      *this, "use-bare-ptr-memref-call-conv",
+      llvm::cl::desc("Replace FuncOp's MemRef arguments with bare pointers "
+                     "to the MemRef element types. Cannot be used with "
+                     "-emit-c-wrappers. (default false)"),
+      ::llvm::cl::init(false)};
+  Option<bool> emitCWrappers{
+      *this, "emit-c-wrappers",
+      llvm::cl::desc("Emit wrappers for C-compatible pointer-to-struct "
+                     "memref descriptors. Cannot be used with "
+                     "-use-bare-ptr-memref-call-conv. (default false)"),
+      llvm::cl::init(false)};
 };
 } // end anonymous namespace
 
@@ -153,7 +166,12 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
         pm.addPass(createMemRefToLLVMPass());
-        pm.addPass(createLowerToLLVMPass());
+        if (options.useBarePtrCallConv || options.emitCWrappers) {
+          pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
+                                              options.emitCWrappers));
+        } else {
+          pm.addPass(createLowerToLLVMPass());
+        }
         pm.addPass(createReconcileUnrealizedCastsPass());
       });
 }
