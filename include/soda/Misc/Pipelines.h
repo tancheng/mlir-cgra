@@ -34,6 +34,12 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
                      "(default 0 - don't tile)"),
       llvm::cl::init(0)};
 
+  ListOption<unsigned> permList{
+      *this, "permutation-map",
+      llvm::cl::desc("Specify the loop permutation. List size must match "
+                     "number of affine.for loops."),
+      llvm::cl::OneOrMore, llvm::cl::CommaSeparated};
+
   Option<bool> noBufferTrick{
       *this, "no-buffer-trick",
       llvm::cl::desc("Remove optimization - the buffer trick "),
@@ -131,14 +137,21 @@ void registerOptimizedForBambuPass() {
           pm.addPass(mlir::soda::createAffineLoopTilingPass(options.tileSize));
         }
 
+        if (options.permList.hasValue()) {
+          // TODO: Permute list must match number of affine.for loops.
+          //       Add logic to break away from these restrictions.
+          // --test-loop-permutation=permutation-map=1,2,0
+          // --test-loop-permutation=permutation-map=1,2,0,3,4,5 if tiled
+          pm.addPass(createAffineLoopPermutationPass(options.permList));
+        }
+
         if (!options.noBufferTrick) {
-          // -affine-data-copy-generate=
-          //   "generate-dma=false fast-mem-space=0"
+          // -affine-data-copy-generate="generate-dma=false fast-mem-space=0"
           // -erase-buffer-deallocation
           pm.addPass(mlir::soda::createAffineDataCopyGenPass(0, 0));
           pm.addPass(mlir::soda::createEraseMemrefDeallocPass());
         }
-        pm.addPass(createCSEPass());
+        // pm.addPass(createCSEPass());
 
         if (!options.noAllocaPromotion) {
           // --promote-buffers-to-stack=
@@ -152,11 +165,12 @@ void registerOptimizedForBambuPass() {
           // --affine-loop-unroll="unroll-full"
           pm.addPass(mlir::createLoopUnrollPass(4, false, true, 0));
         }
+          
+        pm.addPass(createCSEPass());
 
         if (!options.noScalarReplacement) {
           // --affine-scalrep
           pm.addPass(mlir::createAffineScalarReplacementPass());
-          pm.addPass(createCSEPass());
         }
 
         pm.addPass(createLowerAffinePass());
