@@ -56,6 +56,9 @@ std::unique_ptr<OperationPass<FuncOp>> createAffineDataCopyGenPass(
 std::unique_ptr<OperationPass<FuncOp>>
 createAffineLoopTilingPass(unsigned tileSize);
 
+std::unique_ptr<OperationPass<FuncOp>>
+createAffineLoopPermutationPass(const ArrayRef<unsigned>& permList);
+
 //===----------------------------------------------------------------------===//
 // Lowerings
 //===----------------------------------------------------------------------===//
