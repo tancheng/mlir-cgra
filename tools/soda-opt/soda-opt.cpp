@@ -20,16 +20,42 @@
 #include "llvm/Support/ToolOutputFile.h"
 
 #include "soda/Conversion/Passes.h"
+#include "soda/Dialect/SNN/IR/SNN.h"
+#include "soda/Dialect/SNN/Transforms/Passes.h"
 #include "soda/Dialect/SODA/Passes.h"
 #include "soda/Dialect/SODA/SODADialect.h"
-#include "soda/Dialect/SNN/Transforms/Passes.h"
-#include "soda/Dialect/SNN/IR/SNN.h"
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
 // Defined in the test directory, no public header.
 namespace mlir {
 void registerTestLoopPermutationPass();
+namespace test {
+
+int registerTestLinalgCodegenStrategy();
+} // namespace test
+} // namespace mlir
+
+// Register important linalg passes
+inline void registerLinalgPassesForSoda() {
+
+  mlir::registerLinalgPromotionPass();
+  // Test passes
+  mlir::test::registerTestLinalgCodegenStrategy();
+}
+
+// Register important affine passes
+inline void registerAffinePassesForSoda() {
+
+  mlir::registerAffineDataCopyGenerationPass();
+  mlir::registerAffineLoopInvariantCodeMotionPass();
+  mlir::registerAffineLoopTilingPass();
+  mlir::registerAffineLoopFusionPass();
+  mlir::registerAffineLoopUnrollPass();
+  mlir::registerAffineScalarReplacementPass();
+
+  // Test passes
+  mlir::registerTestLoopPermutationPass();
 }
 
 int main(int argc, char **argv) {
@@ -44,12 +70,10 @@ int main(int argc, char **argv) {
   mlir::registerInlinerPass();
   mlir::registerCanonicalizerPass();
   mlir::registerCSEPass();
-  mlir::registerAffineLoopFusionPass();
-  mlir::registerAffineLoopUnrollPass();
-  mlir::registerAffineScalarReplacementPass();
 
-  // Test passes
-  mlir::registerTestLoopPermutationPass();
+  registerLinalgPassesForSoda();
+  registerAffinePassesForSoda();
+  mlir::registerPromoteBuffersToStackPass();
 
   mlir::registerConvertLinalgToStandardPass();
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
@@ -87,6 +111,7 @@ int main(int argc, char **argv) {
   // Misc passes
   mlir::soda::registerTestPrintOpNestingPass();
   mlir::soda::registerTestArgumentsToXMLPass();
+  mlir::soda::registerEraseMemrefDeallocPass();
 
   // SODA Passes
   mlir::soda::registerSodaKernelOutliningPass();
@@ -103,7 +128,8 @@ int main(int argc, char **argv) {
   mlir::soda::registerConvertLinalgGenericToSODAPass();
 
   // Optimization passes
-  mlir::soda::registerPassManagerMiscPass(); // The one PM to rule them all
+  mlir::soda::registerPassManagerMiscPass();
+  mlir::soda::registerOptimizedForBambuPass();
 
   // Conversion passes
 
