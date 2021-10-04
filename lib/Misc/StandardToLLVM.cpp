@@ -13,6 +13,9 @@
 // This file implements a pass to convert MLIR standard and builtin dialects
 // into the LLVM IR dialect.
 //
+// Upstream implementation requires a MLIR context during pass creation, which
+// is not available during pass pipeline creation. Hence this file is needed.
+//
 //===----------------------------------------------------------------------===//
 
 #include "PassDetailForStdToLLVM.h"

@@ -5,6 +5,10 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
+//
+// This is required by the StandardToLLVM pass. 
+//
+//===----------------------------------------------------------------------===//
 
 #ifndef CONVERSION_PASSDETAIL_H_
 #define CONVERSION_PASSDETAIL_H_
