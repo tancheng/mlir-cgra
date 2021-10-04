@@ -1,14 +1,10 @@
 //===- HostGeneration.cpp - Implementation of host call generation --------===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
 //===----------------------------------------------------------------------===//
 //
 // This file implements the SODA dialect host genration pass.
 //
-// It transforms soda.launch_func operations into call to the bambu host api.
+// It transforms soda.launch_func operations in the host code into call to the
+// bambu host api.
 //
 //===----------------------------------------------------------------------===//
 

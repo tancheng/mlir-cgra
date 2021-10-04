@@ -1,13 +1,13 @@
-//===- MiscPasses.cpp - Misc Passes ---------------------------===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
+//===- MiscPasses.cpp - Misc Passes ---------------------------------------===//
 //===----------------------------------------------------------------------===//
 //
-// This file implements a Function level pass performing interprocedural
-// propagation of array shapes through function specialization.
+// This file implements a series of misc passes that dont modify the MLIR code.
+// These passes include printing operation nesting or generating test vectors
+// in XML targeting bambu simulation.
+//
+// Test vector generation works for algorithms with no dynamic behaviour based
+// on the input data. It supports regular memref call convetion and bareptr call
+// convention.
 //
 //===----------------------------------------------------------------------===//
 

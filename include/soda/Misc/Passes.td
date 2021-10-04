@@ -1,9 +1,4 @@
 //===- Passes.td - Pattern Match Optimizations for SODA -*- tablegen -*----===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
 //===----------------------------------------------------------------------===//
 //
 // Defines language-specific pattern match optimizations for SODA using
@@ -65,14 +60,6 @@ def EraseMemrefDealloc : Pass<"erase-buffer-deallocation"> {
   }];
   let constructor = "mlir::soda::createEraseMemrefDeallocPass()";
 }
-
-/// Note: The DRR definition used for defining patterns is shown below:
-///
-/// class Pattern<
-///    dag sourcePattern, list<dag> resultPatterns,
-///    list<dag> additionalConstraints = [],
-///    dag benefitsAdded = (addBenefit 0)
-/// >;
 
 //===----------------------------------------------------------------------===//
 // Basic Pattern-Match and Rewrite
