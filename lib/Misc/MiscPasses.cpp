@@ -260,7 +260,7 @@ class TestArgumentsToXMLPass
     {
       auto indent = pushIndent();
       initInterface();
-      printI() << op.getKernelName().getValue().str() << "\"\n";
+      printI() << op.getKernelName().getValue().str() << "\">\n";
       {
         auto indent = pushIndent();
 
@@ -438,7 +438,7 @@ class TestArgumentsToXMLPass
     {
       auto indent = pushIndent();
       initInterface();
-      printI() << op.getKernelName().getValue().str() << "\"\n";
+      printI() << op.getKernelName().getValue().str() << "\">\n";
       {
         auto indent = pushIndent();
 

@@ -23,7 +23,7 @@ module attributes {soda.container_module}  {
 
 // CHECK_FILE: <?xml version="1.0"?>
 // CHECK_FILE: <module>
-// CHECK_FILE:  <function id="driver_kernel"
+// CHECK_FILE:  <function id="driver_kernel">
 // CHECK_FILE:   <arg id="P0" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
 // CHECK_FILE:   <arg id="P1" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
 // CHECK_FILE:   <arg id="P2" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
@@ -50,7 +50,7 @@ module attributes {soda.container_module}  {
 
 // CHECK_TERMINAL: <?xml version="1.0"?>
 // CHECK_TERMINAL: <module>
-// CHECK_TERMINAL:  <function id="driver_kernel"
+// CHECK_TERMINAL:  <function id="driver_kernel">
 // CHECK_TERMINAL:   <arg id="P0" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
 // CHECK_TERMINAL:   <arg id="P1" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
 // CHECK_TERMINAL:   <arg id="P2" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
@@ -77,7 +77,7 @@ module attributes {soda.container_module}  {
 
 // CHECK_BARE: <?xml version="1.0"?>
 // CHECK_BARE: <module>
-// CHECK_BARE:  <function id="driver_kernel"
+// CHECK_BARE:  <function id="driver_kernel">
 // CHECK_BARE:   <arg id="P0" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
 // CHECK_BARE:   <arg id="P1" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="21" interface_typename_include=""/>
 // CHECK_BARE:   <arg id="P2" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="12" interface_typename_include=""/>
