@@ -27,14 +27,17 @@ do
     source ${KERNELDIR}/../../scripts/bambu-debug-flags.sh
 
     # Perform the synthesis
+
+    # FLOPOCO
     # source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-flopoco.sh
 
-  # With SSDCS
-  source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-with-ssdcs.sh
-  source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-with-ssdcs.sh
+    # SOFT-FLOAT
+    # With SSDCS
+    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-with-ssdcs.sh
+    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-with-ssdcs.sh
 
-  # NO SSDCS
-  source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-no-ssdcs.sh
-  source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-no-ssdcs.sh
+    # NO SSDCS
+    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-no-ssdcs.sh
+    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-no-ssdcs.sh
   done
 done
