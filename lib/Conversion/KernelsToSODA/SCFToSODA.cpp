@@ -1,9 +1,4 @@
 //===- SCFToSODA.cpp - Convert an affine loop nest to a SODA kernel -------===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
 //===----------------------------------------------------------------------===//
 //
 // This implements a straightforward conversion of an loop nest into a SODA

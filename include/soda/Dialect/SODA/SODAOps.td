@@ -213,14 +213,14 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
     operation has a symbol attribute named `kernel` to identify the fully 
     specified kernel function to launch (both the soda.module and func).
 
-    The `gpu.launch_func` supports async dependencies: the kernel does not
+    The `soda.launch_func` supports async dependencies: the kernel does not
     start executing until the ops that produce those async dependencies have
     completed.
 
     By the default, the host implicitly blocks until kernel execution has
     completed. If the `async` keyword is present, the host does not block but
-    instead a `!gpu.async.token` is returned. Other async GPU ops can take this
-    token as dependency.
+    instead a `!soda.async.token` is returned. Other async SODA ops can take
+    this token as dependency.
     
     During outlining transformation, any variables needed by the kernel
     function, that were created outside of the `soda.launch` operation are
@@ -368,8 +368,7 @@ def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, NoSideEffect,
 
   let builders = [OpBuilder<(ins), [{ // empty}]>];
 
-  let parser = [{ return parseReturnOp(parser, result); }];
-  let printer = [{ p << getOperationName(); }];
+  let assemblyFormat = "attr-dict ($operands^ `:` type($operands))?";
   let verifier = [{ return ::verify(*this); }];
 }
 
@@ -383,8 +382,7 @@ def SODA_TerminatorOp : SODA_Op<"terminator", [HasParent<"LaunchOp">,
     terminator takes no operands.
   }];
 
-  let parser = [{ return success(); }];
-  let printer = [{ p << getOperationName(); }];
+  let assemblyFormat = "attr-dict";
 }
 
 def SODA_YieldOp : SODA_Op<"yield", [NoSideEffect, Terminator]>,
@@ -425,8 +423,7 @@ def SODA_BarrierOp : SODA_Op<"barrier"> {
     Either none or all work items of a workgroup need to execute this op
     in convergence.
   }];
-  let parser = [{ return success(); }];
-  let printer = [{ p << getOperationName(); }];
+  let assemblyFormat = "attr-dict";
 }
 
 
@@ -477,8 +474,7 @@ def SODA_ModuleEndOp : SODA_Op<"module_end", [
     This op terminates the only block inside the only region of a `soda.module`.
   }];
 
-  let parser = [{ return success(); }];
-  let printer = [{ p << getOperationName(); }];
+  let assemblyFormat = "attr-dict";
 }
 
 def SODA_HostRegisterOp : SODA_Op<"host_register">,

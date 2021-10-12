@@ -4,7 +4,7 @@ module attributes {soda.container_module} {
 
   // CHECK-LABEL:func @no_args(%{{.*}}: index)
   func @no_args(%sz : index) {
-    // CHECK: soda.launch
+    // CHECK: soda.launch {
     soda.launch {
       // CHECK: soda.terminator
       soda.terminator
@@ -14,7 +14,7 @@ module attributes {soda.container_module} {
 
   // CHECK-LABEL:func @args(%{{.*}}: index, %{{.*}}: index, %{{.*}}: f32, %{{.*}}: memref<?xf32, 1>) {
   func @args(%blk : index, %thrd : index, %float : f32, %data : memref<?xf32,1>) {
-    // CHECK: soda.launch
+    // CHECK: soda.launch {
     soda.launch {
       "use"(%float) : (f32) -> ()
       "use"(%data) : (memref<?xf32,1>) -> ()

@@ -1,10 +1,10 @@
-# soda-opt - Enabling System Level Design in MLIR
+# SODA-OPT - Enabling System Level Design in MLIR
 
-This project aims to create `soda-opt`, a tool that leverages `mlir` to
-extract pre-selected high-level code snippets and compile these snippets to
-llvm IR, so they can be synthesized by our high-level synthesis tool of choice.
+This project aims to create `soda-opt`, a tool that leverages `mlir` to extract
+pre-selected high-level code snippets, optimize, and translate these snippets to
+LLVM IR, so they can be synthesized by our high-level synthesis tool of choice.
 
-As a long term vision, the `soda-opt` project seeks to provide a set of
+As a long term vision, the SODA-OPT project seeks to provide a set of
 *compiler libraries* to perform the target optimizations; *runtime libraries* 
 to offload the compute from host to the selected targets; and to be
 *standalone*, being built on top of standard `mlir` tools and dialects, so
@@ -18,7 +18,7 @@ goal, `soda-opt` could later be merged into the main `llvm-project` codebase.
 This setup assumes that you have built LLVM and MLIR in `$BUILD_DIR` and
 installed it to `$PREFIX`. 
 The current version of this project was tested with `llvm-project` commit:
-`3d9a9fa6911a5228ce799a7c639e94d322678934`.
+`7eb899cbcdd15bd57e5630bb0c43163d0c992a82`.
 Make sure you have the correct commit checked-out.
 
 **Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM/MLIR 
@@ -137,14 +137,59 @@ $PROJ_BUILD_DIR/bin/soda-opt \
   --soda-opt-pipeline
 ```
 
-## License
-
-This project is made available under the Apache License 2.0 with LLVM
-Exceptions. See the `LICENSE.txt` file for more details.
-
 ## Credits
 
 This project was build on top of the mlir out-of-tree template available here:
 
 - Original author: https://github.com/jmgorius/mlir-standalone-template
 - LLVM Mirror: https://github.com/llvm/llvm-project/tree/main/mlir/examples/standalone
+
+---
+
+## License
+
+This project is made available under the BSD2 License.  See the
+[LICENSE.txt](LICENSE.txt) file for more details.
+
+### Software from third parties included in the SODA-OPT Project
+
+The SODA-OPT Project contains third party software which is under different
+license terms. All such code will be identified clearly using at least one of
+two mechanisms:
+1) It will be in a separate directory tree with its own `LICENSE.txt` or
+   `LICENSE` file at the top containing the specific license and restrictions
+   which apply to that software, or
+2) It will contain specific license and restriction terms at the top of every
+   file. 
+
+---
+
+# Disclaimer Notice
+
+This material was prepared as an account of work sponsored by an agency of the
+United States Government.  Neither the United States Government nor the United
+States Department of Energy, nor Battelle, nor any of their employees, nor any
+jurisdiction or organization that has cooperated in the development of these
+materials, makes any warranty, express or implied, or assumes any legal
+liability or responsibility for the accuracy, completeness, or usefulness or any
+information, apparatus, product, software, or process disclosed, or represents
+that its use would not infringe privately owned rights.
+
+Reference herein to any specific commercial product, process, or service by
+trade name, trademark, manufacturer, or otherwise does not necessarily
+constitute or imply its endorsement, recommendation, or favoring by the United
+States Government or any agency thereof, or Battelle Memorial Institute. The
+views and opinions of authors expressed herein do not necessarily state or
+reflect those of the United States Government or any agency thereof.
+
+
+<div align=center>
+<pre style="align-text:center">
+PACIFIC NORTHWEST NATIONAL LABORATORY
+operated by
+BATTELLE
+for the
+UNITED STATES DEPARTMENT OF ENERGY
+under Contract DE-AC05-76RL01830
+</pre>
+</div>

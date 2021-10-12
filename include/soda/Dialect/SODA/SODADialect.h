@@ -29,6 +29,7 @@ class FuncOp;
 
 namespace soda {
 
+// TODO Remove
 /// Utility class for the SODA dialect to represent triples of `Value`s
 /// accessible through `.x`, `.y`, and `.z` similarly to CUDA notation.
 struct KernelDim3 {

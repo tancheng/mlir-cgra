@@ -13,11 +13,18 @@
 #ifndef SODA_MISC_PASSES_H
 #define SODA_MISC_PASSES_H
 
+#include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassRegistry.h"
 #include <memory>
 
 namespace mlir {
 class Pass;
+} // namespace mlir
+
+namespace mlir {
+namespace memref {
+class DeallocOp;
+} // namespace memref
 } // namespace mlir
 
 namespace mlir {
@@ -29,13 +36,43 @@ namespace soda {
 std::unique_ptr<mlir::Pass> createTestPrintOpNestingPass();
 std::unique_ptr<mlir::Pass> createTestArgumentsToXMLPass();
 
+std::unique_ptr<mlir::Pass> createEraseMemrefDeallocPass();
+void populateEraseMemrefDeallocPattern(RewritePatternSet &patterns);
+
 //===----------------------------------------------------------------------===//
 // Optimizations
 //===----------------------------------------------------------------------===//
 
+/// Performs packing (or explicit copying) of accessed memref regions into
+/// buffers in the specified faster memory space through either pointwise copies
+/// or DMA operations.
+std::unique_ptr<OperationPass<FuncOp>> createAffineDataCopyGenPass(
+    unsigned slowMemorySpace, unsigned fastMemorySpace,
+    unsigned tagMemorySpace = 0, int minDmaTransferSize = 1024,
+    uint64_t fastMemCapacityBytes = std::numeric_limits<uint64_t>::max(),
+    bool generateDma = false);
+
+/// Expose affine loop tiling creation with explicit tileSize selection
+std::unique_ptr<OperationPass<FuncOp>>
+createAffineLoopTilingPass(unsigned tileSize);
+
+std::unique_ptr<OperationPass<FuncOp>>
+createAffineLoopPermutationPass(const ArrayRef<unsigned>& permList);
+
 //===----------------------------------------------------------------------===//
 // Lowerings
 //===----------------------------------------------------------------------===//
+
+// TODO: Move this pass out of the Misc directory into the Conversion directory
+/// Perform lowering from std operations to LLVM dialect.
+/// Exposing the options of barePtrCallConv or emitCWrappers without the need
+/// to know the mlir context during pass (pipeline) creation. MLIR context is
+/// obtained at runtime.
+///
+/// This pass is based on:
+///    https://github.com/llvm/llvm-project/blob/main/mlir/lib/Conversion/StandardToLLVM/StandardToLLVM.cpp#L1250
+std::unique_ptr<OperationPass<ModuleOp>>
+createStandardToLLVMPass(bool useBarePtrCallConv, bool emitCWrappers);
 
 //===----------------------------------------------------------------------===//
 // Register passes
