@@ -10,10 +10,19 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include <fcntl.h>
 
+#include "llvm/Support/CommandLine.h"
+
 // completely arbitrary, will need something that makes sense eventually
 #define MAGIC_THRESHOLD 512
 
 using namespace llvm;
+
+static cl::opt<bool> WriteToTerminal(
+    "write-to-terminal", cl::Hidden,
+    cl::desc("Set write to terminal instead of to a file (default: false)."),
+    cl::init(false));
+
+#define DEBUG_TYPE "memory-xml-writer"
 
 namespace {
 
@@ -51,15 +60,19 @@ void printClosure() {
   printIndent() << "</memory>\n";
 }
 
-struct XMLWriter : public ModulePass {
+struct XMLWriterPass : public ModulePass {
   static char ID;
-  XMLWriter() : ModulePass(ID) {}
+  XMLWriterPass() : ModulePass(ID) {}
 
   bool runOnModule(Module &M) override {
     std::error_code errorMessage;
     StringRef fileName = "memory_allocation.xml";
     raw_fd_ostream outFile(fileName, errorMessage);
     outputStream = &outFile;
+
+    if (WriteToTerminal) {
+      outputStream = &llvm::outs();
+    }
 
     resetIndent();
     printPreamble();
@@ -107,11 +120,10 @@ struct XMLWriter : public ModulePass {
     return false;
   }
 }; // end of struct Namer
-} // end of anonymous namespace
 
-char XMLWriter::ID = 0;
-static RegisterPass<XMLWriter>
-    X("XMLwriter",
+char XMLWriterPass::ID = 0;
+static RegisterPass<XMLWriterPass>
+    X("xml-mem-writer",
       "Generates an XML file for bambu that allocates memory instructions to "
       "internal and external storage.",
       true /* Only looks at CFG */, true /* Analysis Pass */);
@@ -119,5 +131,7 @@ static RegisterPass<XMLWriter>
 static RegisterStandardPasses Y(PassManagerBuilder::EP_EarlyAsPossible,
                                 [](const PassManagerBuilder &Builder,
                                    legacy::PassManagerBase &PM) {
-                                  PM.add(new XMLWriter());
+                                  PM.add(new XMLWriterPass());
                                 });
+
+} // end of anonymous namespace
