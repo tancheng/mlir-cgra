@@ -359,8 +359,8 @@ class TestArgumentsToXMLPass
 
           if (IntegerType value = a.dyn_cast<IntegerType>()) {
             printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-            printI() << "interface_typename=\"float\" ";
-            printI() << "interface_typename_orig=\"float\" ";
+            printI() << "interface_typename=\"int\" ";
+            printI() << "interface_typename_orig=\"int\" ";
             printI() << "interface_typename_include=\"\"/>\n" ;
           }
         }
@@ -489,8 +489,8 @@ class TestArgumentsToXMLPass
 
           if (IntegerType value = a.dyn_cast<IntegerType>()) {
             printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-            printI() << "interface_typename=\"float\" ";
-            printI() << "interface_typename_orig=\"float\" ";
+            printI() << "interface_typename=\"int\" ";
+            printI() << "interface_typename_orig=\"int\" ";
             printI() << "interface_typename_include=\"\"/>\n" ;
           }
         }
