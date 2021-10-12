@@ -10,7 +10,7 @@ set(STANDALONE_TEST_DEPENDS
         soda-opt
         soda-translate
         mlir-runner
-        LLVMNamer
+        AllocaNamer
         XMLWriter
         )
 

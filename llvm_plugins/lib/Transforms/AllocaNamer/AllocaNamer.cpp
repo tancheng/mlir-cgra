@@ -10,9 +10,9 @@
 using namespace llvm;
 
 namespace {
-struct Namer : public FunctionPass {
+struct AllocaNamerPass : public FunctionPass {
   static char ID;
-  Namer() : FunctionPass(ID) {}
+  AllocaNamerPass() : FunctionPass(ID) {}
 
   bool runOnFunction(Function &F) override {
     if (!F.isDeclaration()) {
@@ -33,17 +33,17 @@ struct Namer : public FunctionPass {
 
     return true;
   }
-}; // end of struct Namer
+}; // end of struct AllocaNamerPass
 } // end of anonymous namespace
 
-char Namer::ID = 0;
-static RegisterPass<Namer>
-    X("namer",
+char AllocaNamerPass::ID = 0;
+static RegisterPass<AllocaNamerPass>
+    X("name-allocas-for-xml-gen",
       "Assign metadata representing names for memory allocation operations.",
       false /* Only looks at CFG */, false /* Analysis Pass */);
 
 static RegisterStandardPasses Y(PassManagerBuilder::EP_EarlyAsPossible,
                                 [](const PassManagerBuilder &Builder,
                                    legacy::PassManagerBase &PM) {
-                                  PM.add(new Namer());
+                                  PM.add(new AllocaNamerPass());
                                 });

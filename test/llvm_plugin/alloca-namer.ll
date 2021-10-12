@@ -1,4 +1,4 @@
-; RUN: opt -load %sodashlibdir/LLVMNamer%shlibext -namer \
+; RUN: opt -load %sodashlibdir/AllocaNamer%shlibext -name-allocas-for-xml-gen \
 ; RUN:     -S -enable-new-pm=0 < %s 2>&1 | FileCheck %s
 
 declare i8* @malloc(i64)

@@ -1,5 +1,5 @@
 add_llvm_library(XMLWriter MODULE
-  XMLwriter.cpp
+  XMLWriter.cpp
 
   PLUGIN_TOOL
   opt
