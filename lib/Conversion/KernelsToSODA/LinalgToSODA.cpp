@@ -81,7 +81,7 @@ LogicalResult mlir::convertLinalgMatmulToSODALaunch(linalg::MatmulOp op) {
   return ::convertLinalgMatmulToSODALaunch(op);
 }
 
-static LogicalResult convertLinalgConvToSODALaunch(linalg::ConvOp op) {
+static LogicalResult convertLinalgConvToSODALaunch(linalg::Conv2DOp op) {
 
   LinalgToSodaConverter converter;
   converter.createLaunch(op);
@@ -89,7 +89,7 @@ static LogicalResult convertLinalgConvToSODALaunch(linalg::ConvOp op) {
   return success();
 }
 
-LogicalResult mlir::convertLinalgConvToSODALaunch(linalg::ConvOp op) {
+LogicalResult mlir::convertLinalgConvToSODALaunch(linalg::Conv2DOp op) {
   return ::convertLinalgConvToSODALaunch(op);
 }
 

@@ -19,7 +19,6 @@
 
 using namespace mlir;
 
-
 namespace {
 //===----------------------------------------------------------------------===//
 // Linalg<Operation>ToSODA
@@ -28,8 +27,7 @@ namespace {
 // A pass that traverses top-level dots in the function and converts them to
 // SODA launch operations.  Nested launches are not allowed, so this does not
 // walk the function recursively to avoid considering nested dots.
-struct LinalgDotMapper
-    : public ConvertLinalgDotToSODABase<LinalgDotMapper> {
+struct LinalgDotMapper : public ConvertLinalgDotToSODABase<LinalgDotMapper> {
   LinalgDotMapper() = default;
 
   void runOnFunction() override {
@@ -62,13 +60,12 @@ struct LinalgMatmulMapper
 // A pass that traverses top-level conv in the function and converts them to
 // SODA launch operations.  Nested launches are not allowed, so this does not
 // walk the function recursively to avoid considering nested conv.
-struct LinalgConvMapper
-    : public ConvertLinalgConvToSODABase<LinalgConvMapper> {
+struct LinalgConvMapper : public ConvertLinalgConvToSODABase<LinalgConvMapper> {
   LinalgConvMapper() = default;
 
   void runOnFunction() override {
     for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
-      if (auto convOp = dyn_cast<linalg::ConvOp>(&op)) {
+      if (auto convOp = dyn_cast<linalg::Conv2DOp>(&op)) {
         if (failed(convertLinalgConvToSODALaunch(convOp)))
           signalPassFailure();
       }
