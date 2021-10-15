@@ -1,4 +1,6 @@
-#!/bin/bash
+!/bin/bash
+
+export PATH=$PATH:/opt/soda-panda/bin:/home/serena/soda/builds/soda-opt/build/bin:/home/serena/soda/builds/llvm-project/build/bin
 
 # USAGE
 #  This file is supposed to be run in the same folder where it exists.
@@ -6,7 +8,7 @@
 # Kernel configs
 NAME=bicg
 
-KS=("2" "4" "8")
+KS=("2" "4" "8" "16" "32")
 # CN=("2" "4")
 CN=("2")
  
@@ -34,10 +36,10 @@ do
     # SOFT-FLOAT
     # With SSDCS
     source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-with-ssdcs.sh
-    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-with-ssdcs.sh
+    # source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-with-ssdcs.sh
 
     # NO SSDCS
-    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-no-ssdcs.sh
-    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-no-ssdcs.sh
+    # source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-no-ssdcs.sh
+    # source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-no-ssdcs.sh
   done
 done
