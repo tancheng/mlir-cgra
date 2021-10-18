@@ -265,58 +265,29 @@ class TestArgumentsToXMLPass
         auto indent = pushIndent();
 
         for (auto a : op.getOperandTypes()) {
-          // According to the MLIR doc memref argument is converted into a
-          // pointer-to-struct argument of type:
-          // template <typename Elem, size_t Rank>
-          // struct {
-          //   Elem *allocated;
-          //   Elem *aligned;
-          //   int64_t offset;
-          //   int64_t sizes[Rank]; // omitted when rank == 0
-          //   int64_t strides[Rank]; // omitted when rank == 0
-          // };
-
-          // TODO
-          // soda.launch_func should not have anything else but memrefs as args
-          // if (a.isa<MemRefType, UnrankedMemRefType>()) {
+          
+          long numElements = 0;
+          std::string typeString = "int";
+          
           if (MemRefType mr = a.dyn_cast<MemRefType>()) {
 
             assert(mr.hasRank() && "expected only ranked shapes");
+            numElements = mr.getNumElements();
 
-            // auto shape = a.getShape();
-            long numElements = mr.getNumElements();
-
-            // Allocated
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"array\" ";
             if (mr.getElementType().isa<FloatType>()) {
-              printI() << "interface_typename=\"float*\" ";
-              printI() << "interface_typename_orig=\"float (*)\" ";
+              typeString = "float";
             }
-            else if (mr.getElementType().isa<IntegerType>()) {
+            else if (mr.getElementType().isInteger(8)) {
+                typeString = "char";
               // TODO: this is a very generic case and it probably would not always work
               // add more cases with different types and bitwidths
-              printI() << "interface_typename=\"int*\" ";
-              printI() << "interface_typename_orig=\"int (*)\" ";
             }
 
-            printI() << "size=\"" << numElements << "\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
+            //Allocated
+            printInterfaceLine(incPointerId(), true, typeString, numElements);
 
             //Aligned
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"array\" ";
-            if (mr.getElementType().isa<FloatType>()) {
-              printI() << "interface_typename=\"float*\" ";
-              printI() << "interface_typename_orig=\"float (*)\" ";
-            }
-            else if (mr.getElementType().isa<IntegerType>()) {
-              // TODO: this is a very generic case and it probably would not always work
-              // add more cases with different types and bitwidths
-              printI() << "interface_typename=\"int*\" ";
-              printI() << "interface_typename_orig=\"int (*)\" ";
-            }
-
-            printI() << "size=\"" << numElements << "\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
+            printInterfaceLine(incPointerId(), true, typeString, numElements);
 
             // Offset
             SmallVector<int64_t> strides;
@@ -327,41 +298,28 @@ class TestArgumentsToXMLPass
                            << "strided form\n";
               return;
             }
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-            printI() << "interface_typename=\"long long\" ";
-            printI() << "interface_typename_orig=\"long long\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
+            typeString = "long long";
+            printInterfaceLine(incPointerId(), false, typeString, numElements);
 
             if (mr.getRank() != 0) {
               // Sizes
               for (auto dim : mr.getShape()){
-                printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-                printI() << "interface_typename=\"long long\" ";
-                printI() << "interface_typename_orig=\"long long\" ";
-                printI() << "interface_typename_include=\"\"/>\n" ;
+                printInterfaceLine(incPointerId(), false, typeString, numElements);
               }
               // Strides
               for (auto stride : strides){
-                printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-                printI() << "interface_typename=\"long long\" ";
-                printI() << "interface_typename_orig=\"long long\" ";
-                printI() << "interface_typename_include=\"\"/>\n" ;
+                printInterfaceLine(incPointerId(), false, typeString, numElements);
               }
             }
           }
-
-          if (FloatType value = a.dyn_cast<FloatType>()) {
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-            printI() << "interface_typename=\"float\" ";
-            printI() << "interface_typename_orig=\"float\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
-          }
-
-          if (IntegerType value = a.dyn_cast<IntegerType>()) {
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-            printI() << "interface_typename=\"int\" ";
-            printI() << "interface_typename_orig=\"int\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
+          else{
+            if (FloatType value = a.dyn_cast<FloatType>()) {
+             typeString = "float";
+            }
+            if (IntegerType value = a.dyn_cast<IntegerType>()) {
+             typeString = "int";
+            }
+            printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
         }
       }
@@ -443,55 +401,32 @@ class TestArgumentsToXMLPass
         auto indent = pushIndent();
 
         for (auto a : op.getOperandTypes()) {
-          // According to the MLIR doc memref argument is converted into a
-          // pointer-to-struct argument of type:
-          // template <typename Elem, size_t Rank>
-          // struct {
-          //   Elem *allocated;
-          //   Elem *aligned;
-          //   int64_t offset;
-          //   int64_t sizes[Rank]; // omitted when rank == 0
-          //   int64_t strides[Rank]; // omitted when rank == 0
-          // };
 
-          // But with `--convert-std-to-llvm=use-bare-ptr-memref-call-conv` we
-          // only have one pointer per memref, thus we only use need the number
-          // of elements to generate the array and we can ignore the other
-          // members
+          long numElements = 0;
+          std::string typeString = "int";
 
           if (MemRefType mr = a.dyn_cast<MemRefType>()) {
-
             assert(mr.hasRank() && "expected only ranked shapes");
-            long numElements = mr.getNumElements();
-
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"array\" ";
+            numElements = mr.getNumElements();
+            
             if (mr.getElementType().isa<FloatType>()) {
-              printI() << "interface_typename=\"float*\" ";
-              printI() << "interface_typename_orig=\"float (*)\" ";
+              typeString = "float";
             }
-            else if (mr.getElementType().isa<IntegerType>()) {
+            else if (mr.getElementType().isInteger(8)) {
+                typeString = "char";
               // TODO: this is a very generic case and it probably would not always work
               // add more cases with different types and bitwidths
-              printI() << "interface_typename=\"int*\" ";
-              printI() << "interface_typename_orig=\"int (*)\" ";
             }
-
-            printI() << "size=\"" << numElements << "\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
+            printInterfaceLine(incPointerId(), true, typeString, numElements);
           }
-
-          if (FloatType value = a.dyn_cast<FloatType>()) {
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-            printI() << "interface_typename=\"float\" ";
-            printI() << "interface_typename_orig=\"float\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
-          }
-
-          if (IntegerType value = a.dyn_cast<IntegerType>()) {
-            printIndentI() << "<arg id=\"P" << incPointerId() << "\" interface_type=\"default\" ";
-            printI() << "interface_typename=\"int\" ";
-            printI() << "interface_typename_orig=\"int\" ";
-            printI() << "interface_typename_include=\"\"/>\n" ;
+          else{
+            if (FloatType value = a.dyn_cast<FloatType>()) {
+             typeString = "float";
+            }
+            if (IntegerType value = a.dyn_cast<IntegerType>()) {
+             typeString = "int";
+            }
+            printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
         }
       }
@@ -527,6 +462,21 @@ class TestArgumentsToXMLPass
     printIndentI() << "</function>\n";
     resetIndent();
     printIndentI() << "</module>\n";
+  }
+
+  void printInterfaceLine(int ID, bool isArray, const std::string& typeString, long arraySize){
+    printIndentI() << "<arg id=\"P" << ID << "\" interface_type=\""; 
+    if(isArray)
+      printI() << "array\" ";
+    else
+      printI() << "default\" ";
+    printI() << "interface_typename=\"" << typeString;
+    if(isArray)
+      printI() << "*";
+    printI() << "\" interface_typename_orig=\"" << typeString;
+    if(isArray)
+      printI() << " (*)\" size=\"" << arraySize;
+    printI() << "\" interface_typename_include=\"\"/>\n" ;
   }
 
   /// Manages the indentation as we traverse the IR nesting.
