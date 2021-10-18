@@ -6,6 +6,10 @@
 
 #include "mlir/Pass/Pass.h"
 
+namespace LLVM {
+class LLVMDialect;
+} // end namespace LLVM
+
 namespace mlir {
 
 #define GEN_PASS_CLASSES
