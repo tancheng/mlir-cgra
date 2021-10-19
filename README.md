@@ -1,8 +1,8 @@
 # SODA-OPT - Enabling System Level Design in MLIR
 
-This project aims to create `soda-opt`, a tool that leverages `mlir` to extract
-pre-selected high-level code snippets, optimize, and translate these snippets to
-LLVM IR, so they can be synthesized by our high-level synthesis tool of choice.
+This project aims to create `soda-opt`, a tool that leverages `mlir` to extract, 
+optimize, and translate high-level code snippets into LLVM IR, 
+so they can be synthesized by our high-level synthesis tool of choice.
 
 As a long term vision, the SODA-OPT project seeks to provide a set of
 *compiler libraries* to perform the target optimizations; *runtime libraries* 
@@ -71,6 +71,10 @@ After successful build, available passes can be displayed with:
 $PROJ_BUILD_DIR/bin/soda-opt -h
 ```
 
+The passes and pipelines described below have several options,
+check `soda-opt -h` for additional informaton.
+
+
 Search passes can be executed with the following command:
 
 ```sh
@@ -93,6 +97,18 @@ $PROJ_BUILD_DIR/bin/soda-opt \
 # In the future, searched coded can be outlined for other architectures
 # following the pass template: 
 # --soda-outline-<target_name>-code
+```
+
+The above command can include automatic XML test generation to be
+later used during simulation:
+
+```sh
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/Dialect/SODA/outlining-matmul.mlir \
+  --soda-outline-bambu-code \
+  --soda-extract-arguments-to-xml=using-bare-ptr
+# This will generate an xml file for each outlined kernel in the
+# folder in which was called
 ```
 
 Generation/extraction of kernel code exclusive for bambu can be obtained with
@@ -131,10 +147,14 @@ $PROJ_BUILD_DIR/bin/soda-opt \
   $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
   --soda-opt-pipeline="cache-size=512"
 
-# Without loop tiling
+# Specfic pipeline for bambu (with bare pointer call convertion)
 $PROJ_BUILD_DIR/bin/soda-opt \
   $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
-  --soda-opt-pipeline
+  --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv
+
+#  In the future, additional pipelines for other target architectures
+# will be performed by the following pass template:
+ # --soda-opt-pipeline-for-<target_name>
 ```
 
 ## Credits
