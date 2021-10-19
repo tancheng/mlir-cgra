@@ -14,10 +14,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/IR/BlockAndValueMapping.h"
 #include "mlir/IR/Builders.h"
+#include "mlir/IR/FunctionSupport.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Support/LLVM.h"
 #include "mlir/Transforms/RegionUtils.h"
@@ -28,6 +30,7 @@
 #include "soda/Dialect/SODA/Utils.h"
 
 using namespace mlir;
+using namespace mlir::LLVM;
 
 namespace {
 
@@ -87,9 +90,7 @@ void SodaKernelGenerationPass::runOnOperation() {
   Block *oldBlock = &mop->getRegions().front().getBlocks().front();
   oldBlock->erase();
 
-  mop.walk([](soda::ModuleEndOp endOp) {
-    endOp.erase();
-  });
+  mop.walk([](soda::ModuleEndOp endOp) { endOp.erase(); });
 
   mop.walk([](soda::SODAFuncOp funcOp) {
     OpBuilder replacer(funcOp);
@@ -99,6 +100,17 @@ void SodaKernelGenerationPass::runOnOperation() {
 
     dstFunc.body().takeBody(funcOp.body());
     funcOp.erase();
+
+    // Set all memref arguments to noalias
+    // TODO (NICO): Create analysis on the outliner, only carry decisions here
+    int index = 0;
+    for (BlockArgument argument : dstFunc.getArguments()) {
+      if (argument.getType().isa<MemRefType>()) {
+        dstFunc.setArgAttr(index, LLVMDialect::getNoAliasAttrName(),
+                           UnitAttr::get(dstFunc.getContext()));
+      }
+      index++;
+    }
   });
 
   mop.walk([](soda::ReturnOp returnOp) {
