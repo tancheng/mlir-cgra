@@ -274,14 +274,18 @@ class TestArgumentsToXMLPass
             assert(mr.hasRank() && "expected only ranked shapes");
             numElements = mr.getNumElements();
 
-            if (mr.getElementType().isa<FloatType>()) {
+            if (mr.getElementType().isa<FloatType>())
               typeString = "float";
-            }
-            else if (mr.getElementType().isInteger(8)) {
-                typeString = "char";
-              // TODO: this is a very generic case and it probably would not always work
-              // add more cases with different types and bitwidths
-            }
+            if (mr.getElementType().isInteger(1))
+              typeString = "_Bool";
+            if (mr.getElementType().isInteger(8))
+              typeString = "unsigned char";
+            if (mr.getElementType().isInteger(16))
+              typeString = "unsigned short";
+            if (mr.getElementType().isInteger(32))
+              typeString = "unsigned int";
+            if (mr.getElementType().isInteger(64))
+              typeString = "unsigned long long";            
 
             //Allocated
             printInterfaceLine(incPointerId(), true, typeString, numElements);
@@ -298,7 +302,7 @@ class TestArgumentsToXMLPass
                            << "strided form\n";
               return;
             }
-            typeString = "long long";
+            typeString = "unsigned long long";
             printInterfaceLine(incPointerId(), false, typeString, numElements);
 
             if (mr.getRank() != 0) {
@@ -313,11 +317,19 @@ class TestArgumentsToXMLPass
             }
           }
           else{
-            if (FloatType value = a.dyn_cast<FloatType>()) {
+            if (FloatType value = a.dyn_cast<FloatType>())
              typeString = "float";
-            }
             if (IntegerType value = a.dyn_cast<IntegerType>()) {
-             typeString = "int";
+              if (a.isInteger(1))
+                typeString = "_Bool";
+              if (a.isInteger(8))
+                typeString = "unsigned char";
+              if (a.isInteger(16))
+                typeString = "unsigned short";
+              if (a.isInteger(32))
+                typeString = "unsigned int";
+              if (a.isInteger(64))
+                typeString = "unsigned long long";    
             }
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
@@ -409,22 +421,35 @@ class TestArgumentsToXMLPass
             assert(mr.hasRank() && "expected only ranked shapes");
             numElements = mr.getNumElements();
             
-            if (mr.getElementType().isa<FloatType>()) {
+            if (mr.getElementType().isa<FloatType>())
               typeString = "float";
-            }
-            else if (mr.getElementType().isInteger(8)) {
-                typeString = "char";
-              // TODO: this is a very generic case and it probably would not always work
-              // add more cases with different types and bitwidths
-            }
+            if (mr.getElementType().isInteger(1))
+              typeString = "_Bool";
+            if (mr.getElementType().isInteger(8))
+              typeString = "unsigned char";
+            if (mr.getElementType().isInteger(16))
+              typeString = "unsigned short";
+            if (mr.getElementType().isInteger(32))
+              typeString = "unsigned int";
+            if (mr.getElementType().isInteger(64))
+              typeString = "unsigned long long";
+
             printInterfaceLine(incPointerId(), true, typeString, numElements);
           }
           else{
-            if (FloatType value = a.dyn_cast<FloatType>()) {
+            if (FloatType value = a.dyn_cast<FloatType>())
              typeString = "float";
-            }
             if (IntegerType value = a.dyn_cast<IntegerType>()) {
-             typeString = "int";
+              if (a.isInteger(1))
+                typeString = "_Bool";
+              if (a.isInteger(8))
+                typeString = "unsigned char";
+              if (a.isInteger(16))
+                typeString = "unsigned short";
+              if (a.isInteger(32))
+                typeString = "unsigned int";
+              if (a.isInteger(64))
+                typeString = "unsigned long long";    
             }
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }

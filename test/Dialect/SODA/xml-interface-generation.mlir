@@ -26,25 +26,25 @@ module attributes {soda.container_module}  {
 // CHECK_FILE:  <function id="driver_kernel">
 // CHECK_FILE:   <arg id="P0" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
 // CHECK_FILE:   <arg id="P1" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P2" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P3" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P4" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P5" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P6" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P2" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P3" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P4" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P5" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P6" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
 // CHECK_FILE:   <arg id="P7" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="21" interface_typename_include=""/>
 // CHECK_FILE:   <arg id="P8" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="21" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P9" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P10" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P11" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P12" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P13" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P9" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P10" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P11" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P12" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P13" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
 // CHECK_FILE:   <arg id="P14" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="12" interface_typename_include=""/>
 // CHECK_FILE:   <arg id="P15" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="12" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P16" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P17" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P18" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P19" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_FILE:   <arg id="P20" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P16" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P17" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P18" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P19" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_FILE:   <arg id="P20" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
 // CHECK_FILE:  </function>
 // CHECK_FILE: </module>
 
@@ -53,25 +53,25 @@ module attributes {soda.container_module}  {
 // CHECK_TERMINAL:  <function id="driver_kernel">
 // CHECK_TERMINAL:   <arg id="P0" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
 // CHECK_TERMINAL:   <arg id="P1" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="28" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P2" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P3" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P4" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P5" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P6" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P2" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P3" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P4" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P5" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P6" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
 // CHECK_TERMINAL:   <arg id="P7" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="21" interface_typename_include=""/>
 // CHECK_TERMINAL:   <arg id="P8" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="21" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P9" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P10" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P11" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P12" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P13" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P9" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P10" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P11" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P12" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P13" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
 // CHECK_TERMINAL:   <arg id="P14" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="12" interface_typename_include=""/>
 // CHECK_TERMINAL:   <arg id="P15" interface_type="array" interface_typename="float*" interface_typename_orig="float (*)" size="12" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P16" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P17" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P18" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P19" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
-// CHECK_TERMINAL:   <arg id="P20" interface_type="default" interface_typename="long long" interface_typename_orig="long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P16" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P17" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P18" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P19" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
+// CHECK_TERMINAL:   <arg id="P20" interface_type="default" interface_typename="unsigned long long" interface_typename_orig="unsigned long long" interface_typename_include=""/>
 // CHECK_TERMINAL:  </function>
 // CHECK_TERMINAL: </module>
 
