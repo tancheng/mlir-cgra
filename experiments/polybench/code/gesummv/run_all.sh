@@ -1,6 +1,4 @@
-!/bin/bash
-
-export PATH=$PATH:/opt/soda-panda/bin:/home/serena/soda/builds/soda-opt/build/bin:/home/serena/soda/builds/llvm-project/build/bin
+#!/bin/bash
 
 # USAGE
 #  This file is supposed to be run in the same folder where it exists.
