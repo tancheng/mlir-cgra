@@ -57,6 +57,7 @@ soda-opt \
   -o ${ODIR}/06-02-outlined.mlir
 
 mv ${KERNELDIR}/${KERNELNAME}_test.xml ${ODIR}/${KERNELNAME}_test.xml
+mv ${KERNELDIR}/${KERNELNAME}_interface.xml ${ODIR}/${KERNELNAME}_interface.xml
 
 # # Isolate the outlined region in a separate file ###############################
 soda-opt \
@@ -110,6 +111,7 @@ bambu \
   --generate-tb=${ODIR}/${KERNELNAME}_test.xml \
   --simulate --simulator=VERILATOR \
   --top-fname=${KERNELNAME} \
+  --generate-interface=INFER --interface-xml-file=${ODIR}/${KERNELNAME}_interface.xml \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
 popd
 
