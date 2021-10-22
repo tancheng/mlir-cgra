@@ -1,0 +1,7 @@
+# opt_full
+#code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
+#code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
+# 
+# opt_none
+code/gemm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
+#code/gemm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 4
