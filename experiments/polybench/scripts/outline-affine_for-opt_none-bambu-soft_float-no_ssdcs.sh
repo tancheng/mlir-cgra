@@ -137,7 +137,6 @@ bambu \
   --generate-tb=${ODIR}/${KERNELNAME}_test.xml \
   --simulate --simulator=VERILATOR \
   --top-fname=${KERNELNAME} \
-  --generate-interface=INFER --interface-xml-file=${ODIR}/${KERNELNAME}_interface.xml \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
 popd
 
