@@ -18,12 +18,12 @@ CHANNELSNUMBER=2
 source ${KERNELDIR}/../../scripts/bambu-debug-flags.sh
 
 # Perform the synthesis
-# source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-flopoco.sh
+# source ${KERNELDIR}/../../scripts/outline-affine_for-opt_full-bambu-flopoco.sh
 
 # With SSDCS
-source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-with-ssdcs.sh
-source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-with-ssdcs.sh
+source ${KERNELDIR}/../../scripts/outline-affine_for-opt_full-bambu-soft_float-with_ssdcs.sh
+source ${KERNELDIR}/../../scripts/outline-affine_for-opt_none-bambu-soft_float-with_ssdcs.sh
 
 # NO SSDCS
-source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-no-ssdcs.sh
-source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-no-ssdcs.sh
+source ${KERNELDIR}/../../scripts/outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh
+source ${KERNELDIR}/../../scripts/outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh
