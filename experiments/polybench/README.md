@@ -23,12 +23,21 @@ cd code/gemm
 grep -iIR "Total Cycles" | sort
 ```
 
+## Batch run
+
+parallel --will-cite --jobs 2 < jobs.txt
+grep -iIR "Total cycles"
+
+## Collect Results
+
+
+
 # Summary of results
 
 Results collected using the following scripts:
 
-- [No High-Level Opts](scripts/outline-affine-for-optimize-none-bambu-soft-float-with-ssdcs.sh)
-- [With High-Level Opts](scripts/outline-affine-for-optimize-full-bambu-soft-float-with-ssdcs.sh)
+- [No High-Level Opts](scripts/outline-affine_for-opt_none-bambu-soft_float-with_ssdcs.sh)
+- [With High-Level Opts](scripts/outline-affine_for-opt_full-bambu-soft_float-with_ssdcs.sh)
 
 Important Bambu configurations:
 
