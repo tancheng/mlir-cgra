@@ -19,9 +19,6 @@
 # source ${KERNELDIR}/../../../scripts/<name-of-this-file>.sh
 ####
 
-# Uncomment to see commands
-set -x 
-
 KERNEL=${NAME}_${KSIZE}
 FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
@@ -30,6 +27,7 @@ KERNELNAME=${KERNEL}_kernel
 WORKDIR=$(pwd)
 ODIR=${KERNELDIR}/output/${KERNEL}/opt_none-soft_float-no_ssdcs
 BAMBUDIR=${ODIR}/bambu
+SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Bambu configs
 CLKPERIOD=${CLKPERIOD}
@@ -39,6 +37,33 @@ CHANNELSNUMBER=${CHANNELSNUMBER}
 mkdir -p ${BAMBUDIR}
 mkdir -p ${ODIR}
 
+# Decide if needs rerun
+source ${SCRIPTDIR}/needs_rerun.sh
+
+LIST1=(
+  # Generic compilation scripts
+  ${SCRIPTDIR}/bambu-config-values.sh
+  ${SCRIPTDIR}/bambu-debug-flags.sh
+  ${SCRIPTDIR}/needs_rerun.sh
+  ${SCRIPTDIR}/outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh
+
+  # Kernel Specific
+  ${KERNELDIR}/${FILENAME}
+)
+  
+LIST2=(
+  # Output files of the kernel
+  ${ODIR}/model.ll
+  ${BAMBUDIR}/results.txt
+)
+
+RERUN=false
+needs_rerun LIST1 LIST2
+
+if [ "$RERUN" = true ]; then
+
+# Uncomment to see commands
+set -x 
 
 # ==============================================================================
 # SODA Search, Outiline
@@ -116,3 +141,6 @@ bambu \
 popd
 
 set +x
+else
+  echo "ALREADY COMPLETED (and did not rerun): ${KERNELDIR}/${FILENAME}"
+fi
