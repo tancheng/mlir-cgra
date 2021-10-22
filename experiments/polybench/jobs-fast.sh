@@ -3,24 +3,26 @@
 code/bicg/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/bicg/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/bicg/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
-code/bicg/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
+# code/bicg/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
  
 # opt_none
 code/bicg/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
 code/bicg/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 4
 code/bicg/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 8
-code/bicg/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 16
+# code/bicg/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 16
 
 # GEMM -------------------------------------------------------------------------
 # opt_full
 code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
+# code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
  
 # opt_none
 code/gemm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
 code/gemm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 4
 code/gemm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 8
+# code/gemm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 16
 
 # GESUMMV ----------------------------------------------------------------------
 # opt_full
