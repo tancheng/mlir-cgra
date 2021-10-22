@@ -22,11 +22,13 @@
 # Uncomment to see commands
 set -x 
 
+
 KERNEL=${NAME}_${KSIZE}
 FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
 
 # Directories
+WORKDIR=$(pwd)
 ODIR=${KERNELDIR}/output/${KERNEL}/opt_full-soft_float-no_ssdcs
 BAMBUDIR=${ODIR}/bambu
 
@@ -56,7 +58,8 @@ soda-opt \
   ${ODIR}/06-01-searched.mlir \
   -o ${ODIR}/06-02-outlined.mlir
 
-mv ${KERNELDIR}/${KERNELNAME}_test.xml ${ODIR}/${KERNELNAME}_test.xml
+mv ${WORKDIR}/${KERNELNAME}_test.xml ${ODIR}/${KERNELNAME}_test.xml
+mv ${WORKDIR}/${KERNELNAME}_interface.xml ${ODIR}/${KERNELNAME}_interface.xml
 
 # # Isolate the outlined region in a separate file ###############################
 soda-opt \
