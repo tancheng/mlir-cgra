@@ -6,6 +6,13 @@
 # Definition
 #  Calls the scripts to perform soda-opt compilation and bambu synthesis
 
+if [ $# -ne 1 ]; then
+    echo "This script requires exactly one argument."
+    echo "usage:"
+    echo "   $0 <kernel size>"
+    exit -1
+fi
+
 # Kernel configs
 NAME=gemm
 KSIZE=$1
