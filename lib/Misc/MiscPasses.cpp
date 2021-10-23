@@ -109,7 +109,8 @@ class TestArgumentsToXMLPass
       std::string errorMessageT;
       std::string errorMessageI;
       std::string filenameT = op.getKernelName().getValue().str() + "_test.xml";
-      std::string filenameI = op.getKernelName().getValue().str() + "_interface.xml";
+      std::string filenameI =
+          op.getKernelName().getValue().str() + "_interface.xml";
       auto outputT = openOutputFile(filenameT, &errorMessageT);
       auto outputI = openOutputFile(filenameI, &errorMessageI);
       outputStreamT = &outputT->os();
@@ -126,8 +127,7 @@ class TestArgumentsToXMLPass
       if (usingBarePtr) {
         generateTestXMLforBareLaunchFunc(op);
         generateInterfaceXMLforBareLaunchFunc(op);
-      }
-      else {
+      } else {
         generateTestXMLforLaunchFunc(op);
         generateInterfaceXMLforLaunchFunc(op);
       }
@@ -265,10 +265,10 @@ class TestArgumentsToXMLPass
         auto indent = pushIndent();
 
         for (auto a : op.getOperandTypes()) {
-          
+
           long numElements = 0;
           std::string typeString = "int";
-          
+
           if (MemRefType mr = a.dyn_cast<MemRefType>()) {
 
             assert(mr.hasRank() && "expected only ranked shapes");
@@ -285,12 +285,12 @@ class TestArgumentsToXMLPass
             if (mr.getElementType().isInteger(32))
               typeString = "unsigned int";
             if (mr.getElementType().isInteger(64))
-              typeString = "unsigned long long";            
+              typeString = "unsigned long long";
 
-            //Allocated
+            // Allocated
             printInterfaceLine(incPointerId(), true, typeString, numElements);
 
-            //Aligned
+            // Aligned
             printInterfaceLine(incPointerId(), true, typeString, numElements);
 
             // Offset
@@ -307,18 +307,20 @@ class TestArgumentsToXMLPass
 
             if (mr.getRank() != 0) {
               // Sizes
-              for (auto dim : mr.getShape()){
-                printInterfaceLine(incPointerId(), false, typeString, numElements);
+              for (size_t i = 0; i < mr.getShape().size(); i++) {
+                printInterfaceLine(incPointerId(), false, typeString,
+                                   numElements);
               }
+
               // Strides
-              for (auto stride : strides){
-                printInterfaceLine(incPointerId(), false, typeString, numElements);
+              for (size_t i = 0; i < strides.size(); i++) {
+                printInterfaceLine(incPointerId(), false, typeString,
+                                   numElements);
               }
             }
-          }
-          else{
+          } else {
             if (FloatType value = a.dyn_cast<FloatType>())
-             typeString = "float";
+              typeString = "float";
             if (IntegerType value = a.dyn_cast<IntegerType>()) {
               if (a.isInteger(1))
                 typeString = "_Bool";
@@ -329,7 +331,7 @@ class TestArgumentsToXMLPass
               if (a.isInteger(32))
                 typeString = "unsigned int";
               if (a.isInteger(64))
-                typeString = "unsigned long long";    
+                typeString = "unsigned long long";
             }
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
@@ -420,7 +422,7 @@ class TestArgumentsToXMLPass
           if (MemRefType mr = a.dyn_cast<MemRefType>()) {
             assert(mr.hasRank() && "expected only ranked shapes");
             numElements = mr.getNumElements();
-            
+
             if (mr.getElementType().isa<FloatType>())
               typeString = "float";
             if (mr.getElementType().isInteger(1))
@@ -435,10 +437,9 @@ class TestArgumentsToXMLPass
               typeString = "unsigned long long";
 
             printInterfaceLine(incPointerId(), true, typeString, numElements);
-          }
-          else{
+          } else {
             if (FloatType value = a.dyn_cast<FloatType>())
-             typeString = "float";
+              typeString = "float";
             if (IntegerType value = a.dyn_cast<IntegerType>()) {
               if (a.isInteger(1))
                 typeString = "_Bool";
@@ -449,7 +450,7 @@ class TestArgumentsToXMLPass
               if (a.isInteger(32))
                 typeString = "unsigned int";
               if (a.isInteger(64))
-                typeString = "unsigned long long";    
+                typeString = "unsigned long long";
             }
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
@@ -461,7 +462,7 @@ class TestArgumentsToXMLPass
 
   void printTestPreamble() {
     printIndentT() << "<?xml version=\"1.0\"?>\n"
-                  << "<function>\n";
+                   << "<function>\n";
   }
 
   void initTestbench() {
@@ -475,33 +476,34 @@ class TestArgumentsToXMLPass
 
   void printInterfacePreamble() {
     printIndentI() << "<?xml version=\"1.0\"?>\n"
-                  << "<module>\n";
+                   << "<module>\n";
   }
 
   void initInterface() {
-    printIndentI() << "<function id=\"" ;
+    printIndentI() << "<function id=\"";
     resetPointerId();
   }
 
-  void closeInterface() { 
+  void closeInterface() {
     printIndentI() << "</function>\n";
     resetIndent();
     printIndentI() << "</module>\n";
   }
 
-  void printInterfaceLine(int ID, bool isArray, const std::string& typeString, long arraySize){
-    printIndentI() << "<arg id=\"P" << ID << "\" interface_type=\""; 
-    if(isArray)
+  void printInterfaceLine(int ID, bool isArray, const std::string &typeString,
+                          long arraySize) {
+    printIndentI() << "<arg id=\"P" << ID << "\" interface_type=\"";
+    if (isArray)
       printI() << "array\" ";
     else
       printI() << "default\" ";
     printI() << "interface_typename=\"" << typeString;
-    if(isArray)
+    if (isArray)
       printI() << "*";
     printI() << "\" interface_typename_orig=\"" << typeString;
-    if(isArray)
+    if (isArray)
       printI() << " (*)\" size=\"" << arraySize;
-    printI() << "\" interface_typename_include=\"\"/>\n" ;
+    printI() << "\" interface_typename_include=\"\"/>\n";
   }
 
   /// Manages the indentation as we traverse the IR nesting.
