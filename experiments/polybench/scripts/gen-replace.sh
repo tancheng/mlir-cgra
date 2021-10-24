@@ -4,7 +4,14 @@
 #
 #  Uses a file that based on 16 and generates 2, 4, 8, 32 versions for it
 
-KERNEL=three_mm
+if [ $# -ne 1 ]; then
+    echo "This script requires exactly one argument."
+    echo "usage:"
+    echo "   $0 <new kernel name>"
+    exit -1
+fi
+
+KERNEL=$1
 FILE=${KERNEL}_16.mlir
 
 KSIZES=(
@@ -19,7 +26,7 @@ for K in "${KSIZES[@]}"; do
   sed -i "s/16/${K}/g" ${KERNEL}_${K}.mlir
 done
 
-cp -r ../gemm/scripts scripts
+cp -r ../gemm/scripts .
 
 FILES="scripts/*.sh"
 
