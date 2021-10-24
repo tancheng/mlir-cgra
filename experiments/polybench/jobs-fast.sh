@@ -50,6 +50,19 @@ code/gemver/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh
 code/gemver/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 8
 code/gemver/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 16
 
+# SYMM ------------------------------------------------------------------------
+# opt_nbt no-buffer-trick
+code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 2
+code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 4
+# code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 8
+# code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 16
+
+# opt_none
+code/symm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
+code/symm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 4
+code/symm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 8
+code/symm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 16
+
 # SYR2K ------------------------------------------------------------------------
 # opt_full
 code/syr2k/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
