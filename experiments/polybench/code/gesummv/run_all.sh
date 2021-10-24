@@ -6,7 +6,7 @@
 # Kernel configs
 NAME=gesummv
 
-KS=("2" "4" "8")
+KS=("2" "4" "8" "16" "32")
 # CN=("2" "4")
 CN=("2")
  
@@ -29,15 +29,15 @@ do
     # Perform the synthesis
 
     # FLOPOCO
-    # source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-flopoco.sh
+    # source ${KERNELDIR}/../../scripts/outline-affine_for-opt_full-bambu-flopoco.sh
 
     # SOFT-FLOAT
     # With SSDCS
-    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-with-ssdcs.sh
-    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-with-ssdcs.sh
+    # source ${KERNELDIR}/../../scripts/outline-affine_for-opt_full-bambu-soft_float-with_ssdcs.sh
+    # source ${KERNELDIR}/../../scripts/outline-affine_for-opt_none-bambu-soft_float-with_ssdcs.sh
 
     # NO SSDCS
-    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-full-bambu-soft-float-no-ssdcs.sh
-    source ${KERNELDIR}/../../scripts/outline-affine-for-optimize-none-bambu-soft-float-no-ssdcs.sh
+    source ${KERNELDIR}/../../scripts/outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh
+    source ${KERNELDIR}/../../scripts/outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh
   done
 done

@@ -105,26 +105,36 @@ class TestArgumentsToXMLPass
   void runOnOperation() override {
 
     getOperation().walk([this](mlir::soda::LaunchFuncOp op) {
-      // Prepare the output stream
-      std::string errorMessage;
-      std::string filename = op.getKernelName().getValue().str() + "_test.xml";
-      auto output = openOutputFile(filename, &errorMessage);
-      outputStream = &output->os();
+      // Prepare the output streams
+      std::string errorMessageT;
+      std::string errorMessageI;
+      std::string filenameT = op.getKernelName().getValue().str() + "_test.xml";
+      std::string filenameI =
+          op.getKernelName().getValue().str() + "_interface.xml";
+      auto outputT = openOutputFile(filenameT, &errorMessageT);
+      auto outputI = openOutputFile(filenameI, &errorMessageI);
+      outputStreamT = &outputT->os();
+      outputStreamI = &outputI->os();
 
       if (writeToTerminal) {
-        outputStream = &llvm::outs();
+        outputStreamT = &llvm::outs();
+        outputStreamI = &llvm::outs();
       }
 
       // Populate the stream with the xml vector
       resetIndent();
 
-      if (usingBarePtr)
-        generateXMLforBareLaunchFunc(op);
-      else
-        generateXMLforLaunchFunc(op);
+      if (usingBarePtr) {
+        generateTestXMLforBareLaunchFunc(op);
+        generateInterfaceXMLforBareLaunchFunc(op);
+      } else {
+        generateTestXMLforLaunchFunc(op);
+        generateInterfaceXMLforLaunchFunc(op);
+      }
 
       if (!writeToTerminal) {
-        output->keep();
+        outputT->keep();
+        outputI->keep();
       }
     });
 
@@ -143,8 +153,8 @@ class TestArgumentsToXMLPass
   void resetPointerId() { pointerId = 0; }
   int incPointerId() { return pointerId++; }
 
-  void generateXMLforLaunchFunc(soda::LaunchFuncOp op) {
-    printPreamble();
+  void generateTestXMLforLaunchFunc(soda::LaunchFuncOp op) {
+    printTestPreamble();
     {
       auto indent = pushIndent();
       initTestbench();
@@ -188,18 +198,18 @@ class TestArgumentsToXMLPass
             long numElements = mr.getNumElements();
 
             // Allocated
-            printIndent() << "P" << incPointerId() << "=\"{";
+            printIndentT() << "P" << incPointerId() << "=\"{";
             for (long i = 0; i < numElements - 1; ++i) {
-              print() << v << ",";
+              printT() << v << ",";
             }
-            print() << v << "}\"\n";
+            printT() << v << "}\"\n";
 
             // Aligned
-            printIndent() << "P" << incPointerId() << "=\"{";
+            printIndentT() << "P" << incPointerId() << "=\"{";
             for (long i = 0; i < numElements - 1; ++i) {
-              print() << v << ",";
+              printT() << v << ",";
             }
-            print() << v << "}\"\n";
+            printT() << v << "}\"\n";
 
             // Offset
             SmallVector<int64_t> strides;
@@ -210,43 +220,129 @@ class TestArgumentsToXMLPass
                            << "strided form\n";
               return;
             }
-            printIndent() << "P" << incPointerId() << "=\"" << offset << "\" ";
+            printIndentT() << "P" << incPointerId() << "=\"" << offset << "\" ";
 
             if (mr.getRank() == 0) {
-              print() << "\n";
+              printT() << "\n";
             } else {
               // Sizes
               for (auto dim : mr.getShape())
-                print() << "P" << incPointerId() << "=\"" << dim << "\" ";
+                printT() << "P" << incPointerId() << "=\"" << dim << "\" ";
 
               // Strides
               for (auto stride : strides)
-                print() << "P" << incPointerId() << "=\"" << stride << "\" ";
+                printT() << "P" << incPointerId() << "=\"" << stride << "\" ";
 
-              print() << "\n";
+              printT() << "\n";
             }
           }
 
           if (FloatType value = a.dyn_cast<FloatType>()) {
             StringRef v;
             v = "1.0";
-            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
+            printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
 
           if (IntegerType value = a.dyn_cast<IntegerType>()) {
             StringRef v;
             v = "1";
-            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
+            printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
         }
       }
       closeTestbench();
     }
-    printClosure();
+    printTestClosure();
   };
 
-  void generateXMLforBareLaunchFunc(soda::LaunchFuncOp op) {
-    printPreamble();
+  void generateInterfaceXMLforLaunchFunc(soda::LaunchFuncOp op) {
+    printInterfacePreamble();
+    {
+      auto indent = pushIndent();
+      initInterface();
+      printI() << op.getKernelName().getValue().str() << "\">\n";
+      {
+        auto indent = pushIndent();
+
+        for (auto a : op.getOperandTypes()) {
+
+          long numElements = 0;
+          std::string typeString = "int";
+
+          if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+
+            assert(mr.hasRank() && "expected only ranked shapes");
+            numElements = mr.getNumElements();
+
+            if (mr.getElementType().isa<FloatType>())
+              typeString = "float";
+            if (mr.getElementType().isInteger(1))
+              typeString = "_Bool";
+            if (mr.getElementType().isInteger(8))
+              typeString = "unsigned char";
+            if (mr.getElementType().isInteger(16))
+              typeString = "unsigned short";
+            if (mr.getElementType().isInteger(32))
+              typeString = "unsigned int";
+            if (mr.getElementType().isInteger(64))
+              typeString = "unsigned long long";
+
+            // Allocated
+            printInterfaceLine(incPointerId(), true, typeString, numElements);
+
+            // Aligned
+            printInterfaceLine(incPointerId(), true, typeString, numElements);
+
+            // Offset
+            SmallVector<int64_t> strides;
+            int64_t offset;
+            // TODO(NICO): Must handle aborting testbench gen
+            if (failed(getStridesAndOffset(mr, strides, offset))) {
+              llvm::outs() << "MemRefType " << mr << " cannot be converted to "
+                           << "strided form\n";
+              return;
+            }
+            typeString = "unsigned long long";
+            printInterfaceLine(incPointerId(), false, typeString, numElements);
+
+            if (mr.getRank() != 0) {
+              // Sizes
+              for (size_t i = 0; i < mr.getShape().size(); i++) {
+                printInterfaceLine(incPointerId(), false, typeString,
+                                   numElements);
+              }
+
+              // Strides
+              for (size_t i = 0; i < strides.size(); i++) {
+                printInterfaceLine(incPointerId(), false, typeString,
+                                   numElements);
+              }
+            }
+          } else {
+            if (FloatType value = a.dyn_cast<FloatType>())
+              typeString = "float";
+            if (IntegerType value = a.dyn_cast<IntegerType>()) {
+              if (a.isInteger(1))
+                typeString = "_Bool";
+              if (a.isInteger(8))
+                typeString = "unsigned char";
+              if (a.isInteger(16))
+                typeString = "unsigned short";
+              if (a.isInteger(32))
+                typeString = "unsigned int";
+              if (a.isInteger(64))
+                typeString = "unsigned long long";
+            }
+            printInterfaceLine(incPointerId(), false, typeString, numElements);
+          }
+        }
+      }
+      closeInterface();
+    }
+  };
+
+  void generateTestXMLforBareLaunchFunc(soda::LaunchFuncOp op) {
+    printTestPreamble();
     {
       auto indent = pushIndent();
       initTestbench();
@@ -284,44 +380,131 @@ class TestArgumentsToXMLPass
             long numElements = mr.getNumElements();
 
             // Allocated bare pointers
-            printIndent() << "P" << incPointerId() << "=\"{";
+            printIndentT() << "P" << incPointerId() << "=\"{";
             for (long i = 0; i < numElements - 1; ++i) {
-              print() << v << ",";
+              printT() << v << ",";
             }
-            print() << v << "}\"\n";
+            printT() << v << "}\"\n";
           }
 
           if (FloatType value = a.dyn_cast<FloatType>()) {
             StringRef v;
             v = "1.0";
-            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
+            printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
 
           if (IntegerType value = a.dyn_cast<IntegerType>()) {
             StringRef v;
             v = "1";
-            printIndent() << "P" << incPointerId() << "=\"" << v << "\"\n";
+            printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
         }
       }
       closeTestbench();
     }
-    printClosure();
+    printTestClosure();
   };
 
-  void printPreamble() {
-    printIndent() << "<?xml version=\"1.0\"?>\n"
-                  << "<function>\n";
+  void generateInterfaceXMLforBareLaunchFunc(soda::LaunchFuncOp op) {
+    printInterfacePreamble();
+    {
+      auto indent = pushIndent();
+      initInterface();
+      printI() << op.getKernelName().getValue().str() << "\">\n";
+      {
+        auto indent = pushIndent();
+
+        for (auto a : op.getOperandTypes()) {
+
+          long numElements = 0;
+          std::string typeString = "int";
+
+          if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+            assert(mr.hasRank() && "expected only ranked shapes");
+            numElements = mr.getNumElements();
+
+            if (mr.getElementType().isa<FloatType>())
+              typeString = "float";
+            if (mr.getElementType().isInteger(1))
+              typeString = "_Bool";
+            if (mr.getElementType().isInteger(8))
+              typeString = "unsigned char";
+            if (mr.getElementType().isInteger(16))
+              typeString = "unsigned short";
+            if (mr.getElementType().isInteger(32))
+              typeString = "unsigned int";
+            if (mr.getElementType().isInteger(64))
+              typeString = "unsigned long long";
+
+            printInterfaceLine(incPointerId(), true, typeString, numElements);
+          } else {
+            if (FloatType value = a.dyn_cast<FloatType>())
+              typeString = "float";
+            if (IntegerType value = a.dyn_cast<IntegerType>()) {
+              if (a.isInteger(1))
+                typeString = "_Bool";
+              if (a.isInteger(8))
+                typeString = "unsigned char";
+              if (a.isInteger(16))
+                typeString = "unsigned short";
+              if (a.isInteger(32))
+                typeString = "unsigned int";
+              if (a.isInteger(64))
+                typeString = "unsigned long long";
+            }
+            printInterfaceLine(incPointerId(), false, typeString, numElements);
+          }
+        }
+      }
+      closeInterface();
+    }
+  };
+
+  void printTestPreamble() {
+    printIndentT() << "<?xml version=\"1.0\"?>\n"
+                   << "<function>\n";
   }
 
   void initTestbench() {
-    printIndent() << "<testbench\n";
+    printIndentT() << "<testbench\n";
     resetPointerId();
   }
 
-  void closeTestbench() { printIndent() << "/>\n"; }
+  void closeTestbench() { printIndentT() << "/>\n"; }
 
-  void printClosure() { printIndent() << "</function>\n"; }
+  void printTestClosure() { printIndentT() << "</function>\n"; }
+
+  void printInterfacePreamble() {
+    printIndentI() << "<?xml version=\"1.0\"?>\n"
+                   << "<module>\n";
+  }
+
+  void initInterface() {
+    printIndentI() << "<function id=\"";
+    resetPointerId();
+  }
+
+  void closeInterface() {
+    printIndentI() << "</function>\n";
+    resetIndent();
+    printIndentI() << "</module>\n";
+  }
+
+  void printInterfaceLine(int ID, bool isArray, const std::string &typeString,
+                          long arraySize) {
+    printIndentI() << "<arg id=\"P" << ID << "\" interface_type=\"";
+    if (isArray)
+      printI() << "array\" ";
+    else
+      printI() << "default\" ";
+    printI() << "interface_typename=\"" << typeString;
+    if (isArray)
+      printI() << "*";
+    printI() << "\" interface_typename_orig=\"" << typeString;
+    if (isArray)
+      printI() << " (*)\" size=\"" << arraySize;
+    printI() << "\" interface_typename_include=\"\"/>\n";
+  }
 
   /// Manages the indentation as we traverse the IR nesting.
   int indent;
@@ -333,17 +516,26 @@ class TestArgumentsToXMLPass
   void resetIndent() { indent = 0; }
   IndentRAII pushIndent() { return IndentRAII(++indent); }
 
-  /// Output stream to the generated XML file or terminal output
-  raw_ostream *outputStream;
-  raw_ostream &xmlOut() { return *outputStream; }
+  /// Output streams to the generated XML files or terminal output
+  raw_ostream *outputStreamT;
+  raw_ostream *outputStreamI;
+  raw_ostream &xmlOutT() { return *outputStreamT; }
+  raw_ostream &xmlOutI() { return *outputStreamI; }
 
-  llvm::raw_ostream &printIndent() {
+  llvm::raw_ostream &printIndentT() {
     for (int i = 0; i < indent; ++i)
-      xmlOut() << " ";
-    return xmlOut();
+      xmlOutT() << " ";
+    return xmlOutT();
   }
 
-  llvm::raw_ostream &print() { return xmlOut(); }
+  llvm::raw_ostream &printIndentI() {
+    for (int i = 0; i < indent; ++i)
+      xmlOutI() << " ";
+    return xmlOutI();
+  }
+
+  llvm::raw_ostream &printT() { return xmlOutT(); }
+  llvm::raw_ostream &printI() { return xmlOutI(); }
 };
 
 } // end anonymous namespace

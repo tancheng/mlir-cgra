@@ -27,7 +27,7 @@ FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
 
 # Directories
-ODIR=${KERNELDIR}/output/${KERNEL}/opt_full-soft_float-with_ssdcs
+ODIR=${KERNELDIR}/output/${KERNEL}
 BAMBUDIR=${ODIR}/bambu
 
 # Bambu configs
@@ -57,6 +57,7 @@ soda-opt \
   -o ${ODIR}/06-02-outlined.mlir
 
 mv ${KERNELDIR}/${KERNELNAME}_test.xml ${ODIR}/${KERNELNAME}_test.xml
+mv ${KERNELDIR}/${KERNELNAME}_interface.xml ${ODIR}/${KERNELNAME}_interface.xml
 
 # # Isolate the outlined region in a separate file ###############################
 soda-opt \
@@ -70,8 +71,11 @@ soda-opt \
 # ==============================================================================
 # Optimize the isolated code
 soda-opt \
-    --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv \
     ${ODIR}/06-03-isolated.mlir \
+    -convert-linalg-to-affine-loops \
+    -lower-affine -convert-scf-to-std -convert-memref-to-llvm \
+    -convert-std-to-llvm=use-bare-ptr-memref-call-conv  \
+    -reconcile-unrealized-casts \
     -o ${ODIR}/07-llvm.mlir \
     -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
 
@@ -95,7 +99,7 @@ opt-10 \
 pushd ${BAMBUDIR}
 bambu \
   ${BAMBUDEBUGFLAGS} \
-  -lm --soft-float \
+  -lm --flopoco \
   --compiler=I386_CLANG10  \
   -O2 \
   --device=xc7z020-1clg484-VVD \
@@ -105,8 +109,9 @@ bambu \
   --memory-allocation-policy=ALL_BRAM \
   --disable-function-proxy \
   --generate-tb=${ODIR}/${KERNELNAME}_test.xml \
-  --simulate --simulator=VERILATOR \
+  --simulate --simulator=MODELSIM --mentor-root="/opt/modelsim_dlx" --mentor-optimizer=0 \
   --top-fname=${KERNELNAME} \
+  --generate-interface=INFER --interface-xml-file=${ODIR}/${KERNELNAME}_interface.xml \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
 popd
 

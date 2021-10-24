@@ -19,16 +19,17 @@
 # source ${KERNELDIR}/../../../scripts/<name-of-this-file>.sh
 ####
 
-# Uncomment to see commands
-set -x 
+
 
 KERNEL=${NAME}_${KSIZE}
 FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
 
 # Directories
-ODIR=${KERNELDIR}/output/${KERNEL}/opt_none-soft_float-with_ssdcs
+WORKDIR=$(pwd)
+ODIR=${KERNELDIR}/output/${KERNEL}/opt_full-soft_float-no_ssdcs
 BAMBUDIR=${ODIR}/bambu
+SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Bambu configs
 CLKPERIOD=${CLKPERIOD}
@@ -38,7 +39,33 @@ CHANNELSNUMBER=${CHANNELSNUMBER}
 mkdir -p ${BAMBUDIR}
 mkdir -p ${ODIR}
 
+# Decide if needs rerun
+source ${SCRIPTDIR}/needs_rerun.sh
 
+LIST1=(
+  # Generic compilation scripts
+  ${SCRIPTDIR}/bambu-config-values.sh
+  ${SCRIPTDIR}/bambu-debug-flags.sh
+  ${SCRIPTDIR}/needs_rerun.sh
+  ${SCRIPTDIR}/outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh
+
+  # Kernel Specific
+  ${KERNELDIR}/${FILENAME}
+)
+  
+LIST2=(
+  # Output files of the kernel
+  ${ODIR}/model.ll
+  ${BAMBUDIR}/results.txt
+)
+
+RERUN=false
+needs_rerun LIST1 LIST2
+
+if [ "$RERUN" = true ]; then
+
+# Uncomment to see commands
+set -x 
 # ==============================================================================
 # SODA Search, Outiline
 # ==============================================================================
@@ -56,7 +83,8 @@ soda-opt \
   ${ODIR}/06-01-searched.mlir \
   -o ${ODIR}/06-02-outlined.mlir
 
-mv ${KERNELDIR}/${KERNELNAME}_test.xml ${ODIR}/${KERNELNAME}_test.xml
+mv ${WORKDIR}/${KERNELNAME}_test.xml ${ODIR}/${KERNELNAME}_test.xml
+mv ${WORKDIR}/${KERNELNAME}_interface.xml ${ODIR}/${KERNELNAME}_interface.xml
 
 # # Isolate the outlined region in a separate file ###############################
 soda-opt \
@@ -70,11 +98,8 @@ soda-opt \
 # ==============================================================================
 # Optimize the isolated code
 soda-opt \
+    --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv \
     ${ODIR}/06-03-isolated.mlir \
-    -convert-linalg-to-affine-loops \
-    -lower-affine -convert-scf-to-std -convert-memref-to-llvm \
-    -convert-std-to-llvm=use-bare-ptr-memref-call-conv  \
-    -reconcile-unrealized-casts \
     -o ${ODIR}/07-llvm.mlir \
     -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
 
@@ -103,14 +128,18 @@ bambu \
   -O2 \
   --device=xc7z020-1clg484-VVD \
   --clock-period=${CLKPERIOD} --no-iob \
-  --experimental-setup=BAMBU-BALANCED-MP -s \
+  --experimental-setup=BAMBU-BALANCED-MP \
   --channels-number=${CHANNELSNUMBER} \
   --memory-allocation-policy=ALL_BRAM \
   --disable-function-proxy \
   --generate-tb=${ODIR}/${KERNELNAME}_test.xml \
   --simulate --simulator=VERILATOR \
   --top-fname=${KERNELNAME} \
+  --generate-interface=INFER --interface-xml-file=${ODIR}/${KERNELNAME}_interface.xml \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
 popd
 
 set +x
+else
+  echo "ALREADY COMPLETED (and did not rerun): ${KERNELDIR}/${FILENAME}"
+fi
