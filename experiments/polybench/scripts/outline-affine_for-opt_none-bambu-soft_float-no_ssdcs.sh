@@ -87,7 +87,7 @@ mv ${WORKDIR}/${KERNELNAME}_interface.xml ${ODIR}/${KERNELNAME}_interface.xml
 
 # # Isolate the outlined region in a separate file ###############################
 soda-opt \
-  -soda-generate-bambu-accelcode \
+  -soda-generate-bambu-accelcode=no-aa \
   ${ODIR}/06-02-outlined.mlir \
   -o ${ODIR}/06-03-isolated.mlir
 

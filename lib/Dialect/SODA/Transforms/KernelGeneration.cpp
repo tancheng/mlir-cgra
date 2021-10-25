@@ -92,7 +92,7 @@ void SodaKernelGenerationPass::runOnOperation() {
 
   mop.walk([](soda::ModuleEndOp endOp) { endOp.erase(); });
 
-  mop.walk([](soda::SODAFuncOp funcOp) {
+  mop.walk([this](soda::SODAFuncOp funcOp) {
     OpBuilder replacer(funcOp);
 
     FuncOp dstFunc = replacer.create<mlir::FuncOp>(
@@ -103,13 +103,16 @@ void SodaKernelGenerationPass::runOnOperation() {
 
     // Set all memref arguments to noalias
     // TODO (NICO): Create analysis on the outliner, only carry decisions here
-    int index = 0;
-    for (BlockArgument argument : dstFunc.getArguments()) {
-      if (argument.getType().isa<MemRefType>()) {
-        dstFunc.setArgAttr(index, LLVMDialect::getNoAliasAttrName(),
-                           UnitAttr::get(dstFunc.getContext()));
+
+    if (!(this->noAliasAnalysis)) {
+      int index = 0;
+      for (BlockArgument argument : dstFunc.getArguments()) {
+        if (argument.getType().isa<MemRefType>()) {
+          dstFunc.setArgAttr(index, LLVMDialect::getNoAliasAttrName(),
+                             UnitAttr::get(dstFunc.getContext()));
+        }
+        index++;
       }
-      index++;
     }
   });
 

@@ -1,4 +1,5 @@
 // RUN: soda-opt -split-input-file -allow-unregistered-dialect -soda-outline-bambu-code -soda-generate-bambu-accelcode %s | FileCheck %s
+// RUN: soda-opt -split-input-file -allow-unregistered-dialect -soda-outline-bambu-code -soda-generate-bambu-accelcode=no-aa %s | FileCheck %s --check-prefixes CHECKNOAA
 
 // CHECK: module attributes {soda.bambu.container_module
 func @driver() {
@@ -28,7 +29,7 @@ func @complex() {
   %B = call @init_b(): () -> (memref<512x512xf32>)
 
   soda.launch  {
-    // CHECK call @init_c
+    // CHECK: call @init_c
     %C = call @init_c(): () -> (memref<512x512xf32>)
     linalg.matmul ins(%A, %B : memref<512x512xf32>, memref<512x512xf32>)
                     outs(%C : memref<512x512xf32>)
@@ -45,6 +46,7 @@ func private @init_c() -> (memref<512x512xf32>)
 
 // -----
 
+// CHECKNOAA: func @gemm_4_kernel(%arg0: memref<4x4xf32>, %arg1: f32, %arg2: memref<4x4xf32>, %arg3: memref<4x4xf32>, %arg4: f32) {
 // CHECK: func @gemm_4_kernel(%arg0: memref<4x4xf32> {llvm.noalias}, %arg1: f32, %arg2: memref<4x4xf32> {llvm.noalias}, %arg3: memref<4x4xf32> {llvm.noalias}, %arg4: f32) {
 func @gemm_4(%arg0: f32, %arg1: f32, %arg2: memref<4x4xf32>, %arg3: memref<4x4xf32>, %arg4: memref<4x4xf32>) {
   soda.launch {                                                                                                                            

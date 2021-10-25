@@ -20,6 +20,11 @@ def SodaKernelOutlining : Pass<"soda-outline-bambu-code", "ModuleOp"> {
 def SodaKernelGeneration : Pass<"soda-generate-bambu-accelcode", "ModuleOp"> {
   let summary = "Extract bambu kernels into simple mlir modules";
   let constructor = "mlir::soda::createSodaKernelGenerationPass()";
+  
+  let options = [
+    Option<"noAliasAnalysis", "no-aa", "bool", /*default=*/"false",
+           "If set, kernel arguments will not be marked with no-alias (default: false)">,
+  ];
 }
 
 def SodaHostGeneration : Pass<"soda-generate-bambu-hostcode", "ModuleOp"> {
