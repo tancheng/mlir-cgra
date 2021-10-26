@@ -16,7 +16,7 @@ code/bicg/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 1
 code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
-# code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
+code/gemm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
  
 # opt_none
 code/gemm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
@@ -42,7 +42,7 @@ code/gesummv/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.s
 code/gemver/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/gemver/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/gemver/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
-# code/gemver/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
+code/gemver/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
  
 # opt_none
 code/gemver/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
@@ -54,9 +54,8 @@ code/gemver/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh
 # opt_nbt no-buffer-trick
 code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 2
 code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 4
-code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 8
-## code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 8
-# code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 16
+## code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 8 # Broken 
+code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 16
 
 # opt_none
 code/symm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
@@ -108,7 +107,7 @@ code/trmm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 1
 code/two_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/two_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/two_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
-# code/two_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
+code/two_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
 
 # opt_none
 code/two_mm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
@@ -120,7 +119,7 @@ code/two_mm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh
 # opt_full
 code/three_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/three_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
-# code/three_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
+code/three_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
 # code/three_mm/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
 
 # opt_none
@@ -134,7 +133,7 @@ code/three_mm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.
 code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
-# code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
+code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
 
 # opt_none
 code/atax/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
@@ -147,7 +146,7 @@ code/atax/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 1
 code/doitgen/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/doitgen/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/doitgen/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
-# code/doitgen/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
+code/doitgen/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
 
 # opt_none
 code/doitgen/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2
