@@ -23,7 +23,7 @@ func @mvt_2(
       %2 = affine.load %x2[%i] : memref<2xf32>
       %3 = mulf %0, %1 : f32
       %4 = addf %2, %3 : f32
-      affine.store %4, %x1[%i] : memref<2xf32>
+      affine.store %4, %x2[%i] : memref<2xf32>
     }
   }
   }
