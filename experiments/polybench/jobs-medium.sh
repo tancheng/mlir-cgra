@@ -134,7 +134,7 @@ code/three_mm/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.
 code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 2
 code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 4
 code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 8
-# code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
+code/atax/scripts/run-outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh 16
 
 # opt_none
 code/atax/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 2

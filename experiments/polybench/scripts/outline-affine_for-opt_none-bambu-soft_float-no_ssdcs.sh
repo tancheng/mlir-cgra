@@ -128,7 +128,7 @@ bambu \
   -lm --soft-float \
   --compiler=I386_CLANG10  \
   -O2 \
-  --device=xc7z020-1clg484-VVD \
+  --device=xc7vx690t-3ffg1930-VVD \
   --clock-period=${CLKPERIOD} --no-iob \
   --experimental-setup=BAMBU-BALANCED-MP \
   --channels-number=${CHANNELSNUMBER} \
