@@ -55,7 +55,6 @@ code/gemver/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh
 code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 2
 code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 4
 code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 8
-## code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 8
 # code/symm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 16
 
 # opt_none
@@ -93,7 +92,7 @@ code/syrk/scripts/run-outline-affine_for-opt_none-bambu-soft_float-no_ssdcs.sh 1
 # TRMM -------------------------------------------------------------------------
 # opt_nbt no-buffer-trick
 code/trmm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 2
-## code/trmm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 4 # BROKEN
+code/trmm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 4
 code/trmm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 8
 code/trmm/scripts/run-outline-affine_for-opt_nbt-bambu-soft_float-no_ssdcs.sh 16
 
