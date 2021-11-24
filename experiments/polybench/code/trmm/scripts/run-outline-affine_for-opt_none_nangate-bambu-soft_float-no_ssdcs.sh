@@ -14,7 +14,7 @@ if [ $# -ne 1 ]; then
 fi
 
 # Kernel configs
-NAME=gemver
+NAME=trmm
 KSIZE=$1
 
 # Getting the kernel directory

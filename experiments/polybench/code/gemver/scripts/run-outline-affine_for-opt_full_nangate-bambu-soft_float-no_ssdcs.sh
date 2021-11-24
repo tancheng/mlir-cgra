@@ -27,4 +27,4 @@ source ${KERNELDIR}/../../scripts/bambu-config-values-nangate.sh
 source ${KERNELDIR}/../../scripts/bambu-debug-flags-nangate.sh
 
 # Execute
-source ${KERNELDIR}/../../scripts/outline-affine_for-opt_none_nangate-bambu-soft_float-no_ssdcs.sh
+source ${KERNELDIR}/../../scripts/outline-affine_for-opt_full_nangate-bambu-soft_float-no_ssdcs.sh
