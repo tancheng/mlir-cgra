@@ -19,15 +19,13 @@
 # source ${KERNELDIR}/../../../scripts/<name-of-this-file>.sh
 ####
 
-
-
 KERNEL=${NAME}_${KSIZE}
 FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
 
 # Directories
 WORKDIR=$(pwd)
-ODIR=${KERNELDIR}/output/${KERNEL}/opt_full-soft_float-no_ssdcs
+ODIR=${KERNELDIR}/output/${KERNEL}/opt_full_nangate-soft_float-no_ssdcs
 BAMBUDIR=${ODIR}/bambu
 SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
@@ -44,10 +42,12 @@ source ${SCRIPTDIR}/needs_rerun.sh
 
 LIST1=(
   # Generic compilation scripts
-  ${SCRIPTDIR}/bambu-config-values.sh
-  ${SCRIPTDIR}/bambu-debug-flags.sh
+  ${SCRIPTDIR}/bambu-config-values-nangate.sh
+  ${SCRIPTDIR}/bambu-debug-flags-nangate.sh
+  ${SCRIPTDIR}/to_copy/config.mk
+  ${SCRIPTDIR}/to_copy/synthesize_Synthesis_kernelname.sh
   ${SCRIPTDIR}/needs_rerun.sh
-  ${SCRIPTDIR}/outline-affine_for-opt_full-bambu-soft_float-no_ssdcs.sh
+  ${SCRIPTDIR}/outline-affine_for-opt_full_nangate-bambu-soft_float-no_ssdcs.sh
 
   # Kernel Specific
   ${KERNELDIR}/${FILENAME}
@@ -57,6 +57,7 @@ LIST2=(
   # Output files of the kernel
   ${ODIR}/model.ll
   ${BAMBUDIR}/results.txt
+  #${BAMBUDIR}/HLS_output/Synthesis/bash_flow/openroad/results/nangate45/${KERNELNAME}/base/6_final.gds
 )
 
 RERUN=false
@@ -66,6 +67,7 @@ if [ "$RERUN" = true ]; then
 
 # Uncomment to see commands
 set -x 
+
 # ==============================================================================
 # SODA Search, Outiline
 # ==============================================================================
@@ -98,8 +100,8 @@ soda-opt \
 # ==============================================================================
 # Optimize the isolated code
 soda-opt \
-    --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv \
     ${ODIR}/06-03-isolated.mlir \
+    --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv \
     -o ${ODIR}/07-llvm.mlir \
     -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
 
@@ -126,7 +128,7 @@ bambu \
   -lm --soft-float \
   --compiler=I386_CLANG10  \
   -O2 \
-  --device=xc7vx690t-3ffg1930-VVD \
+  --device=nangate45 \
   --clock-period=${CLKPERIOD} --no-iob \
   --experimental-setup=BAMBU-BALANCED-MP \
   --channels-number=${CHANNELSNUMBER} \
@@ -135,8 +137,9 @@ bambu \
   --generate-tb=${ODIR}/${KERNELNAME}_test.xml \
   --simulate --simulator=VERILATOR \
   --top-fname=${KERNELNAME} \
-  --generate-interface=INFER --interface-xml-file=${ODIR}/${KERNELNAME}_interface.xml \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
+
+    source ${SCRIPTDIR}/patch_nangate_synt.sh
 popd
 
 set +x
