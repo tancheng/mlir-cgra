@@ -28,8 +28,8 @@ func @fusion_with_arith(%arg0: memref<4x4xf32>, %arg1: memref<4x4xf32>, %arg2: m
         %3 = affine.load %0[%arg3, %arg5] : memref<4x4xf32>
         %4 = affine.load %1[%arg5, %arg4] : memref<4x4xf32>
         %5 = affine.load %2[%arg3, %arg4] : memref<4x4xf32>
-        %6 = mulf %3, %4 : f32
-        %7 = addf %5, %6 : f32
+        %6 = arith.mulf %3, %4 : f32
+        %7 = arith.addf %5, %6 : f32
         affine.store %7, %2[%arg3, %arg4] : memref<4x4xf32>
       }
     }

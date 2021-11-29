@@ -77,6 +77,8 @@ int main(int argc, char **argv) {
   mlir::registerConvertMemRefToLLVMPass();
   mlir::registerSCFToStandardPass();
   mlir::registerConvertAffineToStandardPass();
+  mlir::registerConvertMathToLLVMPass();
+  mlir::registerConvertArithmeticToLLVMPass();
   mlir::registerReconcileUnrealizedCastsPass();
 
   // Add the following to selectively include the necessary dialects. You only
@@ -90,6 +92,7 @@ int main(int argc, char **argv) {
                   mlir::math::MathDialect,
                   mlir::scf::SCFDialect,
                   mlir::vector::VectorDialect,
+                  mlir::arith::ArithmeticDialect,
                   mlir::AffineDialect>();
   // clang-format on
   // mlir::registerAllDialects(registry);

@@ -2,9 +2,9 @@
 
 // CHECK: @one_d_loop
 func @one_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
-  %c0 = constant 0 : index
-  %c42 = constant 42 : index
-  %c1 = constant 1 : index
+  %c0 = arith.constant 0 : index
+  %c42 = arith.constant 42 : index
+  %c1 = arith.constant 1 : index
 
   // CHECK: soda.launch
   // CHECK-NEXT: scf.for
@@ -20,15 +20,15 @@ func @one_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
 
 // CHECK: @two_d_loop
 func @two_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
-  %c0 = constant 0 : index
-  %c42 = constant 42 : index
-  %c1 = constant 1 : index
+  %c0 = arith.constant 0 : index
+  %c42 = arith.constant 42 : index
+  %c1 = arith.constant 1 : index
   // CHECK: soda.launch
   // CHECK-NEXT: scf.for
   scf.for %arg2 = %c0 to %c42 step %c1 {
-    %c0_0 = constant 0 : index
-    %c42_1 = constant 42 : index
-    %c1_2 = constant 1 : index
+    %c0_0 = arith.constant 0 : index
+    %c42_1 = arith.constant 42 : index
+    %c1_2 = arith.constant 1 : index
     // CHECK-NEXT: constant
     // CHECK-NEXT: constant
     // CHECK-NEXT: constant

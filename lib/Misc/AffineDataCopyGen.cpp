@@ -199,7 +199,7 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
 void AffineDataCopyGen::runOnFunction() {
   FuncOp f = getFunction();
   OpBuilder topBuilder(f.getBody());
-  zeroIndex = topBuilder.create<ConstantIndexOp>(f.getLoc(), 0);
+  zeroIndex = topBuilder.create<arith::ConstantIndexOp>(f.getLoc(), 0);
 
   // Nests that are copy-in's or copy-out's; the root AffineForOps of those
   // nests are stored herein.

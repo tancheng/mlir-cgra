@@ -10,8 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef CONVERSION_PASSDETAIL_H_
-#define CONVERSION_PASSDETAIL_H_
+#ifndef MISC_CONVERSION_PASSDETAIL_H_
+#define MISC_CONVERSION_PASSDETAIL_H_
 
 #include "mlir/Pass/Pass.h"
 
@@ -26,6 +26,10 @@ void registerDialect(DialectRegistry &registry);
 namespace acc {
 class OpenACCDialect;
 } // end namespace acc
+
+namespace arith {
+class ArithmeticDialect;
+} // end namespace arith
 
 namespace complex {
 class ComplexDialect;
@@ -93,4 +97,4 @@ class ArmNeonDialect;
 
 } // end namespace mlir
 
-#endif // CONVERSION_PASSDETAIL_H_
+#endif // MISC_CONVERSION_PASSDETAIL_H_

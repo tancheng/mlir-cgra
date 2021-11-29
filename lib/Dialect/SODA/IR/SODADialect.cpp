@@ -69,8 +69,8 @@ void SODADialect::printType(Type type, DialectAsmPrinter &os) const {
 
 LogicalResult SODADialect::verifyOperationAttribute(Operation *op,
                                                     NamedAttribute attr) {
-  if (!attr.second.isa<UnitAttr>() ||
-      attr.first != getContainerModuleAttrName())
+  if (!attr.getValue().isa<UnitAttr>() ||
+      attr.getName() != getContainerModuleAttrName())
     return success();
 
   auto module = dyn_cast<ModuleOp>(op);

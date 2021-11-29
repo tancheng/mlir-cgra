@@ -17,10 +17,10 @@ func @matmul_kernel(%A:memref<?x?xf32>, %B:memref<?x?xf32>, %C : memref<?x?xf32>
 
 // Creates and returns a 1-D buffer of size %s filled with the value %f
 func @alloc_filled_f32(%s : index, %f : f32) -> memref<?xi8> {
-  %c0 = constant 0 : index
-  %c1 = constant 1 : index
-  %c4 = constant 4 : index // 4 bytes in one f32 value
-  %s4 = muli %s, %c4: index
+  %c0 = arith.constant 0 : index
+  %c1 = arith.constant 1 : index
+  %c4 = arith.constant 4 : index // 4 bytes in one f32 value
+  %s4 = arith.muli %s, %c4: index
   %buf = memref.alloc(%s4) {alignment = 256} : memref<?xi8>
   %V = memref.view %buf[%c0][%s] : memref<?xi8> to memref<?xf32>
   linalg.fill(%f, %V) : f32, memref<?xf32>
@@ -36,21 +36,21 @@ func @alloc_filled_f32(%s : index, %f : f32) -> memref<?xi8> {
     // print(C[0,1])
 func @matmul_driver() -> f32 {
   // Index of returned value
-  %c0 = constant 0 : index    // x, also 0 shift on the memref view
-  %c1 = constant 1 : index    // y
+  %c0 = arith.constant 0 : index    // x, also 0 shift on the memref view
+  %c1 = arith.constant 1 : index    // y
 
   // Matrix dimensions
-  %c2 = constant 2 : index    // M and N dimensions
-  %c16 = constant 16 : index  // K Dimension
+  %c2 = arith.constant 2 : index    // M and N dimensions
+  %c16 = arith.constant 16 : index  // K Dimension
 
   // Number of elements
-  %c32 = constant 32 : index  // Number of elements (not bytes) on A and B
-  %c4 = constant 4 : index    // Number of elements (not bytes) on C
+  %c32 = arith.constant 32 : index  // Number of elements (not bytes) on A and B
+  %c4 = arith.constant 4 : index    // Number of elements (not bytes) on C
 
   // Values
-  %f2 = constant 2.00000e+00 : f32    // A Fill
-  %f1 = constant 1.00000e+00 : f32    // B Fill
-  %f10 = constant 10.00000e+00 : f32  // C FIll, represents added constant
+  %f2 = arith.constant 2.00000e+00 : f32    // A Fill
+  %f1 = arith.constant 1.00000e+00 : f32    // B Fill
+  %f10 = arith.constant 10.00000e+00 : f32  // C FIll, represents added constant
 
   // Allocate bytes as an i8 1d array
   %bA = call @alloc_filled_f32(%c32, %f2) : (index, f32) -> (memref<?xi8>)

@@ -46,8 +46,8 @@ func @buffer_trick(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>
         %6 = affine.load %A[%i, %k] : memref<4x4xf32>
         %7 = affine.load %B[%k, %j] : memref<4x4xf32>
         %8 = affine.load %C[%i, %j] : memref<4x4xf32>
-        %9 = mulf %6, %7 : f32
-        %10 = addf %8, %9 : f32
+        %9 = arith.mulf %6, %7 : f32
+        %10 = arith.addf %8, %9 : f32
         affine.store %10, %C[%i, %j] : memref<4x4xf32>
       }
     }

@@ -20,6 +20,8 @@ set(LIBS
   MLIRLinalg
   MLIRMemRef
   MLIRAffine
+  MLIRArithmetic
+  MLIRMath
   MLIRStandard
   MLIRSCF
  
@@ -37,6 +39,8 @@ set(LIBS
   MLIRAffineToStandard
   MLIRSCFToStandard
   MLIRMemRefToLLVM
+  MLIRMathToLLVM
+  MLIRArithmeticToLLVM
   MLIRStandardToLLVM
   MLIRLinalgToLLVM
   MLIRLinalgToStandard

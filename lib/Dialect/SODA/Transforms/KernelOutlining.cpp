@@ -31,7 +31,8 @@ using namespace mlir;
 /// operations may not have side-effects, as otherwise sinking (and hence
 /// duplicating them) is not legal.
 static bool isSinkingBeneficiary(Operation *op) {
-  return isa<ConstantOp, memref::DimOp, SelectOp, CmpIOp>(op);
+  return isa<arith::ConstantOp, ConstantOp, memref::DimOp, SelectOp,
+             arith::CmpIOp>(op);
 }
 
 /// For a given operation `op`, computes whether it is beneficial to sink the

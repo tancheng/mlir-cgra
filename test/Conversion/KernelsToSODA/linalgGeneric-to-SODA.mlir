@@ -19,8 +19,8 @@ func @my_conv(%A: memref<?x?xf32>, %B: memref<?x?xf32>, %C: memref<?x?xf32>){
     ins(%A, %B : memref<?x?xf32>, memref<?x?xf32>)
     outs(%C : memref<?x?xf32>) {
   ^bb5(%a: f32, %b: f32, %c: f32):
-    %tmp = mulf %a,%b:f32
-    %acc = addf %tmp,%c:f32
+    %tmp = arith.mulf %a,%b:f32
+    %acc = arith.addf %tmp,%c:f32
     linalg.yield %acc : f32
   }
   // CHECK: soda.terminator

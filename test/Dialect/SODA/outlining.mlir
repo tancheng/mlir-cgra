@@ -9,10 +9,10 @@ func @launch() {
   // CHECK: %[[ARG1:.*]] = "op"() : () -> memref<?xf32, 1>
   %1 = "op"() : () -> (memref<?xf32, 1>)
   
-  // CHECK: %[[IDX0:.*]] = constant 1 : index
-  %idx0 = constant 1 : index
-  // CHECK: %[[IDX1:.*]] = constant 2 : index
-  %idx1 = constant 2 : index
+  // CHECK: %[[IDX0:.*]] = arith.constant 1 : index
+  %idx0 = arith.constant 1 : index
+  // CHECK: %[[IDX1:.*]] = arith.constant 2 : index
+  %idx1 = arith.constant 2 : index
 
   // CHECK: soda.launch_func @launch_kernel::@launch_kernel args(%[[ARG0]] : f32, %[[ARG1]] : memref<?xf32, 1>)
   // CHECK-NOT: soda.launch
@@ -60,8 +60,8 @@ func @multiple_launches() {
 
 // CHECK-LABEL: @extra_constants_not_inlined
 func @extra_constants_not_inlined(%arg0: memref<?xf32>) {
-  %cst2 = constant 2 : index
-  %c0 = constant 0 : index
+  %cst2 = arith.constant 2 : index
+  %c0 = arith.constant 0 : index
   %cst3 = "secret_constant"() : () -> index
   // CHECK: soda.launch_func @extra_constants_not_inlined_kernel::@extra_constants_not_inlined_kernel args({{.*}} : memref<?xf32>, {{.*}} : index)
   soda.launch {
@@ -79,9 +79,9 @@ func @extra_constants_not_inlined(%arg0: memref<?xf32>) {
 // CHECK-LABEL: @extra_constants
 // CHECK-SAME: %[[ARG0:.*]]: memref<?xf32>
 func @extra_constants(%arg0: memref<?xf32>) {
-  %cst = constant 8 : index
-  %cst2 = constant 2 : index
-  %c0 = constant 0 : index
+  %cst = arith.constant 8 : index
+  %cst2 = arith.constant 2 : index
+  %c0 = arith.constant 0 : index
   %cst3 = memref.dim %arg0, %c0 : memref<?xf32>
   // CHECK: soda.launch_func @extra_constants_kernel::@extra_constants_kernel args(%[[ARG0]] : memref<?xf32>)
   soda.launch {
@@ -102,8 +102,8 @@ func @extra_constants(%arg0: memref<?xf32>) {
 // CHECK-LABEL: @extra_constants_noarg
 // CHECK-SAME: %[[ARG0:.*]]: memref<?xf32>, %[[ARG1:.*]]: memref<?xf32>
 func @extra_constants_noarg(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
-  %cst2 = constant 2 : index
-  %c0 = constant 0 : index
+  %cst2 = arith.constant 2 : index
+  %c0 = arith.constant 0 : index
   // CHECK: memref.dim %[[ARG1]]
   %cst3 = memref.dim %arg1, %c0 : memref<?xf32>
   // CHECK: soda.launch_func @extra_constants_noarg_kernel::@extra_constants_noarg_kernel args(%[[ARG0]] : memref<?xf32>, {{.*}} : index)
@@ -116,17 +116,17 @@ func @extra_constants_noarg(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
 
 // CHECK-LABEL: func @extra_constants_noarg_kernel(
 // CHECK-SAME: %[[KARG0:.*]]: memref<?xf32>, %[[KARG1:.*]]: index
-// CHECK: %[[KCST:.*]] = constant 2
+// CHECK: %[[KCST:.*]] = arith.constant 2
 // CHECK: "use"(%[[KCST]], %[[KARG0]], %[[KARG1]])
 
 // -----
 
 // CHECK-LABEL: @multiple_uses
 func @multiple_uses(%arg0 : memref<?xf32>) {
-  %c1 = constant 1 : index
-  %c2 = constant 2 : index
+  %c1 = arith.constant 1 : index
+  %c2 = arith.constant 2 : index
   // CHECK: soda.func {{.*}} {
-  // CHECK:   %[[C2:.*]] = constant 2 : index
+  // CHECK:   %[[C2:.*]] = arith.constant 2 : index
   // CHECK:   "use1"(%[[C2]], %[[C2]])
   // CHECK:   "use2"(%[[C2]])
   // CHECK:   soda.return
@@ -143,11 +143,11 @@ func @multiple_uses(%arg0 : memref<?xf32>) {
 
 // CHECK-LABEL: @multiple_uses2
 func @multiple_uses2(%arg0 : memref<*xf32>) {
-  %c1 = constant 1 : index
-  %c2 = constant 2 : index
+  %c1 = arith.constant 1 : index
+  %c2 = arith.constant 2 : index
   %d = memref.dim %arg0, %c2 : memref<*xf32>
   // CHECK: soda.func {{.*}} {
-  // CHECK:   %[[C2:.*]] = constant 2 : index
+  // CHECK:   %[[C2:.*]] = arith.constant 2 : index
   // CHECK:   %[[D:.*]] = memref.dim %[[ARG:.*]], %[[C2]]
   // CHECK:   "use1"(%[[D]])
   // CHECK:   "use2"(%[[C2]], %[[C2]])
@@ -169,7 +169,7 @@ llvm.mlir.global internal @global(42 : i64) : i64
 
 //CHECK-LABEL: @function_call
 func @function_call(%arg0 : memref<?xf32>) {
-  %cst = constant 8 : index
+  %cst = arith.constant 8 : index
   soda.launch {
     call @device_function() : () -> ()
     call @device_function() : () -> ()

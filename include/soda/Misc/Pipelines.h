@@ -118,6 +118,8 @@ void registerPassManagerMiscPass() {
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
         pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createConvertMathToLLVMPass());
+        pm.addPass(arith::createConvertArithmeticToLLVMPass());
         pm.addPass(createLowerToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
       });
@@ -182,6 +184,8 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
         pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createConvertMathToLLVMPass());
+        pm.addPass(arith::createConvertArithmeticToLLVMPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));

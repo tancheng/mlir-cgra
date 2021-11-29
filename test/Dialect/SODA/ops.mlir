@@ -28,12 +28,12 @@ module attributes {soda.container_module} {
     // CHECK: soda.func @kernel_1
     soda.func @kernel_1(%arg0 : f32, %arg1 : memref<?xf32, 1>) kernel {
 
-      %bIdX = constant 1 : index
-      %one = constant 1.0 : f32
+      %bIdX = arith.constant 1 : index
+      %one = arith.constant 1.0 : f32
       %sum = "another_op"(%one) : (f32) -> (f32)
 
-      %width = constant 7 : i32
-      %offset = constant 3 : i32
+      %width = arith.constant 7 : i32
+      %offset = arith.constant 3 : i32
 
       "soda.barrier"() : () -> ()
 
@@ -50,8 +50,8 @@ module attributes {soda.container_module} {
   func @foo() {
     %0 = "op"() : () -> (f32)
     %1 = "op"() : () -> (memref<?xf32, 1>)
-    // CHECK: %{{.*}} = constant 8
-    %cst = constant 8 : index
+    // CHECK: %{{.*}} = arith.constant 8
+    %cst = arith.constant 8 : index
     %t0 = soda.wait async
 
     // CHECK: soda.launch_func @kernels::@kernel_1 args(%{{.*}} : f32, %{{.*}} : memref<?xf32, 1>)

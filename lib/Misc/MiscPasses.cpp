@@ -46,7 +46,7 @@ class TestPrintOpNestingPass
     if (!op->getAttrs().empty()) {
       printIndent() << op->getAttrs().size() << " attributes:\n";
       for (NamedAttribute attr : op->getAttrs())
-        printIndent() << " - '" << attr.first << "' : '" << attr.second
+        printIndent() << " - '" << attr.getName() << "' : '" << attr.getValue()
                       << "'\n";
     }
 
