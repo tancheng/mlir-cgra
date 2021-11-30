@@ -22,6 +22,9 @@
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
+#include "mlir/Dialect/Arithmetic/Transforms/Passes.h"
+#include "mlir/Dialect/StandardOps/Transforms/Passes.h"
+
 // Defined in the test directory, no public header.
 namespace mlir {
 void registerTestLoopPermutationPass();
@@ -78,7 +81,10 @@ int main(int argc, char **argv) {
   mlir::registerSCFToStandardPass();
   mlir::registerConvertAffineToStandardPass();
   mlir::registerConvertMathToLLVMPass();
+  mlir::registerConvertMathToLibmPass();
   mlir::registerConvertArithmeticToLLVMPass();
+  mlir::arith::registerArithmeticExpandOpsPass();
+  mlir::registerStdExpandOpsPass();
   mlir::registerReconcileUnrealizedCastsPass();
 
   // Add the following to selectively include the necessary dialects. You only

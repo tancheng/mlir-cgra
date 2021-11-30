@@ -9,6 +9,10 @@
 // RUN:    -affine-loop-unroll="unroll-full" \
 // RUN:    -affine-scalrep -cse \
 // RUN:    -lower-affine -convert-scf-to-std -convert-memref-to-llvm \
+// RUN:    --convert-math-to-llvm --convert-math-to-libm \
+// RUN:    -std-expand \
+// RUN:    -arith-expand \
+// RUN:    --convert-arith-to-llvm \
 // RUN:    -convert-std-to-llvm  \
 // RUN:    -reconcile-unrealized-casts | FileCheck %s
 

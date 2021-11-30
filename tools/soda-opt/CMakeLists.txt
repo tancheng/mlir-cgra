@@ -40,6 +40,7 @@ set(LIBS
   MLIRSCFToStandard
   MLIRMemRefToLLVM
   MLIRMathToLLVM
+  MLIRMathToLibm
   MLIRArithmeticToLLVM
   MLIRStandardToLLVM
   MLIRLinalgToLLVM
