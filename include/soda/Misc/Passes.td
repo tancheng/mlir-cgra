@@ -53,6 +53,10 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
   ];
 }
 
+//===----------------------------------------------------------------------===//
+// Basic Pattern-Match and Rewrite
+//===----------------------------------------------------------------------===//
+
 def EraseMemrefDealloc : Pass<"erase-buffer-deallocation"> {
   let summary = "Erase all buffer deallocation ops in the IR";
   let description = [{
@@ -61,9 +65,14 @@ def EraseMemrefDealloc : Pass<"erase-buffer-deallocation"> {
   let constructor = "mlir::soda::createEraseMemrefDeallocPass()";
 }
 
-//===----------------------------------------------------------------------===//
-// Basic Pattern-Match and Rewrite
-//===----------------------------------------------------------------------===//
+def ForwardMemrefAlloc : FunctionPass<"forward-memref-allocations"> {
+  let summary = "Move non-nested memref allocations to the top of the function";
+  let description = [{
+      Move non-nested memref.alloc and memref.alloca operations to the top of
+      function. AllocOps will be place before AllocaOps.
+  }];
+  let constructor = "mlir::soda::createForwardMemrefAllocPass()";
+}
 
 //===----------------------------------------------------------------------===//
 // Pattern-Match and Rewrite with Constraints

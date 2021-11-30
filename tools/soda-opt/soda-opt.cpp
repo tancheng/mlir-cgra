@@ -110,6 +110,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerTestPrintOpNestingPass();
   mlir::soda::registerTestArgumentsToXMLPass();
   mlir::soda::registerEraseMemrefDeallocPass();
+  mlir::soda::registerForwardMemrefAllocPass();
 
   // SODA Passes
   mlir::soda::registerSodaKernelOutliningPass();

@@ -4,6 +4,7 @@ add_mlir_dialect_library(SODAMisc
     AffineLoopTiling.cpp
     AffineLoopPermutation.cpp
     MemrefEraseDealloc.cpp
+    ForwardMemrefAlloc.cpp
     StandardToLLVM.cpp
 
     ADDITIONAL_HEADER_DIRS

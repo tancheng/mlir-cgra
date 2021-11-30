@@ -24,6 +24,8 @@ class Pass;
 namespace mlir {
 namespace memref {
 class DeallocOp;
+class AllocOp;
+class AllocaOp;
 } // namespace memref
 } // namespace mlir
 
@@ -37,6 +39,7 @@ std::unique_ptr<mlir::Pass> createTestPrintOpNestingPass();
 std::unique_ptr<mlir::Pass> createTestArgumentsToXMLPass();
 
 std::unique_ptr<mlir::Pass> createEraseMemrefDeallocPass();
+std::unique_ptr<mlir::Pass> createForwardMemrefAllocPass();
 void populateEraseMemrefDeallocPattern(RewritePatternSet &patterns);
 
 //===----------------------------------------------------------------------===//
@@ -57,7 +60,7 @@ std::unique_ptr<OperationPass<FuncOp>>
 createAffineLoopTilingPass(unsigned tileSize);
 
 std::unique_ptr<OperationPass<FuncOp>>
-createAffineLoopPermutationPass(const ArrayRef<unsigned>& permList);
+createAffineLoopPermutationPass(const ArrayRef<unsigned> &permList);
 
 //===----------------------------------------------------------------------===//
 // Lowerings
