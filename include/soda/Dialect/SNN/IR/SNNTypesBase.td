@@ -188,7 +188,7 @@ class SNN_TypeLike<list<Type> types, string description = ""> : TypeConstraint<O
      AnyTypeOf<types>.predicate,
      VectorOf<types>.predicate,
      TensorOf<types>.predicate]>,
-     "signless-integer-32-like">;
+     description>;
 
 def SNN_Int8Like : SNN_TypeLike<[SNN_Int8], "signless-integer-8-bit-like">;
 def SNN_Int16Like : SNN_TypeLike<[SNN_Int16], "signless-integer-16-bit-like">;
