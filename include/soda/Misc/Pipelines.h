@@ -20,11 +20,41 @@ using namespace mlir;
 
 namespace {
 
+struct SimpleOptions : public PassPipelineOptions<SimpleOptions> {
+  Option<bool> useBarePtrCallConv{
+      *this, "use-bare-ptr-memref-call-conv",
+      llvm::cl::desc("Replace FuncOp's MemRef arguments with bare pointers "
+                     "to the MemRef element types. Cannot be used with "
+                     "-emit-c-wrappers. (default false)"),
+      ::llvm::cl::init(false)};
+
+  Option<bool> emitCWrappers{
+      *this, "emit-c-wrappers",
+      llvm::cl::desc("Emit wrappers for C-compatible pointer-to-struct "
+                     "memref descriptors. Cannot be used with "
+                     "-use-bare-ptr-memref-call-conv. (default false)"),
+      llvm::cl::init(false)};
+};
+
 struct MyOptions : public PassPipelineOptions<MyOptions> {
   Option<uint64_t> cacheSizeInKiB{
       *this, "cache-size",
       llvm::cl::desc("Set size of cache to tile for in KiB"),
       llvm::cl::init(0)};
+
+  Option<bool> useBarePtrCallConv{
+      *this, "use-bare-ptr-memref-call-conv",
+      llvm::cl::desc("Replace FuncOp's MemRef arguments with bare pointers "
+                     "to the MemRef element types. Cannot be used with "
+                     "-emit-c-wrappers. (default false)"),
+      ::llvm::cl::init(false)};
+
+  Option<bool> emitCWrappers{
+      *this, "emit-c-wrappers",
+      llvm::cl::desc("Emit wrappers for C-compatible pointer-to-struct "
+                     "memref descriptors. Cannot be used with "
+                     "-use-bare-ptr-memref-call-conv. (default false)"),
+      llvm::cl::init(false)};
 };
 
 struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
@@ -101,7 +131,7 @@ namespace soda {
 void registerPassManagerMiscPass() {
   PassPipelineRegistration<MyOptions> registerOptionsPassPipeline(
       "soda-opt-pipeline",
-      "Run the full pass pipeline to optimize previously outlined key "
+      "Run a generic pass pipeline to optimize previously outlined key "
       "operations",
       [](OpPassManager &pm, const MyOptions &options) {
         pm.addPass(createConvertLinalgToAffineLoopsPass());
@@ -119,8 +149,46 @@ void registerPassManagerMiscPass() {
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
         pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createConvertMathToLLVMPass());
+        pm.addPass(createConvertMathToLibmPass());
+        pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
-        pm.addPass(createLowerToLLVMPass());
+        pm.addPass(createStdExpandOpsPass());
+        if (options.useBarePtrCallConv || options.emitCWrappers) {
+          pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
+                                              options.emitCWrappers));
+        } else {
+          pm.addPass(createLowerToLLVMPass());
+        }
+        pm.addPass(createReconcileUnrealizedCastsPass());
+      });
+}
+
+void registerSimpleLoweringPass() {
+  PassPipelineRegistration<SimpleOptions> registerOptionsPassPipeline(
+      "lower-all-to-llvm",
+      "Run a pipeline of lowering steps until the llvm dialect without "
+      "optimizations",
+      [](OpPassManager &pm, const SimpleOptions &options) {
+        pm.addPass(createConvertLinalgToAffineLoopsPass());
+        pm.addPass(createConvertLinalgToStandardPass());
+        pm.addPass(createLowerAffinePass());
+        pm.addPass(createCanonicalizerPass());
+        pm.addPass(createCSEPass()); // Only has impact outside linalg ops
+        pm.addPass(createLowerToCFGPass());
+        pm.addPass(createCanonicalizerPass());
+        pm.addPass(createCSEPass()); // Only has impact outside linalg ops
+        pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createConvertMathToLLVMPass());
+        pm.addPass(createConvertMathToLibmPass());
+        pm.addPass(arith::createArithmeticExpandOpsPass());
+        pm.addPass(arith::createConvertArithmeticToLLVMPass());
+        pm.addPass(createStdExpandOpsPass());
+        if (options.useBarePtrCallConv || options.emitCWrappers) {
+          pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
+                                              options.emitCWrappers));
+        } else {
+          pm.addPass(createLowerToLLVMPass());
+        }
         pm.addPass(createReconcileUnrealizedCastsPass());
       });
 }
@@ -167,7 +235,7 @@ void registerOptimizedForBambuPass() {
           // --affine-loop-unroll="unroll-full"
           pm.addPass(mlir::createLoopUnrollPass(4, false, true, 0));
         }
-          
+
         pm.addPass(createCSEPass());
 
         // TODO simplify affine structures to get rid of affine.apply
@@ -185,7 +253,10 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createCSEPass());
         pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createConvertMathToLLVMPass());
+        pm.addPass(createConvertMathToLibmPass());
+        pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
+        pm.addPass(createStdExpandOpsPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));

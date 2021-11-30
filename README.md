@@ -142,7 +142,12 @@ Optimizations passes and lowerings can be executed on a `.mlir` file with the
 following command:
 
 ```sh
-# With loop tiling to fit 512KiB "L1" memory
+# Simply lower all operations to the llvm dialect
+$PROJ_BUILD_DIR/bin/soda-opt \
+  $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
+  --lower-all-to-llvm
+
+# Perform loop tiling to fit 512KiB "L1" memory
 $PROJ_BUILD_DIR/bin/soda-opt \
   $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
   --soda-opt-pipeline="cache-size=512"
@@ -152,7 +157,10 @@ $PROJ_BUILD_DIR/bin/soda-opt \
   $PROJ_ROOT_DIR/test/soda-opt/linalg-matmul.mlir \
   --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv
 
-#  In the future, additional pipelines for other target architectures
+# Check other options in the -soda-opt-pipeline-for-bambu with
+$PROJ_BUILD_DIR/bin/soda-opt -h | less
+
+# In the future, additional pipelines for other target architectures
 # will be performed by the following pass template:
  # --soda-opt-pipeline-for-<target_name>
 ```
