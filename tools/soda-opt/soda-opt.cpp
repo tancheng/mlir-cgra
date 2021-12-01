@@ -117,6 +117,8 @@ int main(int argc, char **argv) {
   mlir::soda::registerTestArgumentsToXMLPass();
   mlir::soda::registerEraseMemrefDeallocPass();
   mlir::soda::registerForwardMemrefAllocPass();
+  mlir::soda::registerForwardLinalgFillPass();
+  mlir::soda::registerForwardLinalgCopyPass();
 
   // SODA Passes
   mlir::soda::registerSodaKernelOutliningPass();

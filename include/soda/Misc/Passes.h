@@ -27,6 +27,10 @@ class DeallocOp;
 class AllocOp;
 class AllocaOp;
 } // namespace memref
+namespace linalg {
+class FillOp;
+class CopyOp;
+}
 } // namespace mlir
 
 namespace mlir {
@@ -40,6 +44,8 @@ std::unique_ptr<mlir::Pass> createTestArgumentsToXMLPass();
 
 std::unique_ptr<mlir::Pass> createEraseMemrefDeallocPass();
 std::unique_ptr<mlir::Pass> createForwardMemrefAllocPass();
+std::unique_ptr<mlir::Pass> createForwardLinalgFillPass();
+std::unique_ptr<mlir::Pass> createForwardLinalgCopyPass();
 void populateEraseMemrefDeallocPattern(RewritePatternSet &patterns);
 
 //===----------------------------------------------------------------------===//

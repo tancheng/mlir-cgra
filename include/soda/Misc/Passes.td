@@ -74,6 +74,22 @@ def ForwardMemrefAlloc : FunctionPass<"forward-memref-allocations"> {
   let constructor = "mlir::soda::createForwardMemrefAllocPass()";
 }
 
+def ForwardLinalgFill : FunctionPass<"forward-linalg-fill"> {
+  let summary = "Move non-nested linalg.fill ops the top of the function";
+  let description = [{
+      Move non-nested linalg.fill operations to the top of function.
+  }];
+  let constructor = "mlir::soda::createForwardLinalgFillPass()";
+}
+
+def ForwardLinalgCopy : FunctionPass<"forward-linalg-copy"> {
+  let summary = "Move non-nested linalg.copy ops the top of the function";
+  let description = [{
+      Move non-nested linalg.copy operations to the top of function.
+  }];
+  let constructor = "mlir::soda::createForwardLinalgCopyPass()";
+}
+
 //===----------------------------------------------------------------------===//
 // Pattern-Match and Rewrite with Constraints
 //===----------------------------------------------------------------------===//
