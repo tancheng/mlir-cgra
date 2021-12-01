@@ -160,6 +160,7 @@ void registerPassManagerMiscPass() {
           pm.addPass(createLowerToLLVMPass());
         }
         pm.addPass(createReconcileUnrealizedCastsPass());
+        pm.addPass(createCanonicalizerPass());
       });
 }
 
@@ -264,6 +265,7 @@ void registerOptimizedForBambuPass() {
           pm.addPass(createLowerToLLVMPass());
         }
         pm.addPass(createReconcileUnrealizedCastsPass());
+        pm.addPass(createCanonicalizerPass());
       });
 }
 
