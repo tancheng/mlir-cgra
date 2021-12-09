@@ -248,6 +248,12 @@ class TestArgumentsToXMLPass
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
+          
+          if (IndexType value = a.dyn_cast<IndexType>()) {
+            StringRef v;
+            v = "1";
+            printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
+          }
         }
       }
       closeTestbench();
@@ -333,6 +339,8 @@ class TestArgumentsToXMLPass
               if (a.isInteger(64))
                 typeString = "unsigned long long";
             }
+            if (IndexType value = a.dyn_cast<IndexType>())
+              typeString = "unsigned long long";
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
         }
@@ -398,6 +406,12 @@ class TestArgumentsToXMLPass
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
+          
+          if (IndexType value = a.dyn_cast<IndexType>()) {
+            StringRef v;
+            v = "1";
+            printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
+          }
         }
       }
       closeTestbench();
@@ -452,6 +466,8 @@ class TestArgumentsToXMLPass
               if (a.isInteger(64))
                 typeString = "unsigned long long";
             }
+            if (IndexType value = a.dyn_cast<IndexType>())
+              typeString = "unsigned long long";
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
         }
