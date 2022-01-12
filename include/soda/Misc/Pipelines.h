@@ -135,7 +135,6 @@ void registerPassManagerMiscPass() {
       "operations",
       [](OpPassManager &pm, const MyOptions &options) {
         pm.addPass(createConvertLinalgToAffineLoopsPass());
-        pm.addPass(createConvertLinalgToStandardPass());
 
         // When given a cache size, tile affine loops
         if (options.cacheSizeInKiB > 0)
@@ -171,7 +170,6 @@ void registerSimpleLoweringPass() {
       "optimizations",
       [](OpPassManager &pm, const SimpleOptions &options) {
         pm.addPass(createConvertLinalgToAffineLoopsPass());
-        pm.addPass(createConvertLinalgToStandardPass());
         pm.addPass(createLowerAffinePass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
@@ -201,7 +199,6 @@ void registerOptimizedForBambuPass() {
       "operations for bambu target",
       [](OpPassManager &pm, const OptForBambuOptions &options) {
         pm.addPass(createConvertLinalgToAffineLoopsPass());
-        pm.addPass(createConvertLinalgToStandardPass());
 
         if (options.tileSize > 0) {
           // -affine-loop-tile="tile-size=2"
