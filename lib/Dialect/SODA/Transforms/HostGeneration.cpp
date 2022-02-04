@@ -31,9 +31,7 @@ public:
     RewritePatternSet patterns(&getContext());
     soda::populateHostGenerationConversionPatterns(patterns);
     ConversionTarget target(getContext());
-    target.addLegalDialect<soda::SODADialect, StandardOpsDialect,
-                           BuiltinDialect>();
-    target.addIllegalOp<soda::LaunchFuncOp>();
+    target.addLegalDialect<StandardOpsDialect, BuiltinDialect>();
     if (failed(applyPartialConversion(getOperation(), target,
                                       std::move(patterns)))) {
       signalPassFailure();
@@ -86,13 +84,26 @@ public:
   }
 };
 
+class SODAModuleDeletion : public OpRewritePattern<soda::SODAModuleOp> {
+public:
+  using OpRewritePattern<soda::SODAModuleOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(soda::SODAModuleOp op,
+                                PatternRewriter &rewriter) const override {
+    rewriter.eraseOp(op);
+    return success();
+  }
+};
+
 } // namespace
 
 void soda::populateHostGenerationConversionPatterns(
     RewritePatternSet &patterns) {
   // clang-format off
   patterns.add<
-      SODALaunchFuncLowering>(patterns.getContext());
+      SODALaunchFuncLowering,
+      SODAModuleDeletion
+      >(patterns.getContext());
   // clang-format on
 }
 
