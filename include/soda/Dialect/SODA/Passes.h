@@ -25,7 +25,8 @@ std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelOutliningPass();
 std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelGenerationPass();
 
 /// Transform `soda.launch_func` into calls to the bambu accelerator API
-std::unique_ptr<OperationPass<ModuleOp>> createSodaHostGenerationPass();
+void populateHostGenerationConversionPatterns(RewritePatternSet &patterns);
+std::unique_ptr<Pass> createSodaHostGenerationPass();
 
 /// Rewrites a function region so that SODA ops execute async.
 std::unique_ptr<OperationPass<FuncOp>> createSodaAsyncRegionPass();

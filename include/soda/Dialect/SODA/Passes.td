@@ -27,7 +27,7 @@ def SodaKernelGeneration : Pass<"soda-generate-bambu-accelcode", "ModuleOp"> {
   ];
 }
 
-def SodaHostGeneration : Pass<"soda-generate-bambu-hostcode", "ModuleOp"> {
+def SodaHostGeneration : Pass<"soda-generate-bambu-hostcode"> {
   let summary = "Generate host code to call bambu accelerator api";
   let constructor = "mlir::soda::createSodaHostGenerationPass()";
 }
