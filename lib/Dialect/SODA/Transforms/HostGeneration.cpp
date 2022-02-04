@@ -54,17 +54,18 @@ public:
     ModuleOp module = op->getParentOfType<ModuleOp>();
 
     // Build final function name
-    StringRef moduleName = op.getKernelModuleName();
-    StringRef kernelName = op.getKernelName();
-    StringRef newName = moduleName.str() + "_" + kernelName.str();
-
-    // Act
-    Operation *kernelFunc = module.lookupSymbol(op.kernelAttr());
-    auto kernelSODAFunction = dyn_cast_or_null<soda::SODAFuncOp>(kernelFunc);
+    auto newName =
+        (Twine(op.getKernelModuleName()) + "_" + Twine(op.getKernelName()))
+            .str();
 
     auto func = module.lookupSymbol<FuncOp>(newName);
     if (!func) {
-      // Add a private function with same prototy on the top of parent module
+
+      // Get callee
+      Operation *kernelFunc = module.lookupSymbol(op.kernelAttr());
+      auto kernelSODAFunction = dyn_cast_or_null<soda::SODAFuncOp>(kernelFunc);
+
+      // Add a private function with same prototype on the top of parent module
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
       FunctionType funcTy = kernelSODAFunction.getType();
