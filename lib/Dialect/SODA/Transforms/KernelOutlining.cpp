@@ -130,10 +130,10 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
     kernelOperandTypes.push_back(operand.getType());
   }
   FunctionType type =
-      FunctionType::get(launchOp.getContext(),kernelOperandTypes, {});
+      FunctionType::get(launchOp.getContext(), kernelOperandTypes, {});
   auto outlinedFunc = builder.create<soda::SODAFuncOp>(loc, kernelFnName, type);
   outlinedFunc->setAttr(soda::SODADialect::getKernelFuncAttrName(),
-                       builder.getUnitAttr());
+                        builder.getUnitAttr());
   BlockAndValueMapping map;
 
   // Map the arguments corresponding to the launch parameter like blockIdx,
@@ -217,6 +217,16 @@ public:
         std::string kernelFnName =
             Twine(op->getParentOfType<FuncOp>().getName(), "_kernel").str();
 
+        // func.emitWarning()<< kernelFnName;
+        // auto newName =
+        //     (Twine(op.getKernelModuleName(), "_" +
+        //     Twine(kernelFnName)).str();
+
+        // // auto func = getOperation().lookupSymbol<FuncOp>(newName);
+        // if(getOperation().lookupSymbol<FuncOp>(newName)){
+        //   kernelFnName = kernelFnName+"_kernel";
+        // }
+
         // Pull in instructions that can be sunk
         if (failed(sinkOperationsIntoLaunchOp(op)))
           return WalkResult::interrupt();
@@ -241,7 +251,7 @@ public:
     // a container module.
     if (modified)
       getOperation()->setAttr(soda::SODADialect::getContainerModuleAttrName(),
-                             UnitAttr::get(&getContext()));
+                              UnitAttr::get(&getContext()));
   }
 
 private:
@@ -252,12 +262,22 @@ private:
     // a SymbolTable by the caller. SymbolTable needs to be refactored to
     // prevent manual building of Ops with symbols in code using SymbolTables
     // and then this needs to use the OpBuilder.
+
+    // Prevent module and kernel name combination aliasing to an existing
+    // function name in the symbol table
+    std::string newModuleName = kernelFunc.getName().str();
+    std::string possibleConflict =
+        (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();
+    while (parentSymbolTable.lookup<FuncOp>(possibleConflict)) {
+      newModuleName = newModuleName + "_m";
+      possibleConflict =
+          (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();
+    }
+
     auto context = getOperation().getContext();
     OpBuilder builder(context);
-    OperationState state(kernelFunc.getLoc(),
-                         soda::SODAModuleOp::getOperationName());
-    soda::SODAModuleOp::build(builder, state, kernelFunc.getName());
-    auto kernelModule = cast<soda::SODAModuleOp>(Operation::create(state));
+    auto kernelModule =
+        builder.create<soda::SODAModuleOp>(kernelFunc.getLoc(), newModuleName);
     SymbolTable symbolTable(kernelModule);
     symbolTable.insert(kernelFunc);
 

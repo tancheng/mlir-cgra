@@ -201,3 +201,28 @@ func @recursive_device_function() {
 // CHECK:   func @device_function()
 // CHECK:   func @recursive_device_function()
 // CHECK-NOT:   func @device_function
+
+// -----
+
+// Check if generating module,kernel names will avoid similar names to already
+// defined functions by append _m to soda.module name
+// CHECK-LABEL: @krnl
+func private @krnl_kernel_krnl_kernel(memref<?xf32>, memref<?xf32>)
+func private @dummy() -> memref<?xf32>
+func @krnl(%arg0: memref<?xf32>) {
+  soda.launch {
+    %0 = call @dummy() : () -> memref<?xf32>
+    call @krnl_kernel_krnl_kernel(%arg0, %0) : (memref<?xf32>, memref<?xf32>) -> ()
+    soda.terminator
+  }
+  return
+}
+// CHECK: soda.launch_func  @krnl_kernel_m::@krnl_kernel
+// CHECK-NOT: soda.module @krnl_kernel
+// CHECK: soda.module @krnl_kernel_m
+// CHECK:   soda.func @krnl_kernel
+// CHECK:     call @krnl_kernel_krnl_kernel
+// CHECK:     soda.return
+//
+// CHECK:   func private @dummy()
+// CHECK:   func private @krnl_kernel_krnl_kernel
