@@ -26,7 +26,6 @@ class SodaHostGenerationPass
     : public SodaHostGenerationBase<SodaHostGenerationPass> {
 public:
   void runOnOperation() override {
-    // TODO(nico): Finish implementation - remove soda.module
 
     RewritePatternSet patterns(&getContext());
     soda::populateHostGenerationConversionPatterns(patterns);
