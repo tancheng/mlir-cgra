@@ -103,10 +103,10 @@ soda-opt \
 soda-opt \
     ${ODIR}/06-03-isolated.mlir \
     -convert-linalg-to-affine-loops \
-    -lower-affine -convert-scf-to-std -convert-memref-to-llvm \
+    -lower-affine -convert-scf-to-cf -convert-memref-to-llvm \
     --convert-math-to-llvm --convert-math-to-libm \
-    -std-expand \
     -arith-expand \
+    -memref-expand \
     --convert-arith-to-llvm \
     -convert-std-to-llvm=use-bare-ptr-memref-call-conv  \
     -reconcile-unrealized-casts \
