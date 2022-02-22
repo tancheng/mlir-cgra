@@ -32,7 +32,7 @@ def SodaHostGeneration : Pass<"soda-generate-bambu-hostcode"> {
   let constructor = "mlir::soda::createSodaHostGenerationPass()";
 }
 
-def SodaAsyncRegionPass : FunctionPass<"soda-async-region"> {
+def SodaAsyncRegionPass : Pass<"soda-async-region", "FuncOp"> {
   let summary = "Make SODA ops async.";
   let constructor = "mlir::soda::createSodaAsyncRegionPass()";
 }

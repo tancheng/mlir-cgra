@@ -18,7 +18,7 @@ std::unique_ptr<OperationPass<ModuleOp>> createSNNPrintPass();
 
 /// Collect all patterns to rewrite ops within the SNN dialect.
 inline void populateSNNRewritePatterns(MLIRContext *context,
-                                       OwningRewritePatternList &patterns) {
+                                       RewritePatternSet &patterns) {
   // populateSodaAllReducePatterns(context, patterns);
 }
 

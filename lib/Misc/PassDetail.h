@@ -4,9 +4,17 @@
 #ifndef DIALECT_SODA_MISC_PASSDETAIL_H_
 #define DIALECT_SODA_MISC_PASSDETAIL_H_
 
+#include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/Pass/Pass.h"
 
 namespace mlir {
+// Forward declaration from Dialect.h
+template <typename ConcreteDialect>
+void registerDialect(DialectRegistry &registry);
+
+namespace arith {
+class ArithmeticDialect;
+} // namespace arith
 
 namespace memref {
 class MemRefDialect;

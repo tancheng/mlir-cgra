@@ -34,8 +34,8 @@ struct AffineForLoopMapper
     : public ConvertAffineForToSODABase<AffineForLoopMapper> {
   AffineForLoopMapper() = default;
 
-  void runOnFunction() override {
-    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+  void runOnOperation() override {
+    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto forOp = dyn_cast<AffineForOp>(&op)) {
         if (failed(convertAffineLoopNestToSODALaunch(forOp)))
           signalPassFailure();
@@ -54,8 +54,8 @@ struct AffineForLoopMapper
 struct SCFForLoopMapper : public ConvertSCFForToSODABase<SCFForLoopMapper> {
   SCFForLoopMapper() = default;
 
-  void runOnFunction() override {
-    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+  void runOnOperation() override {
+    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
         if (failed(convertSCFLoopNestToSODALaunch(forOp)))
           signalPassFailure();

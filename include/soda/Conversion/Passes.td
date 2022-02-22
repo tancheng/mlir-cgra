@@ -15,7 +15,7 @@ include "mlir/Pass/PassBase.td"
 // AffineToSODA
 //===----------------------------------------------------------------------===//
 
-def ConvertAffineForToSODA : FunctionPass<"convert-affine-for-to-soda"> {
+def ConvertAffineForToSODA : Pass<"convert-affine-for-to-soda", "FuncOp"> {
   let summary = "Convert top-level AffineFor Ops to SODA kernels";
   let constructor = "mlir::createAffineForToSODAPass()";
   let dependentDialects = ["soda::SODADialect"];
@@ -25,7 +25,7 @@ def ConvertAffineForToSODA : FunctionPass<"convert-affine-for-to-soda"> {
 // SCFToSODA
 //===----------------------------------------------------------------------===//
 
-def ConvertSCFForToSODA : FunctionPass<"convert-scf-for-to-soda"> {
+def ConvertSCFForToSODA : Pass<"convert-scf-for-to-soda", "FuncOp"> {
   let summary = "Convert top-level scf::for Ops to SODA kernels";
   let constructor = "mlir::createSCFForToSODAPass()";
   let dependentDialects = ["soda::SODADialect"];
@@ -35,25 +35,25 @@ def ConvertSCFForToSODA : FunctionPass<"convert-scf-for-to-soda"> {
 // LinalgToSODA
 //===----------------------------------------------------------------------===//
 
-def ConvertLinalgDotToSODA : FunctionPass<"convert-linalg-dot-to-soda"> {
+def ConvertLinalgDotToSODA : Pass<"convert-linalg-dot-to-soda", "FuncOp"> {
   let summary = "Convert top-level linalg::dot Ops to SODA kernels";
   let constructor = "mlir::createLinalgDotToSODAPass()";
   let dependentDialects = ["soda::SODADialect"];
 }
 
-def ConvertLinalgMatmulToSODA : FunctionPass<"convert-linalg-matmul-to-soda"> {
+def ConvertLinalgMatmulToSODA : Pass<"convert-linalg-matmul-to-soda", "FuncOp"> {
   let summary = "Convert top-level linalg::matmul Ops to SODA kernels";
   let constructor = "mlir::createLinalgMatmulToSODAPass()";
   let dependentDialects = ["soda::SODADialect"];
 }
 
-def ConvertLinalgConvToSODA : FunctionPass<"convert-linalg-conv-to-soda"> {
+def ConvertLinalgConvToSODA : Pass<"convert-linalg-conv-to-soda", "FuncOp"> {
   let summary = "Convert top-level linalg::conv Ops to SODA kernels";
   let constructor = "mlir::createLinalgConvToSODAPass()";
   let dependentDialects = ["soda::SODADialect"];
 }
 
-def ConvertLinalgGenericToSODA : FunctionPass<"convert-linalg-generic-to-soda"> {
+def ConvertLinalgGenericToSODA : Pass<"convert-linalg-generic-to-soda", "FuncOp"> {
   let summary = "Convert top-level linalg::generic Ops to SODA kernels";
   let constructor = "mlir::createLinalgGenericToSODAPass()";
   let dependentDialects = ["soda::SODADialect"];

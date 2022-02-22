@@ -8,7 +8,7 @@
 //
 // This file defines the SODA kernel-related operations and puts them in the
 // corresponding dialect.
-// 
+//
 // It was strongly inspired by the GPU dialect.
 //
 //===----------------------------------------------------------------------===//
@@ -18,7 +18,7 @@
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Dialect.h"
-#include "mlir/IR/FunctionSupport.h"
+#include "mlir/IR/FunctionInterfaces.h"
 #include "mlir/IR/OpDefinition.h"
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/IR/SymbolTable.h"

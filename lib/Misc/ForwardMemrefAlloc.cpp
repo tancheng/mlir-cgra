@@ -19,16 +19,19 @@ using namespace soda;
 namespace {
 
 struct ForwardMemrefAlloc : public ForwardMemrefAllocBase<ForwardMemrefAlloc> {
-  void runOnFunction() override;
+  void runOnOperation() override;
 };
 
-void ForwardMemrefAlloc::runOnFunction() {
+void ForwardMemrefAlloc::runOnOperation() {
 
-  FuncOp funcOp = getFunction();
+  FuncOp funcOp = getOperation();
 
-  Operation *firstOp = &funcOp.getBody().front().front();
+  if (funcOp.isExternal())
+    return;
 
-  funcOp->walk([&](memref::AllocOp op) {
+  Operation *firstOp = &funcOp.front().front();
+
+  funcOp.walk([&](memref::AllocOp op) {
     op->moveAfter(firstOp);
     firstOp = op;
   });

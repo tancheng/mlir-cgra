@@ -13,7 +13,7 @@ module attributes {soda.container_module}  {
   }
   soda.module @driver_kernel {
     soda.func @driver_kernel(%arg0: memref<4x7xf32>, %arg1: memref<7x3xf32>, %arg2: memref<4x3xf32>) kernel {
-      br ^bb1
+      cf.br ^bb1
     ^bb1:  // pred: ^bb0
       linalg.matmul ins(%arg0, %arg1 : memref<4x7xf32>, memref<7x3xf32>) outs(%arg2 : memref<4x3xf32>)
       soda.return

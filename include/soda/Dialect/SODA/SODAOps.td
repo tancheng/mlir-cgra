@@ -17,6 +17,7 @@
 
 include "soda/Dialect/SODA/SODABase.td"
 include "mlir/Dialect/LLVMIR/LLVMOpBase.td"
+include "mlir/IR/FunctionInterfaces.td"
 include "mlir/IR/SymbolInterfaces.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
@@ -24,10 +25,10 @@ include "mlir/Interfaces/SideEffectInterfaces.td"
 // SODA Dialect operations.
 //===----------------------------------------------------------------------===//
 
-class SODA_Op<string mnemonic, list<OpTrait> traits = []> :
+class SODA_Op<string mnemonic, list<Trait> traits = []> :
     Op<SODA_Dialect, mnemonic, traits>;
 
-class SODA_IndexOp<string mnemonic, list<OpTrait> traits = []> :
+class SODA_IndexOp<string mnemonic, list<Trait> traits = []> :
     SODA_Op<mnemonic, !listconcat(traits, [NoSideEffect])>,
     Arguments<(ins StrAttr:$dimension)>, Results<(outs Index)> {
   let verifier = [{ return ::verifyIndexOp(*this); }];
@@ -35,7 +36,7 @@ class SODA_IndexOp<string mnemonic, list<OpTrait> traits = []> :
 
 
 def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
-                                    AutomaticAllocationScope, FunctionLike,
+                                    AutomaticAllocationScope, FunctionOpInterface,
                                     IsolatedFromAbove, Symbol]> {
   let summary = "Function executable on a SODA enabled architecture";
 
@@ -140,7 +141,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
 
     /// Adds a new block argument that corresponds to buffers located in
     /// workgroup memory.
-    BlockArgument addWorkgroupAttribution(Type type);
+    BlockArgument addWorkgroupAttribution(Type type, Location loc);
 
     /// Returns the number of buffers located in the private memory.
     unsigned getNumPrivateAttributions() {
@@ -161,7 +162,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
 
     /// Adds a new block argument that corresponds to buffers located in
     /// private memory.
-    BlockArgument addPrivateAttribution(Type type);
+    BlockArgument addPrivateAttribution(Type type, Location loc);
 
     /// Returns the name of the attribute containing the number of buffers
     /// located in the workgroup memory.
@@ -169,8 +170,17 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
       return "workgroup_attributions";
     }
 
-    // FunctionLike trait needs access to the functions below.
-    friend class OpTrait::FunctionLike<SODAFuncOp>;
+    /// Returns the type of this function.
+    /// FIXME: We should drive this via the ODS `type` param.
+    FunctionType getType() {
+      return getTypeAttr().getValue().cast<FunctionType>();
+    }
+
+    /// Returns the argument types of this function.
+    ArrayRef<Type> getArgumentTypes() { return getType().getInputs(); }
+
+    /// Returns the result types of this function.
+    ArrayRef<Type> getResultTypes() { return getType().getResults(); }
 
     /// Hooks for the input/output type enumeration in FunctionLike .
     unsigned getNumFuncArguments() { return getType().getNumInputs(); }
@@ -188,9 +198,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
     LogicalResult verifyBody();
   }];
 
-  // let verifier = [{ return ::verifFuncOpy(*this); }];
-  let printer = [{ printSODAFuncOp(p, *this); }];
-  let parser = [{ return parseSODAFuncOp(parser, result); }];
+  let hasCustomAssemblyFormat = 1;
 }
 
 def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
@@ -351,9 +359,8 @@ def SODA_LaunchOp : SODA_Op<"launch">,
     static constexpr unsigned kNumConfigRegionAttributes = 0;
   }];
 
-  let parser = [{ return parseLaunchOp(parser, result); }];
-  let printer = [{ printLaunchOp(p, *this); }];
-  let verifier = [{ return ::verify(*this); }];
+  let hasCustomAssemblyFormat = 1;
+  let hasVerifier = 1;
 }
 
 def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, NoSideEffect,
@@ -456,10 +463,10 @@ def SODA_SODAModuleOp : SODA_Op<"module", [
 
     ```
   }];
+  
   let builders = [OpBuilder<(ins "StringRef":$name)>];
-  let parser = [{ return ::parseSODAModuleOp(parser, result); }];
-  let printer = [{ return ::print(p, *this); }];
   let regions = (region SizedRegion<1>:$body);
+  let hasCustomAssemblyFormat = 1;
 
   // We need to ensure the block inside the region is properly terminated;
   // the auto-generated builders do not guarantee that.

@@ -73,8 +73,8 @@ public:
       rewriter.setInsertionPoint(op);
     }
 
-    assert(SymbolTable::lookupSymbolIn(module, newName)
-               ->template hasTrait<mlir::OpTrait::FunctionLike>());
+    assert(
+        isa<FunctionOpInterface>(SymbolTable::lookupSymbolIn(module, newName)));
 
     rewriter.replaceOpWithNewOp<CallOp>(op, TypeRange{}, newName,
                                         op.getOperands());

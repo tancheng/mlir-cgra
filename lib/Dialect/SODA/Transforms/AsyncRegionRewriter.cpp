@@ -31,7 +31,7 @@ namespace {
 class SodaAsyncRegionPass
     : public SodaAsyncRegionPassBase<SodaAsyncRegionPass> {
   struct Callback;
-  void runOnFunction() override;
+  void runOnOperation() override;
 };
 } // namespace
 
@@ -111,9 +111,9 @@ struct SodaAsyncRegionPass::Callback {
 // Replaces synchronous SODA ops in the op's region with asynchronous ones and
 // inserts the necessary synchronization (as soda.wait ops). Assumes sequential
 // execution semantics and that no SODA ops are asynchronous yet.
-void SodaAsyncRegionPass::runOnFunction() {
+void SodaAsyncRegionPass::runOnOperation() {
   Callback callback{OpBuilder(&getContext())};
-  if (getFunction().getRegion().walk(callback).wasInterrupted())
+  if (getOperation().getRegion().walk(callback).wasInterrupted())
     return signalPassFailure();
 }
 

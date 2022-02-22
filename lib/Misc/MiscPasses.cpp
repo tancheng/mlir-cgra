@@ -139,7 +139,7 @@ class TestArgumentsToXMLPass
     });
 
     // TODO: Handle case for C interface
-    // getFunction().walk([this](LLVM::CallOp op) {
+    // getOperation().walk([this](LLVM::CallOp op) {
     //   if (isCInterfaceVulkanLaunchCallOp(op))
     //     generateXMLforCLaunchFunc(op);
     // });

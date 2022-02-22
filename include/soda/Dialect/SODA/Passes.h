@@ -33,7 +33,7 @@ std::unique_ptr<OperationPass<FuncOp>> createSodaAsyncRegionPass();
 
 /// Collect all patterns to rewrite ops within the SODA dialect.
 inline void populateSodaRewritePatterns(MLIRContext *context,
-                                        OwningRewritePatternList &patterns) {
+                                        RewritePatternSet &patterns) {
   // populateSodaAllReducePatterns(context, patterns);
 }
 

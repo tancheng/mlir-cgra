@@ -26,6 +26,8 @@
 #include "mlir/Conversion/LLVMCommon/Pattern.h"
 #include "mlir/Conversion/StandardToLLVM/ConvertStandardToLLVM.h"
 #include "mlir/Conversion/StandardToLLVM/ConvertStandardToLLVMPass.h"
+#include "mlir/Conversion/ArithmeticToLLVM/ArithmeticToLLVM.h"
+#include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/Pass/Pass.h"
@@ -54,16 +56,6 @@ struct LLVMLoweringPass : public ConvertStandardToLLVMBase<LLVMLoweringPass> {
       signalPassFailure();
       return;
     }
-
-    ModuleOp m = getOperation();
-    const auto &dataLayoutAnalysis = getAnalysis<DataLayoutAnalysis>();
-    LowerToLLVMOptions options(m.getContext(),
-                               dataLayoutAnalysis.getAtOrAbove(m));
-
-    options.emitCWrappers = emitCWrappers;
-    options.useBarePtrCallConv = useBarePtrCallConv;
-    dataLayout = options.dataLayout.getStringRepresentation();
-
     if (failed(LLVM::LLVMDialect::verifyDataLayoutString(
             this->dataLayout, [this](const Twine &message) {
               getOperation().emitError() << message.str();
@@ -72,6 +64,13 @@ struct LLVMLoweringPass : public ConvertStandardToLLVMBase<LLVMLoweringPass> {
       return;
     }
 
+    ModuleOp m = getOperation();
+    const auto &dataLayoutAnalysis = getAnalysis<DataLayoutAnalysis>();
+
+    LowerToLLVMOptions options(&getContext(),
+                               dataLayoutAnalysis.getAtOrAbove(m));
+    options.useBarePtrCallConv = useBarePtrCallConv;
+    options.emitCWrappers = emitCWrappers;
     if (indexBitwidth != kDeriveIndexBitwidthFromDataLayout)
       options.overrideIndexBitwidth(indexBitwidth);
     options.dataLayout = llvm::DataLayout(this->dataLayout);
@@ -81,6 +80,8 @@ struct LLVMLoweringPass : public ConvertStandardToLLVMBase<LLVMLoweringPass> {
 
     RewritePatternSet patterns(&getContext());
     populateStdToLLVMConversionPatterns(typeConverter, patterns);
+    arith::populateArithmeticToLLVMConversionPatterns(typeConverter, patterns);
+    cf::populateControlFlowToLLVMConversionPatterns(typeConverter, patterns);
 
     LLVMConversionTarget target(getContext());
     if (failed(applyPartialConversion(m, target, std::move(patterns))))

@@ -18,7 +18,7 @@ include "mlir/Interfaces/SideEffectInterfaces.td"
 // SNN Dialect operations.
 //===----------------------------------------------------------------------===//
 
-class SNN_Op<string mnemonic, list<OpTrait> traits = []> :
+class SNN_Op<string mnemonic, list<Trait> traits = []> :
     Op<SNN_Dialect, mnemonic, traits> {
   let printer = [{ return ::print(p, *this); }];
   let verifier = [{ return ::verify(*this); }];

@@ -143,7 +143,7 @@ void registerPassManagerMiscPass() {
         pm.addPass(createLowerAffinePass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
-        pm.addPass(createLowerToCFGPass());
+        pm.addPass(createConvertSCFToCFPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
         pm.addPass(createMemRefToLLVMPass());
@@ -151,7 +151,7 @@ void registerPassManagerMiscPass() {
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
-        pm.addPass(createStdExpandOpsPass());
+        pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));
@@ -173,7 +173,7 @@ void registerSimpleLoweringPass() {
         pm.addPass(createLowerAffinePass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
-        pm.addPass(createLowerToCFGPass());
+        pm.addPass(createConvertSCFToCFPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
         pm.addPass(createMemRefToLLVMPass());
@@ -181,7 +181,7 @@ void registerSimpleLoweringPass() {
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
-        pm.addPass(createStdExpandOpsPass());
+        pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));
@@ -224,9 +224,8 @@ void registerOptimizedForBambuPass() {
         if (!options.noAllocaPromotion) {
           // --promote-buffers-to-stack=
           //   "max-rank-of-allocated-memref=4 max-alloc-size-in-bytes=4096"
-          pm.addPass(mlir::createPromoteBuffersToStackPass(
-              options.maxAllocSizeInBytes, options.bitwidthOfIndexType,
-              options.maxRankOfAllocatedMemRef));
+          pm.addPass(mlir::bufferization::createPromoteBuffersToStackPass(
+              options.maxAllocSizeInBytes, options.maxRankOfAllocatedMemRef));
         }
 
         for (size_t i = 0; i < options.numberOfFullUnrolls; i++) {
@@ -246,7 +245,7 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createLowerAffinePass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
-        pm.addPass(createLowerToCFGPass());
+        pm.addPass(createConvertSCFToCFPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
         pm.addPass(createMemRefToLLVMPass());
@@ -254,7 +253,7 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
-        pm.addPass(createStdExpandOpsPass());
+        pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));

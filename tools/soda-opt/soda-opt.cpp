@@ -71,20 +71,20 @@ int main(int argc, char **argv) {
 
   registerLinalgPassesForSoda();
   registerAffinePassesForSoda();
-  mlir::registerPromoteBuffersToStackPass();
+  mlir::bufferization::registerPromoteBuffersToStackPass();
 
   mlir::registerConvertLinalgToStandardPass();
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
   mlir::registerLinalgLowerToAffineLoopsPass();
   mlir::registerConvertStandardToLLVMPass();
   mlir::registerConvertMemRefToLLVMPass();
-  mlir::registerSCFToStandardPass();
+  mlir::registerSCFToControlFlowPass();
   mlir::registerConvertAffineToStandardPass();
   mlir::registerConvertMathToLLVMPass();
   mlir::registerConvertMathToLibmPass();
   mlir::registerConvertArithmeticToLLVMPass();
   mlir::arith::registerArithmeticExpandOpsPass();
-  mlir::registerStdExpandOpsPass();
+  mlir::memref::registerExpandOpsPass();
   mlir::registerReconcileUnrealizedCastsPass();
 
   // Add the following to selectively include the necessary dialects. You only
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerEraseMemrefDeallocPass();
   mlir::soda::registerForwardMemrefAllocPass();
   mlir::soda::registerForwardLinalgFillPass();
-  mlir::soda::registerForwardLinalgCopyPass();
+  mlir::soda::registerForwardMemrefCopyPass();
 
   // SODA Passes
   mlir::soda::registerSodaKernelOutliningPass();

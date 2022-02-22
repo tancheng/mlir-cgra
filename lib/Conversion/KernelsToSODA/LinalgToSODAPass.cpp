@@ -30,8 +30,8 @@ namespace {
 struct LinalgDotMapper : public ConvertLinalgDotToSODABase<LinalgDotMapper> {
   LinalgDotMapper() = default;
 
-  void runOnFunction() override {
-    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+  void runOnOperation() override {
+    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto dotOp = dyn_cast<linalg::DotOp>(&op)) {
         if (failed(convertLinalgDotToSODALaunch(dotOp)))
           signalPassFailure();
@@ -47,8 +47,8 @@ struct LinalgMatmulMapper
     : public ConvertLinalgMatmulToSODABase<LinalgMatmulMapper> {
   LinalgMatmulMapper() = default;
 
-  void runOnFunction() override {
-    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+  void runOnOperation() override {
+    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto matmulOp = dyn_cast<linalg::MatmulOp>(&op)) {
         if (failed(convertLinalgMatmulToSODALaunch(matmulOp)))
           signalPassFailure();
@@ -63,8 +63,8 @@ struct LinalgMatmulMapper
 struct LinalgConvMapper : public ConvertLinalgConvToSODABase<LinalgConvMapper> {
   LinalgConvMapper() = default;
 
-  void runOnFunction() override {
-    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+  void runOnOperation() override {
+    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto convOp = dyn_cast<linalg::Conv2DOp>(&op)) {
         if (failed(convertLinalgConvToSODALaunch(convOp)))
           signalPassFailure();
@@ -80,8 +80,8 @@ struct LinalgGenericMapper
     : public ConvertLinalgGenericToSODABase<LinalgGenericMapper> {
   LinalgGenericMapper() = default;
 
-  void runOnFunction() override {
-    for (Operation &op : llvm::make_early_inc_range(getFunction().getOps())) {
+  void runOnOperation() override {
+    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto genericOp = dyn_cast<linalg::GenericOp>(&op)) {
         if (failed(convertLinalgGenericToSODALaunch(genericOp)))
           signalPassFailure();

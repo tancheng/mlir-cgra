@@ -31,11 +31,12 @@
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 #include "mlir/Transforms/LoopUtils.h"
-#include "soda/Misc/Passes.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Debug.h"
 #include <algorithm>
+
+#include "soda/Misc/Passes.h"
 
 #define DEBUG_TYPE "soda-affine-data-copy-gen"
 
@@ -69,7 +70,7 @@ struct AffineDataCopyGen
     this->generateDma = generateDma;
   }
 
-  void runOnFunction() override;
+  void runOnOperation() override;
   LogicalResult runOnBlock(Block *block, DenseSet<Operation *> &copyNests);
 
   // Constant zero index to avoid too many duplicates.
@@ -196,8 +197,8 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
   return success();
 }
 
-void AffineDataCopyGen::runOnFunction() {
-  FuncOp f = getFunction();
+void AffineDataCopyGen::runOnOperation() {
+  FuncOp f = getOperation();
   OpBuilder topBuilder(f.getBody());
   zeroIndex = topBuilder.create<arith::ConstantIndexOp>(f.getLoc(), 0);
 

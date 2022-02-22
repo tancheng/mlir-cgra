@@ -29,7 +29,7 @@ func @launch() {
 // CHECK-LABEL: module @launch_kernel
 // CHECK-NEXT: soda.func @launch_kernel
 // CHECK-SAME: (%[[KERNEL_ARG0:.*]]: f32, %[[KERNEL_ARG1:.*]]: memref<?xf32, 1>)
-// CHECK-NEXT: br ^[[BLOCK:.*]]
+// CHECK-NEXT: cf.br ^[[BLOCK:.*]]
 // CHECK-NEXT: ^[[BLOCK]]:
 // CHECK: "use"(%[[KERNEL_ARG0]]) : (f32) -> ()
 // CHECK-NEXT: "some_op"(%[[IDX0]], %[[IDX1]]) : (index, index) -> ()
@@ -125,7 +125,7 @@ func @extra_constants_noarg(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
 func @multiple_uses(%arg0 : memref<?xf32>) {
   %c1 = arith.constant 1 : index
   %c2 = arith.constant 2 : index
-  // CHECK: soda.func {{.*}} {
+  // CHECK: soda.func {{.*}}
   // CHECK:   %[[C2:.*]] = arith.constant 2 : index
   // CHECK:   "use1"(%[[C2]], %[[C2]])
   // CHECK:   "use2"(%[[C2]])
@@ -146,7 +146,7 @@ func @multiple_uses2(%arg0 : memref<*xf32>) {
   %c1 = arith.constant 1 : index
   %c2 = arith.constant 2 : index
   %d = memref.dim %arg0, %c2 : memref<*xf32>
-  // CHECK: soda.func {{.*}} {
+  // CHECK: soda.func {{.*}}
   // CHECK:   %[[C2:.*]] = arith.constant 2 : index
   // CHECK:   %[[D:.*]] = memref.dim %[[ARG:.*]], %[[C2]]
   // CHECK:   "use1"(%[[D]])

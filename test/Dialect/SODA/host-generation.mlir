@@ -10,7 +10,7 @@ module attributes {soda.container_module}  {
   }
   soda.module @acc {
     soda.func @krnl(%arg0: memref<512x512xf32>, %arg1: memref<512x512xf32>, %arg2: memref<512x512xf32>) kernel {
-      br ^bb1
+      cf.br ^bb1
     ^bb1:  // pred: ^bb0
       linalg.matmul ins(%arg0, %arg1 : memref<512x512xf32>, memref<512x512xf32>) outs(%arg2 : memref<512x512xf32>)
       soda.return
@@ -40,7 +40,7 @@ module attributes {soda.container_module}  {
   }
   soda.module @acc {
     soda.func @krnl(%arg0: memref<512x512xf32>, %arg1: memref<512x512xf32>, %arg2: memref<512x512xf32>) kernel {
-      br ^bb1
+      cf.br ^bb1
     ^bb1:  // pred: ^bb0
       linalg.matmul ins(%arg0, %arg1 : memref<512x512xf32>, memref<512x512xf32>) outs(%arg2 : memref<512x512xf32>)
       soda.return
@@ -73,7 +73,7 @@ module attributes {soda.container_module}  {
   }
   soda.module @acc1 {
     soda.func @krnl(%arg0: memref<512x512xf32>, %arg1: memref<512x512xf32>, %arg2: memref<512x512xf32>) kernel {
-      br ^bb1
+      cf.br ^bb1
     ^bb1:  // pred: ^bb0
       linalg.matmul ins(%arg0, %arg1 : memref<512x512xf32>, memref<512x512xf32>) outs(%arg2 : memref<512x512xf32>)
       soda.return
@@ -82,7 +82,7 @@ module attributes {soda.container_module}  {
   
   soda.module @acc2 {
     soda.func @krnl(%arg0: memref<512x512xf32>, %arg1: memref<512x512xf32>, %arg2: memref<512x512xf32>) kernel {
-      br ^bb1
+      cf.br ^bb1
     ^bb1:  // pred: ^bb0
       linalg.matmul ins(%arg0, %arg1 : memref<512x512xf32>, memref<512x512xf32>) outs(%arg2 : memref<512x512xf32>)
       soda.return

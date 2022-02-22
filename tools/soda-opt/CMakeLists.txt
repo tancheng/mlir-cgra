@@ -30,6 +30,7 @@ set(LIBS
   MLIRAffineTransforms
   MLIRSCFTransforms
   MLIRReconcileUnrealizedCasts
+  MLIRMemRefTransforms
 
   # Test Passes
   MLIRLinalgTestPasses
@@ -37,7 +38,7 @@ set(LIBS
   
   # Conversion
   MLIRAffineToStandard
-  MLIRSCFToStandard
+  MLIRSCFToControlFlow
   MLIRMemRefToLLVM
   MLIRMathToLLVM
   MLIRMathToLibm

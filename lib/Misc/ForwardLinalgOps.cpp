@@ -21,11 +21,11 @@ using namespace soda;
 namespace {
 
 struct ForwardLinalgFill : public ForwardLinalgFillBase<ForwardLinalgFill> {
-  void runOnFunction() override;
+  void runOnOperation() override;
 };
 
-struct ForwardLinalgCopy : public ForwardLinalgCopyBase<ForwardLinalgCopy> {
-  void runOnFunction() override;
+struct ForwardMemrefCopy : public ForwardMemrefCopyBase<ForwardMemrefCopy> {
+  void runOnOperation() override;
 };
 
 unsigned getPosition(Operation *op) {
@@ -61,9 +61,9 @@ Operation *getLastDominator(Operation *op) {
   return last;
 }
 
-void ForwardLinalgFill::runOnFunction() {
+void ForwardLinalgFill::runOnOperation() {
 
-  FuncOp funcOp = getFunction();
+  FuncOp funcOp = getOperation();
 
   funcOp->walk(
       [&](arith::ConstantOp op) { op->moveAfter(getLastDominator(op)); });
@@ -71,11 +71,11 @@ void ForwardLinalgFill::runOnFunction() {
   funcOp->walk([&](linalg::FillOp op) { op->moveAfter(getLastDominator(op)); });
 }
 
-void ForwardLinalgCopy::runOnFunction() {
+void ForwardMemrefCopy::runOnOperation() {
 
-  FuncOp funcOp = getFunction();
+  FuncOp funcOp = getOperation();
 
-  funcOp->walk([&](linalg::CopyOp op) { op->moveAfter(getLastDominator(op)); });
+  funcOp->walk([&](memref::CopyOp op) { op->moveAfter(getLastDominator(op)); });
 }
 
 } // end anonymous namespace
@@ -84,6 +84,6 @@ std::unique_ptr<mlir::Pass> mlir::soda::createForwardLinalgFillPass() {
   return std::make_unique<ForwardLinalgFill>();
 }
 
-std::unique_ptr<mlir::Pass> mlir::soda::createForwardLinalgCopyPass() {
-  return std::make_unique<ForwardLinalgCopy>();
+std::unique_ptr<mlir::Pass> mlir::soda::createForwardMemrefCopyPass() {
+  return std::make_unique<ForwardMemrefCopy>();
 }
