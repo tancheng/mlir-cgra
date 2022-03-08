@@ -41,6 +41,7 @@ cmake -GNinja \
   -DCMAKE_INSTALL_PREFIX=$MY_INSTALL_DIR  \
   -DCMAKE_BUILD_TYPE=Debug \
   -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
-  -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir
+  -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir \
+  -DMLIR_ENABLE_BINDINGS_PYTHON=ON
 
 cmake --build "$MY_BUILD_DIR" --target soda-opt soda-translate mlir-runner AllocaNamer XMLWriter

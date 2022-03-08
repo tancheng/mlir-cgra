@@ -57,8 +57,14 @@ tool_dirs = [config.soda_tools_dir, config.mlir_tools_dir, config.llvm_tools_dir
 tools = [
     'soda-opt',
     'soda-translate',
+    'soda-capi-test',
     'mlir-runner',
-    'opt'
+    'opt',
+    ToolSubst('%PYTHON', config.python_executable, unresolved='ignore'),
 ]
 
 llvm_config.add_tool_substitutions(tools, tool_dirs)
+
+llvm_config.with_environment('PYTHONPATH', [
+    os.path.join(config.mlir_obj_root, 'python_packages', 'soda'),
+], append_path=True)

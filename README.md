@@ -165,6 +165,23 @@ $PROJ_BUILD_DIR/bin/soda-opt -h | less
  # --soda-opt-pipeline-for-<target_name>
 ```
 
+To use python bindings, setup python lib path:
+
+```
+export PYTHONPATH=$PYTHONPATH:$MLIR_BUILD_DIR/tools/mlir/python_packages/mlir_core
+export PYTHONPATH=$PYTHONPATH:$PROJ_BUILD_DIR/python_packages/soda
+```
+
+Import soda libraries like this:
+
+```python
+from mlir_soda.ir import *
+from mlir_soda.dialects import (
+  builtin as builtin_d,
+  soda as soda_d
+)
+```
+
 ## Credits
 
 This project was build on top of the mlir out-of-tree template available here:
