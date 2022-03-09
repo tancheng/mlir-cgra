@@ -9,7 +9,7 @@
 #include "soda/Conversion/KernelsToSODA/LinalgToSODA.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
-#include "mlir/Dialect/Linalg/IR/LinalgOps.h"
+#include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Location.h"
 

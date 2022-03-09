@@ -9,7 +9,7 @@
 #include "../PassDetail.h"
 #include "soda/Conversion/KernelsToSODA/LinalgToSODA.h"
 
-#include "mlir/Dialect/Linalg/IR/LinalgOps.h"
+#include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "soda/Dialect/SODA/SODADialect.h"
