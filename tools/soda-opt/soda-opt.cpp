@@ -97,6 +97,7 @@ int main(int argc, char **argv) {
                   mlir::linalg::LinalgDialect,
                   mlir::math::MathDialect,
                   mlir::scf::SCFDialect,
+                  mlir::cf::ControlFlowDialect,
                   mlir::vector::VectorDialect,
                   mlir::arith::ArithmeticDialect,
                   mlir::AffineDialect>();
