@@ -13,7 +13,6 @@ cp main_kernel_test.xml output/$1/main_kernel_test.xml
 
 pushd output/$1;
 
-# docker run -u $(id -u) -v $(pwd):/working_dir --rm agostini00/soda \
 docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
 opt -O2 -strip-debug input.ll \
   -S -o visualize.ll

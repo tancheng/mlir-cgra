@@ -13,7 +13,3 @@ mlir-opt \
 --canonicalize -cse \
 $1 \
 -o $2
-
-
-
-# --linalg-generalize-named-ops \
