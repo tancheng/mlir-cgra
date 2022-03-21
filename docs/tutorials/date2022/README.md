@@ -4,6 +4,12 @@ Part of SODA toturial in the DATE2022 conference:
 
 https://www.date-conference.com/tutorial/m04
 
+
+* Presentation date: March 21, 2022
+* Time: 3:15pm - 4:00pm (CET)
+
+In this section you will learn how to use our compiler frontend to perform hardware software partitioning of high-level applications and automatic optimization of selected kernels.
+
 # Instructions for docker users
 
 Download this project on a machine capable of running docker containers
