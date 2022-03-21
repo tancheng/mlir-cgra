@@ -34,3 +34,7 @@ vscode soda-opt/docs/tutorials/date2022/docker-version
 ```
 
 Open the tutorial file `tutorial.ipynb`
+
+# Instructions for users without docker access
+
+Please follow the tutorial using the files and folders available [here](docs/tutorials/date2022/docker-version-executed).
