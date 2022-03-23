@@ -2,6 +2,9 @@
 // RUN: soda-opt --h | FileCheck %s -check-prefix=CHECKHELP
 //
 // CHECK: affine
+// CHECK: arith
+// CHECK: builtin
+// CHECK: cf
 // CHECK: linalg
 // CHECK: llvm
 // CHECK: scf
@@ -9,6 +12,7 @@
 // CHECK: soda
 // CHECK: std
 // CHECK: vector
+
 // CHECKHELP: convert-linalg-matmul-to-soda
 // CHECKHELP: soda-generate-bambu-accelcode
 // CHECKHELP: soda-generate-bambu-hostcode
