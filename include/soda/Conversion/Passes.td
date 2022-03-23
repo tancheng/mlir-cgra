@@ -71,4 +71,14 @@ def ConvertOperationToSODA : Pass<"convert-operation-to-soda", "FuncOp"> {
   ];
 }
 
+def ConvertAllToSODA : Pass<"convert-all-to-soda", "FuncOp"> {
+  let summary = "Convert all function contents into a SODA kernel";
+  let constructor = "mlir::createAllToSODAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+  let options = [
+    Option<"anchorFuncName", "anchor-func", "std::string", /*default=*/"",
+      "Which func op is the anchor to latch on.">,
+  ];
+}
+
 #endif // SODA_CONVERSION_PASSES

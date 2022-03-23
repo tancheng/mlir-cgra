@@ -128,6 +128,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerSodaAsyncRegionPassPass();
 
   // Outlining passes
+  mlir::soda::registerConvertAllToSODAPass();
   mlir::soda::registerConvertOperationToSODAPass();
   mlir::soda::registerConvertAffineForToSODAPass();
   mlir::soda::registerConvertSCFForToSODAPass();

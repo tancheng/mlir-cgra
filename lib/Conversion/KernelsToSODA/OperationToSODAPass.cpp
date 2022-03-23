@@ -20,10 +20,10 @@ using namespace mlir;
 
 namespace {
 //===----------------------------------------------------------------------===//
-// Linalg<Operation>ToSODA
+// OperationToSODA
 //===----------------------------------------------------------------------===//
 
-// A pass that traverses top-level dots in the function and converts them to
+// A pass that traverses top-level ops in the function and converts them to
 // SODA launch operations.  Nested launches are not allowed, so this does not
 // walk the function recursively to avoid considering nested dots.
 struct OperationMapper : public ConvertOperationToSODABase<OperationMapper> {
