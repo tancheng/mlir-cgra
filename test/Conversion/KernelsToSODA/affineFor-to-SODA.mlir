@@ -1,4 +1,5 @@
 // RUN: soda-opt -convert-affine-for-to-soda %s | FileCheck  %s
+// RUN: soda-opt -convert-operation-to-soda="anchor-op=affine.for" %s | FileCheck  %s
 
 // CHECK: @one_d_loop
 func @one_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {

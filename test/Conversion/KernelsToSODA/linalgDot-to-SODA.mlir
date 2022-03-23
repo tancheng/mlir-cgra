@@ -1,4 +1,5 @@
 // RUN: soda-opt -convert-linalg-dot-to-soda %s | FileCheck  %s
+// RUN: soda-opt -convert-operation-to-soda=anchor-op="linalg.dot" %s | FileCheck  %s
 
 // CHECK: @my_dot
 func @my_dot(%A:memref<?xf32>, %B:memref<?xf32>, %C : memref<f32>) {

@@ -4,6 +4,9 @@ add_mlir_conversion_library(SODAKERNELToSODA
   
   LinalgToSODA.cpp
   LinalgToSODAPass.cpp
+  
+  OperationToSODA.cpp
+  OperationToSODAPass.cpp
 
   ADDITIONAL_HEADER_DIRS
   ${PROJ_INCLUDE_DIR}/soda/Conversion/KernelsToSODA

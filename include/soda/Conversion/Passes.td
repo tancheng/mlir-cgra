@@ -59,4 +59,16 @@ def ConvertLinalgGenericToSODA : Pass<"convert-linalg-generic-to-soda", "FuncOp"
   let dependentDialects = ["soda::SODADialect"];
 }
 
+def ConvertOperationToSODA : Pass<"convert-operation-to-soda", "FuncOp"> {
+  let summary = "Convert top-level selected operation to SODA kernels";
+  let constructor = "mlir::createOperationToSODAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+  let options = [
+    Option<"anchorFuncName", "anchor-func", "std::string", /*default=*/"",
+      "Which func op is the anchor to latch on.">,
+    Option<"anchorOpName", "anchor-op", "std::string", /*default=*/"",
+      "Which op within the func is the anchor to latch on.">,
+  ];
+}
+
 #endif // SODA_CONVERSION_PASSES

@@ -2,8 +2,7 @@
 //===----------------------------------------------------------------------===//
 //
 // This implements a straightforward conversion of an loop nest into a SODA
-// kernel.  The caller is expected to guarantee that the conversion is correct
-// or to further transform the kernel to ensure correctness.
+// kernel.  
 //
 //===----------------------------------------------------------------------===//
 

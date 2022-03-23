@@ -2,7 +2,7 @@
 //===----------------------------------------------------------------------===//
 //
 // This implements a straightforward conversion of an key linalg operation into
-// SODA launch operations..
+// SODA launch operations.
 //
 //===----------------------------------------------------------------------===//
 

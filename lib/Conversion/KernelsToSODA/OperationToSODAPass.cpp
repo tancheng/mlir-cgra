@@ -1,0 +1,61 @@
+//===- OperationToSODAPass.cpp - Convert named ops into SODA operations ---- =//
+//
+// This pass converts different operations that match the selected named into
+// soda.launch + the same operation. Marking the region to be outlined.
+//
+//===----------------------------------------------------------------------===//
+
+#include "soda/Conversion/KernelsToSODA/OperationToSODAPass.h"
+#include "../PassDetail.h"
+#include "soda/Conversion/KernelsToSODA/OperationToSODA.h"
+
+#include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Transforms/DialectConversion.h"
+#include "soda/Dialect/SODA/SODADialect.h"
+
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/CommandLine.h"
+
+using namespace mlir;
+
+namespace {
+//===----------------------------------------------------------------------===//
+// Linalg<Operation>ToSODA
+//===----------------------------------------------------------------------===//
+
+// A pass that traverses top-level dots in the function and converts them to
+// SODA launch operations.  Nested launches are not allowed, so this does not
+// walk the function recursively to avoid considering nested dots.
+struct OperationMapper : public ConvertOperationToSODABase<OperationMapper> {
+  OperationMapper() = default;
+
+  OperationMapper(StringRef opName) {
+    this->anchorOpName.setValue(opName.str());
+  }
+
+  OperationMapper(StringRef funcName, StringRef opName) {
+    this->anchorFuncName.setValue(funcName.str());
+    this->anchorOpName.setValue(opName.str());
+  }
+
+  void runOnOperation() override {
+    bool foundMatch = false;
+    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
+      if (op.getName().getStringRef() == this->anchorOpName) {
+        foundMatch = true;
+        if (failed(convertOperationToSODALaunch((&op))))
+          signalPassFailure();
+      }
+    }
+    if (!foundMatch) {
+      getOperation().emitWarning() << "Could not find any operation to mark "
+                                      "for outlining in this function.";
+    }
+  }
+};
+
+} // namespace
+
+std::unique_ptr<OperationPass<FuncOp>> mlir::createOperationToSODAPass() {
+  return std::make_unique<OperationMapper>();
+}
