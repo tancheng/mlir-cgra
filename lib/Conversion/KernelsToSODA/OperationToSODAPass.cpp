@@ -39,17 +39,21 @@ struct OperationMapper : public ConvertOperationToSODABase<OperationMapper> {
   }
 
   void runOnOperation() override {
+    auto funcOp = getOperation();
+    if (!anchorFuncName.empty() && funcOp.getName() != anchorFuncName)
+      return;
+
     bool foundMatch = false;
-    for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
-      if (op.getName().getStringRef() == this->anchorOpName) {
+    for (Operation &op : llvm::make_early_inc_range(funcOp.getOps())) {
+      if (op.getName().getStringRef() == anchorOpName) {
         foundMatch = true;
         if (failed(convertOperationToSODALaunch((&op))))
           signalPassFailure();
       }
     }
     if (!foundMatch) {
-      getOperation().emitWarning() << "Could not find any operation to mark "
-                                      "for outlining in this function.";
+      funcOp.emitWarning() << "Could not find any operation to mark "
+                              "for future outlining in this function.";
     }
   }
 };
