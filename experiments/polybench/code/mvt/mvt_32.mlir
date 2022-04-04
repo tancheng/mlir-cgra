@@ -10,8 +10,8 @@ func @mvt_32(
       %0 = affine.load %A[%i, %j] : memref<32x32xf32>
       %1 = affine.load %y1[%j] : memref<32xf32>
       %2 = affine.load %x1[%i] : memref<32xf32>
-      %3 = mulf %0, %1 : f32
-      %4 = addf %2, %3 : f32
+      %3 = arith.mulf %0, %1 : f32
+      %4 = arith.addf %2, %3 : f32
       affine.store %4, %x1[%i] : memref<32xf32>
     }
   }
@@ -21,8 +21,8 @@ func @mvt_32(
       %0 = affine.load %A[%j, %i] : memref<32x32xf32>
       %1 = affine.load %y2[%j] : memref<32xf32>
       %2 = affine.load %x2[%i] : memref<32xf32>
-      %3 = mulf %0, %1 : f32
-      %4 = addf %2, %3 : f32
+      %3 = arith.mulf %0, %1 : f32
+      %4 = arith.addf %2, %3 : f32
       affine.store %4, %x2[%i] : memref<32xf32>
     }
   }
