@@ -1,0 +1,12 @@
+atax_8.dummy.c
+atax_8.isolated.mlir
+atax_8.llvm.mlir
+atax_8.opt.ll
+atax_8.outlined.mlir
+atax_8.plain.ll
+atax_8.run.tcl
+atax_8.searched.mlir
+kernel_report.xml
+proj/
+vitis_hls.log
+.Xil/

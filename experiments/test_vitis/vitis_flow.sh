@@ -1,8 +1,17 @@
 #!/bin/bash
 
-LLVMDIR=/files0/extended/curz959/soda/builds/llvm-project/build/bin
-LIBDIR=/files0/extended/curz959/soda/builds/soda-opt-vitis/build/lib
-SODAOPTDIR=/files0/extended/curz959/soda/builds/soda-opt-vitis/build/bin
+# Script to run VitisHLS on generated llvm IR files
+# Must export XILINX license path prior to execution:
+#    export XILINXD_LICENSE_FILE=XXXX@XXXX
+
+PROJ_ROOT=/files0/extended/curz959/soda
+SODA_OPT_NAME=soda-opt-vitis
+# PROJ_ROOT=/files0/extended/bohm747/Development/soda
+# SODA_OPT_NAME=soda-opt
+
+LLVMDIR=$PROJ_ROOT/builds/llvm-project/build/bin
+LIBDIR=$PROJ_ROOT/builds/$SODA_OPT_NAME/build/lib
+SODAOPTDIR=$PROJ_ROOT/builds/$SODA_OPT_NAME/build/bin
 HLS_PATH=/files0/extended/shared/HLS
 
 KERNEL_NAME=atax_8
@@ -65,7 +74,7 @@ $LLVMDIR/mlir-translate -mlir-to-llvmir $KERNEL_NAME.llvm.mlir -o $KERNEL_NAME.p
 #not needed?
 #export XILINX_LICENSE_FILE=2100@lion
 
-export LD_LIBRARY_PATH=/files0/extended/shared/HLS/ext/sqlite-3.28.0/lib/lnx64/:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$HLS_PATH/ext/sqlite-3.28.0/lib/lnx64/:$LD_LIBRARY_PATH
 source /opt/Xilinx/Vitis_HLS/2021.1/settings64.sh
 
 vitis_hls $KERNEL_NAME.run.tcl
