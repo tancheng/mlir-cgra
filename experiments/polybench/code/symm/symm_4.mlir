@@ -1,3 +1,5 @@
+#map0 = affine_map<(d0) -> (d0)>
+
 func @symm_4( %alpha: f32, 
               %beta: f32, 
               %C: memref<4x4xf32>, 
@@ -9,7 +11,7 @@ func @symm_4( %alpha: f32,
       %temp2 = memref.alloca() : memref<f32>
       %c0 = arith.constant 0.0 : f32
       affine.store %c0, %temp2[] : memref<f32>
-      affine.for %k = 0 to 4 {
+      affine.for %k = 0 to #map0(%i) {
         %0 = affine.load %A[%i, %k] : memref<4x4xf32>
         %1 = affine.load %B[%i, %j] : memref<4x4xf32>
         %2 = affine.load %C[%k, %j] : memref<4x4xf32>
