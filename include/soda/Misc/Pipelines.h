@@ -261,7 +261,7 @@ void registerOptimizedForBambuPass() {
           pm.addPass(createLowerToLLVMPass());
         }
         pm.addPass(createReconcileUnrealizedCastsPass());
-        pm.addPass(createCanonicalizerPass());
+        //pm.addPass(createCanonicalizerPass());
       });
 }
 
