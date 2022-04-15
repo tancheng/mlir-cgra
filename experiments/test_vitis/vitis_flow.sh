@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Script to run VitisHLS on generated llvm IR files
-# Must export XILINX license path prior to execution:
-#    export XILINXD_LICENSE_FILE=XXXX@XXXX
 
 PROJ_ROOT=/files0/extended/curz959/soda
 SODA_OPT_NAME=soda-opt-vitis
@@ -54,9 +52,9 @@ $LLVMDIR/mlir-translate -mlir-to-llvmir $KERNEL_NAME.llvm.mlir -o $KERNEL_NAME.p
 "${LLVMDIR}/opt" $KERNEL_NAME.plain.ll \
   -S \
   -enable-new-pm=0 \
-  -strip-debug \
-  -instcombine \
   -load "${LIBDIR}/VhlsLLVMRewriter.so" \
+  -mem2arr -strip-debug \
+  -instcombine \
   -xlnname \
   -xlnanno -xlntop $TOP_NAME \
   -xlntbgen -xlntbdummynames="$KERNEL_NAME.dummy.c" \
@@ -67,12 +65,12 @@ $LLVMDIR/mlir-translate -mlir-to-llvmir $KERNEL_NAME.llvm.mlir -o $KERNEL_NAME.p
 # -xlnname is needed to rename basic blocks, function arguments, and values
 # -xlnanno is needed to annotate the top function, requires -xlntop
 # -xlntbgen creates TCL and testbench, requires -xlntbdummynames, -xlntbtclnames, -xlnllvm, -xlnpath
+# -mem2arr reconstructs array sizes
 
-# other available phism options: -mem2arr -mem2ptr -xlnmath -strip-attr -xlnunroll -xlnarraypartition -subview  
+# other available phism options: -mem2ptr -xlnmath -strip-attr -xlnunroll -xlnarraypartition -subview  
 #                                -xlnram2p -anno-noinline -xlnloopname -select-pointer
 
-#not needed?
-#export XILINX_LICENSE_FILE=2100@lion
+export XILINXD_LICENSE_FILE=2100@junction01
 
 export LD_LIBRARY_PATH=$HLS_PATH/ext/sqlite-3.28.0/lib/lnx64/:$LD_LIBRARY_PATH
 source /opt/Xilinx/Vitis_HLS/2021.1/settings64.sh

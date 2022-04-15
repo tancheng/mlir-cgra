@@ -12,10 +12,6 @@
 # # Directories
 # KERNELDIR=$(pwd)
 
-# # Bambu configs
-# CLKPERIOD=10
-# CHANNELSNUMBER=2
-
 # source ${KERNELDIR}/../../../scripts/<name-of-this-file>.sh
 ####
 
@@ -31,7 +27,6 @@ SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Bambu configs
 CLKPERIOD=${CLKPERIOD}
-CHANNELSNUMBER=${CHANNELSNUMBER}
 
 # Preparing folders
 mkdir -p ${BAMBUDIR}
@@ -92,9 +87,7 @@ soda-opt \
 # Optimize the isolated code
 soda-opt \
     ${ODIR}/06-03-isolated.mlir \
-    -convert-linalg-to-affine-loops \
     --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv \
-    -reconcile-unrealized-casts \
     -o ${ODIR}/07-llvm.mlir \
     -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
 
@@ -115,9 +108,9 @@ pushd ${BAMBUDIR}
 opt ${ODIR}/model.ll \
   -S \
   -enable-new-pm=0 \
-  -strip-debug \
-  -instcombine \
   -load "${LIBDIR}/VhlsLLVMRewriter.so" \
+  -mem2arr -strip-debug \
+  -instcombine \
   -xlnname \
   -xlnanno -xlntop $KERNELNAME \
   -xlntbgen -xlntbdummynames="$KERNELNAME.dummy.c" \
@@ -125,12 +118,14 @@ opt ${ODIR}/model.ll \
   -xlnllvm="$KERNELNAME.opt.ll" -xlnpath=$HLS_PATH \
   > $KERNELNAME.opt.ll
 
+export XILINXD_LICENSE_FILE=2100@junction01
 export LD_LIBRARY_PATH=$HLS_PATH/ext/sqlite-3.28.0/lib/lnx64/:$LD_LIBRARY_PATH
 source /opt/Xilinx/Vitis_HLS/2021.1/settings64.sh
 
 vitis_hls $KERNELNAME.run.tcl
 
 source /opt/Xilinx/Vivado/2021.1/settings64.sh
+cp ${ODIR}/../../../../../scripts/extract_results.tcl .
 vivado -mode batch -nojournal -nolog -source extract_results.tcl -tclargs $KERNELNAME
 
 popd

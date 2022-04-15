@@ -6,7 +6,7 @@ code/gemm/scripts/run-outline-affine_for-opt_full-vitishls.sh 2
 # code/gemm/scripts/run-outline-affine_for-opt_full-vitishls.sh 16
 
 # opt_partial
-code/gemm/scripts/run-outline-affine_for-opt_partial-vitishls.sh 2
+# code/gemm/scripts/run-outline-affine_for-opt_partial-vitishls.sh 2
 # code/gemm/scripts/run-outline-affine_for-opt_partial-vitishls.sh 4
 # code/gemm/scripts/run-outline-affine_for-opt_partial-vitishls.sh 8
 # code/gemm/scripts/run-outline-affine_for-opt_partial-vitishls.sh 16
