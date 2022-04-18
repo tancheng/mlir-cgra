@@ -87,7 +87,7 @@ soda-opt \
 # Optimize the isolated code
 soda-opt \
     ${ODIR}/06-03-isolated.mlir \
-    --soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv \
+    --soda-opt-pipeline-for-vitis-hls=use-bare-ptr-memref-call-conv \
     -o ${ODIR}/07-llvm.mlir \
     -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
 
