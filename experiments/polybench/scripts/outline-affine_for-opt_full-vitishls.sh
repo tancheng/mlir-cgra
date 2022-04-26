@@ -18,6 +18,7 @@
 KERNEL=${NAME}_${KSIZE}
 FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
+BENCHMARKNAME=${KERNEL}_${KSIZE}_opt_full
 
 # Directories
 WORKDIR=$(pwd)
@@ -126,7 +127,7 @@ vitis_hls $KERNELNAME.run.tcl
 
 source /opt/Xilinx/Vivado/2021.1/settings64.sh
 cp ${ODIR}/../../../../../scripts/extract_results.tcl .
-vivado -mode batch -nojournal -nolog -source extract_results.tcl -tclargs $KERNELNAME
+vivado -mode batch -nojournal -nolog -source extract_results.tcl -tclargs $BENCHMARKNAME
 
 popd
 

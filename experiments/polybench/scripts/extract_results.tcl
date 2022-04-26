@@ -60,7 +60,7 @@ proc dump_statistics { name } {
   file delete -force kernel_report.xml 
   set ofile_report [open kernel_report.xml w]
   puts $ofile_report "<?xml version=\"1.0\"?>"
-  puts $ofile_report "<vitis_results benchmark_name=\"$name\">>"
+  puts $ofile_report "<bambu_results benchmark_name=\"$name\">"
   puts $ofile_report "  <SLICE value=\"$Slice\"/>"
   puts $ofile_report "  <REGISTERS value=\"$SliceRegisters\"/>"
   puts $ofile_report "  <SLICE_LUTS value=\"$SliceLUTs\"/>"
@@ -71,7 +71,7 @@ proc dump_statistics { name } {
   puts $ofile_report "  <FREQUENCY value=\"$design_freq\"/>"
   puts $ofile_report "  <CYCLES value=\"$tot_cycles\"/>"
   puts $ofile_report "  <TOTAL_CYCLES value=\"$tot_cycles\"/>"
-  puts $ofile_report "</vitis_results>"
+  puts $ofile_report "</bambu_results>"
   close $ofile_report
 }; #END PROC
 
