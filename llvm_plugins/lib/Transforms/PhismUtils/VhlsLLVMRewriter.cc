@@ -24,6 +24,7 @@
 
 #include <queue>
 #include <regex>
+#include <string>
 
 using namespace llvm;
 using namespace phism::llvm;
@@ -549,7 +550,7 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
            << "set_top " << F.getName().str() << "\n"
            << "open_solution -reset solution1\n"
            << "set_part \"xc7vx690t-ffg1930-3\"\n"
-           << "create_clock -period \"100MHz\"\n"
+           << "create_clock -period " << std::to_string(getClockPeriod()) << "\n"
            //  << "config_compile -pipeline_loops 16\n"
            << '\n';
 
@@ -592,7 +593,7 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
            //  << "config_bind -effort high\n"
            << "csynth_design\n"
            << "cosim_design\n"
-           << "config_export -version 2.0.1\n"
+           //<< "config_export -version 2.0.1\n"
            << "export_design -format syn_dcp -flow impl\n";
 }
 

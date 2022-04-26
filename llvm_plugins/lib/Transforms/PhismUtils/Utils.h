@@ -19,6 +19,7 @@ std::string getXlnTBTclNames();
 std::string getXlnTBDummyNames();
 std::string getXlnLLVMIn();
 std::string getXlnFEPath();
+int getClockPeriod();
 bool getXlnArrayPartitionEnabled();
 bool getXlnArrayPartitionFlattened();
 int getXlnLoopUnrollMaxCount();

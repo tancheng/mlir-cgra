@@ -18,7 +18,6 @@
 KERNEL=${NAME}_${KSIZE}
 FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
-BENCHMARKNAME=${KERNEL}_${KSIZE}_opt_none
 
 # Directories
 WORKDIR=$(pwd)
@@ -26,8 +25,7 @@ ODIR=${KERNELDIR}/output/${KERNEL}/opt_none-vitishls
 BAMBUDIR=${ODIR}/vitishls
 SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Bambu configs
-CLKPERIOD=${CLKPERIOD}
+BENCHMARKNAME=${KERNEL}_opt_none_${CLKPERIOD}
 
 # Preparing folders
 mkdir -p ${BAMBUDIR}
@@ -118,6 +116,7 @@ opt ${ODIR}/model.ll \
   -xlntbgen -xlntbdummynames="$KERNELNAME.dummy.c" \
   -xlntbtclnames="$KERNELNAME.run.tcl" \
   -xlnllvm="$KERNELNAME.opt.ll" -xlnpath=$HLS_PATH \
+  -clock-period-ns=$CLKPERIOD \
   > $KERNELNAME.opt.ll
 
 export XILINXD_LICENSE_FILE=2100@junction01

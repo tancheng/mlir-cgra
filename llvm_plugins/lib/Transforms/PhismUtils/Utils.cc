@@ -43,6 +43,10 @@ static cl::opt<std::string>
 static cl::opt<std::string>
     XlnFEPath("xlnpath", cl::desc("Specify the path to the open source Vitis frontend."),
               cl::value_desc("vitis path"));
+static cl::opt<int>
+    clockPeriodNS("clock-period-ns",
+              cl::desc("The desired clock period in nanoseconds."),
+                cl::init(10));
 static cl::opt<bool> XlnArrayPartitionEnabled(
     "xln-ap-enabled", cl::desc("Whether array partition has been enabled"));
 static cl::opt<bool> XlnArrayPartitionFlattened(
@@ -74,6 +78,7 @@ std::string getXlnTBTclNames() { return XlnTBTclNames; }
 std::string getXlnTBDummyNames() { return XlnTBDummyNames; }
 std::string getXlnLLVMIn() { return XlnLLVMIn; }
 std::string getXlnFEPath() { return XlnFEPath; }
+int getClockPeriod() { return clockPeriodNS; }
 bool getXlnArrayPartitionEnabled() { return XlnArrayPartitionEnabled; }
 bool getXlnArrayPartitionFlattened() { return XlnArrayPartitionFlattened; }
 int getXlnLoopUnrollMaxCount() { return XlnLoopUnrollMaxCount; }
