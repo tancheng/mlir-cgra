@@ -549,7 +549,7 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
            << "add_files -tb " << dummyFileName << "\n"
            << "set_top " << F.getName().str() << "\n"
            << "open_solution -reset solution1\n"
-           << "set_part \"xc7vx690t-ffg1930-3\"\n"
+           << "set_part " << getTargetBoard() << "\n"
            << "create_clock -period " << std::to_string(getClockPeriod()) << "\n"
            //  << "config_compile -pipeline_loops 16\n"
            << '\n';

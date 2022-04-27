@@ -115,7 +115,7 @@ opt ${ODIR}/model.ll \
   -xlntbgen -xlntbdummynames="$KERNELNAME.dummy.c" \
   -xlntbtclnames="$KERNELNAME.run.tcl" \
   -xlnllvm="$KERNELNAME.opt.ll" -xlnpath=$HLS_PATH \
-  -clock-period-ns=$CLKPERIOD \
+  -clock-period-ns=$CLKPERIOD -target=$TARGET_BOARD \
   > $KERNELNAME.opt.ll
 
 export XILINXD_LICENSE_FILE=2100@junction01

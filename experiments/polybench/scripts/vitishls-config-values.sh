@@ -1,4 +1,5 @@
 CLKPERIOD=10
+TARGET_BOARD=xc7vx690t-ffg1930-3
 
 # USER PATHS
 PROJ_ROOT=/files0/extended/curz959/soda

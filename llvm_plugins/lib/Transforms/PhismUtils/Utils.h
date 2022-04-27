@@ -19,6 +19,7 @@ std::string getXlnTBTclNames();
 std::string getXlnTBDummyNames();
 std::string getXlnLLVMIn();
 std::string getXlnFEPath();
+std::string getTargetBoard();
 int getClockPeriod();
 bool getXlnArrayPartitionEnabled();
 bool getXlnArrayPartitionFlattened();

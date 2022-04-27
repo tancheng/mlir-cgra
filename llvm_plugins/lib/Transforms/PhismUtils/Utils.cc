@@ -43,6 +43,10 @@ static cl::opt<std::string>
 static cl::opt<std::string>
     XlnFEPath("xlnpath", cl::desc("Specify the path to the open source Vitis frontend."),
               cl::value_desc("vitis path"));
+static cl::opt<std::string>
+    targetBoardID("target", cl::desc("Specify the FPGA target."),
+              cl::value_desc("target FPGA"),
+              cl::init("xc7vx690t-ffg1930-3"));
 static cl::opt<int>
     clockPeriodNS("clock-period-ns",
               cl::desc("The desired clock period in nanoseconds."),
@@ -78,6 +82,7 @@ std::string getXlnTBTclNames() { return XlnTBTclNames; }
 std::string getXlnTBDummyNames() { return XlnTBDummyNames; }
 std::string getXlnLLVMIn() { return XlnLLVMIn; }
 std::string getXlnFEPath() { return XlnFEPath; }
+std::string getTargetBoard() { return targetBoardID; }
 int getClockPeriod() { return clockPeriodNS; }
 bool getXlnArrayPartitionEnabled() { return XlnArrayPartitionEnabled; }
 bool getXlnArrayPartitionFlattened() { return XlnArrayPartitionFlattened; }
