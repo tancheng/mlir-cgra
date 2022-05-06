@@ -597,9 +597,11 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
            << " -o $LLVM_CUSTOM_OUTPUT}\n"
            //  << "config_bind -effort high\n"
            << "csynth_design\n"
-           << "cosim_design\n"
+           << "cosim_design\n";
            //<< "config_export -version 2.0.1\n"
-           << "export_design -format syn_dcp -flow impl\n";
+  if(!getSimulationOnly()){
+    XlnTBTcl << "export_design -format syn_dcp -flow impl\n";
+  }
 }
 
 namespace {

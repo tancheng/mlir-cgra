@@ -21,6 +21,7 @@ std::string getXlnLLVMIn();
 std::string getXlnFEPath();
 std::string getTargetBoard();
 int getClockPeriod();
+bool getSimulationOnly();
 bool getXlnArrayPartitionEnabled();
 bool getXlnArrayPartitionFlattened();
 int getXlnLoopUnrollMaxCount();

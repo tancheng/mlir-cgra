@@ -51,6 +51,9 @@ static cl::opt<int>
     clockPeriodNS("clock-period-ns",
               cl::desc("The desired clock period in nanoseconds."),
                 cl::init(10));
+static cl::opt<bool> simOnly(
+    "sim-only", cl::desc("Whether to stop after HLS and simulation."),
+                cl::init(false));                
 static cl::opt<bool> XlnArrayPartitionEnabled(
     "xln-ap-enabled", cl::desc("Whether array partition has been enabled"));
 static cl::opt<bool> XlnArrayPartitionFlattened(
@@ -84,6 +87,7 @@ std::string getXlnLLVMIn() { return XlnLLVMIn; }
 std::string getXlnFEPath() { return XlnFEPath; }
 std::string getTargetBoard() { return targetBoardID; }
 int getClockPeriod() { return clockPeriodNS; }
+bool getSimulationOnly() { return simOnly; }
 bool getXlnArrayPartitionEnabled() { return XlnArrayPartitionEnabled; }
 bool getXlnArrayPartitionFlattened() { return XlnArrayPartitionFlattened; }
 int getXlnLoopUnrollMaxCount() { return XlnLoopUnrollMaxCount; }
