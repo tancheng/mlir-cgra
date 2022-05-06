@@ -133,6 +133,11 @@ struct StripInvalidAttributes : public ModulePass {
       F.removeFnAttr(Attribute::AttrKind::NoSync);
       F.removeFnAttr(Attribute::AttrKind::Speculatable);
       F.removeFnAttr(Attribute::AttrKind::WillReturn);
+      F.removeFnAttr(Attribute::AttrKind::ImmArg);
+      for (auto &P : F.args()){
+        P.removeAttr(Attribute::AttrKind::ImmArg);
+        P.removeAttr(Attribute::AttrKind::NoUndef);
+      }
     }
 
     return false;
