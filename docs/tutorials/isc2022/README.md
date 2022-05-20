@@ -1,12 +1,12 @@
 # ISC-2022 Tutorial - SODA-OPT
 
-Part of SODA toturial in the ISC2022 conference: 
+Part of the *Modern High-Level Synthesis for Complex Data Science Applications* toturial in the ISC2022 conference: 
 
-* [Link](https://app.swapcard.com/widget/event/isc-high-performance-2022/planning/UGxhbm5pbmdfODYxMTU1)
+* [Tutorial website](https://app.swapcard.com/widget/event/isc-high-performance-2022/planning/UGxhbm5pbmdfODYxMTU1)
 
 
 * Presentation date: Sunday, May 29, 2022 
-* Time: 2:00 PM to 6:00 PM
+* Time: 3:00 PM to 3:45 PM (CEST)
 
 In this section you will learn how to use our compiler frontend to perform hardware software partitioning of high-level applications and automatic optimization of selected kernels.
 
