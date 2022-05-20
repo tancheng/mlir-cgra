@@ -6,6 +6,10 @@
 
 PROJ_ROOT=/files0/extended/curz959/soda
 SODA_OPT_NAME=soda-opt-vitis
+
+# PROJ_ROOT=/working_dir
+# SODA_OPT_NAME=soda-opt
+
 # PROJ_ROOT=/files0/extended/bohm747/Development/soda
 # SODA_OPT_NAME=soda-opt
 
