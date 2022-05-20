@@ -141,6 +141,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerPassManagerMiscPass();
   mlir::soda::registerSimpleLoweringPass();
   mlir::soda::registerOptimizedForBambuPass();
+  mlir::soda::registerOptimizedForVitisHLSPass();
 
   // Conversion passes
 
