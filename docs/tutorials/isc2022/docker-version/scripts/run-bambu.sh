@@ -2,7 +2,7 @@
 
 if [ -d output/$1 ] 
 then
-    rm -rf output/$1
+    # rm -rf output/$1
     mkdir -p output/$1
 else
     mkdir -p output/$1
@@ -35,9 +35,3 @@ input.ll 2>&1 | tee bambu-log
 
 
 popd
-
-# Patch nangate
-SCRIPTDIR=scripts
-BAMBUDIR=output/$1
-KERNELNAME=main_kernel
-source ${SCRIPTDIR}/patch_nangate_synt.sh
