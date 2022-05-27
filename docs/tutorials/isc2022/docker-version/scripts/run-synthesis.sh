@@ -1,10 +1,10 @@
 #!/bin/bash
 
+# Verify that bambu and vivado are installed
+command -v bambu >/dev/null 2>&1 || { echo >&2 "Warning: This script requires bambu installed locally. Place and route not performed."; exit 1; }
+
 BAMBUDIR=output/$1
 pushd $BAMBUDIR
-
-
-# TODO - Make sure xilinx path exists
 
 bambu \
   -v3 \
@@ -22,7 +22,7 @@ bambu \
   --simulator=VERILATOR \
   --evaluation \
   --top-fname=main_kernel input.ll \
-  --xilinx-root=/files0/Xilinx/Vivado/2020.2 \
+  --xilinx-root=$2 \
   2>&1 | tee synth-log
 
 popd

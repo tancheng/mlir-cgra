@@ -12,7 +12,7 @@ In this section you will learn how to use our compiler frontend to perform hardw
 
 # Instructions for docker users
 
-Download this project on a machine capable of running docker containers
+Download this project on a machine **capable of running docker containers**
 
 ```
 git clone https://gitlab.pnnl.gov/sodalite/soda-opt
@@ -27,19 +27,24 @@ cd soda-opt/docs/tutorials/isc2022/docker-version
 Create a python environment with needed dependencies
 
 ```
-virtualenv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Option 1 - using virtualenv
+#    with virtual env vscode current project root folder must contain the .venv_isc2022 folder
+virtualenv .venv_isc2022
+source .venv_isc2022/bin/activate
+pip install tensorflow-cpu pandas lxml
+
+# Option 2 - using conda
+conda create --name isc2022 tensorflow-cpu pandas lxml
 ```
 
-Enter the ISC tutorial directory with vscode or another tool capable of rendering jupyter notebooks
+Enter the ISC tutorial directory with vscode or another tool capable of rendering jupyter notebooks.
 
 ```
 vscode soda-opt/docs/tutorials/isc2022/docker-version
 # Open this folder with vscode
 ```
 
-Open the tutorial file `tutorial.ipynb`
+Open the tutorial file `tutorial.ipynb` and select the correct virtual env allowing vscode to install any missing dependencies if required.
 
 # Instructions for users without docker access
 
