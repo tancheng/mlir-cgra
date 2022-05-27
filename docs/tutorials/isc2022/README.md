@@ -35,6 +35,7 @@ pip install tensorflow-cpu pandas lxml
 
 # Option 2 - using conda
 conda create --name isc2022 tensorflow-cpu pandas lxml
+conda activate isc2022
 ```
 
 Enter the ISC tutorial directory with vscode or another tool capable of rendering jupyter notebooks.
@@ -44,7 +45,8 @@ vscode soda-opt/docs/tutorials/isc2022/docker-version
 # Open this folder with vscode
 ```
 
-Open the tutorial file `tutorial.ipynb` and select the correct virtual env allowing vscode to install any missing dependencies if required.
+Open the tutorial file `tutorial.ipynb` and select the correct virtual env.
+If required, grant permissions for vscode to install any missing dependencies.
 
 # Instructions for users without docker access
 
