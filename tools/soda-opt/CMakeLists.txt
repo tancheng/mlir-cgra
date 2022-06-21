@@ -22,10 +22,11 @@ set(LIBS
   MLIRAffine
   MLIRArithmetic
   MLIRMath
-  MLIRStandard
+  MLIRFunc
   MLIRSCF
  
   # Transforms
+  MLIRFuncTransforms
   MLIRLinalgTransforms
   MLIRAffineTransforms
   MLIRSCFTransforms
@@ -43,7 +44,7 @@ set(LIBS
   MLIRMathToLLVM
   MLIRMathToLibm
   MLIRArithmeticToLLVM
-  MLIRStandardToLLVM
+  MLIRFuncToLLVM
   MLIRLinalgToLLVM
   MLIRLinalgToStandard
 

@@ -19,6 +19,6 @@ add_mlir_dialect_library(MLIRSNNOps
   MLIRInferTypeOpInterface
   MLIRSideEffectInterfaces
   MLIRSupport
-  MLIRStandard
+  MLIRFunc
   MLIRViewLikeInterface
   )

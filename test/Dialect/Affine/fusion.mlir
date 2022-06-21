@@ -1,6 +1,6 @@
  // RUN: soda-opt -allow-unregistered-dialect %s -affine-loop-fusion="fusion-maximal" -split-input-file | FileCheck %s
  
-func @fusion_with_arith(%arg0: memref<4x4xf32>, %arg1: memref<4x4xf32>, %arg2: memref<4x4xf32>) -> memref<4x4xf32> {
+func.func @fusion_with_arith(%arg0: memref<4x4xf32>, %arg1: memref<4x4xf32>, %arg2: memref<4x4xf32>) -> memref<4x4xf32> {
   %0 = memref.alloc() : memref<4x4xf32>
   affine.for %arg3 = 0 to 4 {
     affine.for %arg4 = 0 to 4 {
@@ -46,7 +46,7 @@ func @fusion_with_arith(%arg0: memref<4x4xf32>, %arg1: memref<4x4xf32>, %arg2: m
   return %arg2 : memref<4x4xf32>
 }
 
-// CHECK-LABEL: func @fusion_with_arith
+// CHECK-LABEL: func.func @fusion_with_arith
 // CHECK:       affine.for %{{.*}} = 0 to 4 
 // CHECK-NEXT:    affine.for %{{.*}} = 0 to 4
 // CHECK-NEXT:      affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<4x4xf32>
@@ -69,8 +69,8 @@ func @fusion_with_arith(%arg0: memref<4x4xf32>, %arg1: memref<4x4xf32>, %arg2: m
 
 // TODO: This is not fusing...
 // But for our goals, it should
-// CHECK-LABEL: func @fusion_with_memops
-func @fusion_with_memops(%arg0: memref<4x4xf32>, %arg1: memref<4x4xf32>, %arg2: memref<4x4xf32>) {
+// CHECK-LABEL: func.func @fusion_with_memops
+func.func @fusion_with_memops(%arg0: memref<4x4xf32>, %arg1: memref<4x4xf32>, %arg2: memref<4x4xf32>) {
   %0 = memref.alloc() : memref<4x4xf32>
   %1 = memref.alloc() : memref<4x4xf32>
   affine.for %arg3 = 0 to 4 {

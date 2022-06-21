@@ -32,7 +32,7 @@ namespace {
 
 /// This pass applies the permutation on the first maximal perfect nest.
 struct TestLoopPermutation
-    : public PassWrapper<TestLoopPermutation, OperationPass<FuncOp>> {
+    : public PassWrapper<TestLoopPermutation, OperationPass<func::FuncOp>> {
   StringRef getArgument() const final { return PASS_NAME; }
   StringRef getDescription() const final {
     return "Tests affine loop permutation utility";
@@ -74,7 +74,7 @@ void TestLoopPermutation::runOnOperation() {
   }
 }
 
-std::unique_ptr<OperationPass<FuncOp>>
+std::unique_ptr<OperationPass<func::FuncOp>>
 mlir::soda::createAffineLoopPermutationPass(
     const ArrayRef<unsigned> &permList) {
   return std::make_unique<TestLoopPermutation>(permList);

@@ -6,6 +6,8 @@ add_mlir_dialect_library(MLIRSODAOps
 
   DEPENDS
   MLIRSODAOpsIncGen
+  MLIRSODAOpsAttributesIncGen
+  MLIRSODAOpsEnumsGen
   MLIRSODAOpInterfacesIncGen
 
   LINK_LIBS PUBLIC
@@ -42,7 +44,7 @@ add_mlir_dialect_library(MLIRSODATransforms
   #MLIRMemRef
   MLIRPass
   MLIRSCF
-  MLIRStandard
+  MLIRFunc
   MLIRSupport
   MLIRTransformUtils
   )

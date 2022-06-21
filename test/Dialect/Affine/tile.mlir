@@ -1,6 +1,6 @@
 // RUN: soda-opt %s -affine-loop-tile="tile-size=2" | FileCheck %s
 
-func @tile(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>) -> memref<4x4xf32> {
+func.func @tile(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>) -> memref<4x4xf32> {
   affine.for %i = 0 to 4 {
     affine.for %j = 0 to 4 {
       affine.for %k = 0 to 4 {

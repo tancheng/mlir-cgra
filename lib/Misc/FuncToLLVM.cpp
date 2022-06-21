@@ -1,4 +1,4 @@
-//===- StandardToLLVM.cpp - Standard to LLVM dialect conversion -----------===//
+//===- FuncToLLVM.cpp - Standard to LLVM dialect conversion -----------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 // This file was modified based on:
-//  llvm-project/mlir/lib/Conversion/StandardToLLVM/StandardToLLVM.cpp
+//  llvm-project/mlir/lib/Conversion/FuncToLLVM/FuncToLLVM.cpp
 // Adding the functionality to create loop tiling passes based on a static
 // number instead of size in KiB
 //
@@ -18,16 +18,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "PassDetailForStdToLLVM.h"
+#include "PassDetailForFuncToLLVM.h"
 #include "soda/Misc/Passes.h"
 
 #include "mlir/Analysis/DataLayoutAnalysis.h"
-#include "mlir/Conversion/LLVMCommon/ConversionTarget.h"
-#include "mlir/Conversion/LLVMCommon/Pattern.h"
-#include "mlir/Conversion/StandardToLLVM/ConvertStandardToLLVM.h"
-#include "mlir/Conversion/StandardToLLVM/ConvertStandardToLLVMPass.h"
 #include "mlir/Conversion/ArithmeticToLLVM/ArithmeticToLLVM.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
+#include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
+#include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVMPass.h"
+#include "mlir/Conversion/LLVMCommon/ConversionTarget.h"
+#include "mlir/Conversion/LLVMCommon/Pattern.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/Pass/Pass.h"
@@ -39,7 +39,7 @@ using namespace mlir;
 
 namespace {
 /// A pass converting MLIR operations into the LLVM IR dialect.
-struct LLVMLoweringPass : public ConvertStandardToLLVMBase<LLVMLoweringPass> {
+struct LLVMLoweringPass : public ConvertFuncToLLVMBase<LLVMLoweringPass> {
   LLVMLoweringPass() = default;
 
   LLVMLoweringPass(bool useBarePtrCallConv, bool emitCWrappers) {
@@ -79,7 +79,7 @@ struct LLVMLoweringPass : public ConvertStandardToLLVMBase<LLVMLoweringPass> {
                                     &dataLayoutAnalysis);
 
     RewritePatternSet patterns(&getContext());
-    populateStdToLLVMConversionPatterns(typeConverter, patterns);
+    populateFuncToLLVMConversionPatterns(typeConverter, patterns);
     arith::populateArithmeticToLLVMConversionPatterns(typeConverter, patterns);
     cf::populateControlFlowToLLVMConversionPatterns(typeConverter, patterns);
 

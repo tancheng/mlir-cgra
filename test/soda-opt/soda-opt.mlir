@@ -5,12 +5,12 @@
 // CHECK: arith
 // CHECK: builtin
 // CHECK: cf
+// CHECK: func
 // CHECK: linalg
 // CHECK: llvm
 // CHECK: scf
 // CHECK: snn
 // CHECK: soda
-// CHECK: std
 // CHECK: vector
 
 // CHECKHELP: convert-linalg-matmul-to-soda

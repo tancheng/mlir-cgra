@@ -9,6 +9,7 @@
 #define SNN_TYPES_BASE
 
 include "mlir/IR/OpBase.td"
+include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/BuiltinDialect.td"
 include "mlir/IR/BuiltinTypeInterfaces.td"
 include "mlir/IR/SubElementInterfaces.td"

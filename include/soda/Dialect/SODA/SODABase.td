@@ -15,6 +15,7 @@
 #ifndef SODA_BASE
 #define SODA_BASE
 
+include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/OpBase.td"
 
 //===----------------------------------------------------------------------===//
@@ -49,6 +50,9 @@ def SODA_Dialect : Dialect {
     /// space.
     static unsigned getPrivateAddressSpace() { return 5; }
   }];
+  
+  let useDefaultAttributePrinterParser = 1;
+  let useDefaultTypePrinterParser = 1;
 }
 
 def SODA_AsyncToken : DialectType<
@@ -98,6 +102,15 @@ def SODA_AsyncOpInterface : OpInterface<"AsyncOpInterface"> {
       }]
     >
   ];
+}
+
+//===----------------------------------------------------------------------===//
+// SODA Attributes.
+//===----------------------------------------------------------------------===//
+
+class SODA_Attr<string attrName, string attrMnemonic, list<Trait> traits = []>
+    : AttrDef<SODA_Dialect, attrName, traits> {
+  let mnemonic = attrMnemonic;
 }
 
 #endif // SODA_BASE

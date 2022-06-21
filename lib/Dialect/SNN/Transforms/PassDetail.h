@@ -4,6 +4,7 @@
 #ifndef DIALECT_TENSOR_TRANSFORMS_PASSDETAIL_H_
 #define DIALECT_TENSOR_TRANSFORMS_PASSDETAIL_H_
 
+#include "mlir/IR/BuiltinOps.h"
 #include "mlir/Pass/Pass.h"
 
 namespace mlir {

@@ -14,7 +14,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "PassDetail.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/BlockAndValueMapping.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/PatternMatch.h"
@@ -117,6 +117,7 @@ void SodaAsyncRegionPass::runOnOperation() {
     return signalPassFailure();
 }
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::soda::createSodaAsyncRegionPass() {
+std::unique_ptr<OperationPass<func::FuncOp>>
+mlir::soda::createSodaAsyncRegionPass() {
   return std::make_unique<SodaAsyncRegionPass>();
 }

@@ -1,7 +1,7 @@
 // RUN: soda-opt -convert-scf-for-to-soda %s | FileCheck  %s
 
 // CHECK: @one_d_loop
-func @one_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
+func.func @one_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
   %c0 = arith.constant 0 : index
   %c42 = arith.constant 42 : index
   %c1 = arith.constant 1 : index
@@ -19,7 +19,7 @@ func @one_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
 }
 
 // CHECK: @two_d_loop
-func @two_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
+func.func @two_d_loop(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
   %c0 = arith.constant 0 : index
   %c42 = arith.constant 42 : index
   %c1 = arith.constant 1 : index

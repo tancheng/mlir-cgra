@@ -12,7 +12,7 @@
 }
 
 // CHECK: @my_conv
-func @my_conv(%A: memref<?x?xf32>, %B: memref<?x?xf32>, %C: memref<?x?xf32>){
+func.func @my_conv(%A: memref<?x?xf32>, %B: memref<?x?xf32>, %C: memref<?x?xf32>){
   // CHECK: soda.launch
   // CHECK-NEXT: linalg.generic
   linalg.generic #matmul_trait

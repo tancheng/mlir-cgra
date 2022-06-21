@@ -29,8 +29,8 @@
 #include "mlir/Dialect/Affine/LoopUtils.h"
 #include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/Support/CommandLine.h"
@@ -84,7 +84,8 @@ struct AffineDataCopyGen
 /// buffers in 'fastMemorySpace', and replaces memory operations to the former
 /// by the latter. Only load op's handled for now.
 /// TODO: extend this to store op's.
-std::unique_ptr<OperationPass<FuncOp>> mlir::soda::createAffineDataCopyGenPass(
+std::unique_ptr<OperationPass<func::FuncOp>>
+mlir::soda::createAffineDataCopyGenPass(
     unsigned slowMemorySpace, unsigned fastMemorySpace, unsigned tagMemorySpace,
     int minDmaTransferSize, uint64_t fastMemCapacityBytes, bool generateDma) {
   return std::make_unique<AffineDataCopyGen>(slowMemorySpace, fastMemorySpace,
@@ -134,8 +135,8 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
     // If you hit a non-copy for loop, we will split there.
     if ((forOp = dyn_cast<AffineForOp>(&*it)) && copyNests.count(forOp) == 0) {
       // Perform the copying up unti this 'for' op first.
-      affineDataCopyGenerate(/*begin=*/curBegin, /*end=*/it, copyOptions,
-                             /*filterMemRef=*/llvm::None, copyNests);
+      (void)affineDataCopyGenerate(/*begin=*/curBegin, /*end=*/it, copyOptions,
+                                   /*filterMemRef=*/llvm::None, copyNests);
 
       // Returns true if the footprint is known to exceed capacity.
       auto exceedsCapacity = [&](AffineForOp forOp) {
@@ -168,8 +169,9 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
         // Inner loop copies have their own scope - we don't thus update
         // consumed capacity. The footprint check above guarantees this inner
         // loop's footprint fits.
-        affineDataCopyGenerate(/*begin=*/it, /*end=*/std::next(it), copyOptions,
-                               /*filterMemRef=*/llvm::None, copyNests);
+        (void)affineDataCopyGenerate(/*begin=*/it, /*end=*/std::next(it),
+                                     copyOptions,
+                                     /*filterMemRef=*/llvm::None, copyNests);
       }
       // Get to the next load or store op after 'forOp'.
       curBegin = std::find_if(std::next(it), block->end(), [&](Operation &op) {
@@ -191,15 +193,16 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
     assert(!curBegin->hasTrait<OpTrait::IsTerminator>() &&
            "can't be a terminator");
     // Exclude the affine.yield - hence, the std::prev.
-    affineDataCopyGenerate(/*begin=*/curBegin, /*end=*/std::prev(block->end()),
-                           copyOptions, /*filterMemRef=*/llvm::None, copyNests);
+    (void)affineDataCopyGenerate(/*begin=*/curBegin,
+                                 /*end=*/std::prev(block->end()), copyOptions,
+                                 /*filterMemRef=*/llvm::None, copyNests);
   }
 
   return success();
 }
 
 void AffineDataCopyGen::runOnOperation() {
-  FuncOp f = getOperation();
+  func::FuncOp f = getOperation();
   OpBuilder topBuilder(f.getBody());
   zeroIndex = topBuilder.create<arith::ConstantIndexOp>(f.getLoc(), 0);
 

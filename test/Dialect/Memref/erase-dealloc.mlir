@@ -1,8 +1,8 @@
 // RUN: soda-opt %s -erase-buffer-deallocation | FileCheck %s
 
-func private @do_something(memref<4x4xf32>) -> ()
+func.func private @do_something(memref<4x4xf32>) -> ()
 
-func @erase_dealloc() {
+func.func @erase_dealloc() {
   %0 = memref.alloc() : memref<4x4xf32>
   %1 = memref.alloc() : memref<4x4xf32>
   %2 = memref.alloc() : memref<4x4xf32>

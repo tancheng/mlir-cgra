@@ -9,7 +9,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "mlir/Conversion/LLVMCommon/Pattern.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/IR/ImplicitLocOpBuilder.h"
 
@@ -30,7 +30,7 @@ public:
     RewritePatternSet patterns(&getContext());
     soda::populateHostGenerationConversionPatterns(patterns);
     ConversionTarget target(getContext());
-    target.addLegalDialect<StandardOpsDialect, BuiltinDialect>();
+    target.addLegalDialect<func::FuncDialect, BuiltinDialect>();
     if (failed(applyPartialConversion(getOperation(), target,
                                       std::move(patterns)))) {
       signalPassFailure();
@@ -55,7 +55,7 @@ public:
         (Twine(op.getKernelModuleName()) + "_" + Twine(op.getKernelName()))
             .str();
 
-    auto func = module.lookupSymbol<FuncOp>(newName);
+    auto func = module.lookupSymbol<func::FuncOp>(newName);
     if (!func) {
 
       // Get callee
@@ -65,9 +65,9 @@ public:
       // Add a private function with same prototype on the top of parent module
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
-      FunctionType funcTy = kernelSODAFunction.getType();
-      FuncOp func =
-          rewriter.create<FuncOp>(rewriter.getUnknownLoc(), newName, funcTy);
+      FunctionType funcTy = kernelSODAFunction.getFunctionType();
+      func::FuncOp func = rewriter.create<func::FuncOp>(
+          rewriter.getUnknownLoc(), newName, funcTy);
       func.setPrivate();
 
       rewriter.setInsertionPoint(op);
@@ -76,8 +76,8 @@ public:
     assert(
         isa<FunctionOpInterface>(SymbolTable::lookupSymbolIn(module, newName)));
 
-    rewriter.replaceOpWithNewOp<CallOp>(op, TypeRange{}, newName,
-                                        op.getOperands());
+    rewriter.replaceOpWithNewOp<func::CallOp>(op, TypeRange{}, newName,
+                                              op.getOperands());
 
     return success();
   }

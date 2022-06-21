@@ -4,11 +4,10 @@
 #ifndef DIALECT_SODA_TRANSFORMS_PASSDETAIL_H_
 #define DIALECT_SODA_TRANSFORMS_PASSDETAIL_H_
 
+#include "mlir/Dialect/Func/IR/FuncOps.h"
+#include "mlir/IR/BuiltinOps.h"
 #include "mlir/Pass/Pass.h"
-
-// namespace LLVM {
-// class LLVMDialect;
-// } // end namespace LLVM
+#include "soda/Dialect/SODA/SODADialect.h"
 
 namespace mlir {
 

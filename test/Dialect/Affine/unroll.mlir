@@ -1,6 +1,6 @@
  // RUN: soda-opt %s -affine-loop-unroll="unroll-full" | FileCheck %s
 
-func @unroll_inner(%A: memref<2x2xf32>, %B: memref<2x2xf32>, %C: memref<2x2xf32>) -> memref<2x2xf32> {
+func.func @unroll_inner(%A: memref<2x2xf32>, %B: memref<2x2xf32>, %C: memref<2x2xf32>) -> memref<2x2xf32> {
   affine.for %i = 0 to 4 {
     affine.for %j = 0 to 4 {
       affine.for %k = 0 to 4 {
@@ -16,7 +16,7 @@ func @unroll_inner(%A: memref<2x2xf32>, %B: memref<2x2xf32>, %C: memref<2x2xf32>
   return %C : memref<2x2xf32>
 }
 
-// CHECK-LABEL: func @unroll_inner
+// CHECK-LABEL: func.func @unroll_inner
 // CHECK:         affine.for %{{.*}} = 0 to 4
 // CHECK-NEXT:      affine.for %{{.*}} = 0 to 4
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %c0] : memref<2x2xf32>

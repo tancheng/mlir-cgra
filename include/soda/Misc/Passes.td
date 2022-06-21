@@ -65,7 +65,7 @@ def EraseMemrefDealloc : Pass<"erase-buffer-deallocation"> {
   let constructor = "mlir::soda::createEraseMemrefDeallocPass()";
 }
 
-def ForwardMemrefAlloc : Pass<"forward-memref-allocations", "FuncOp"> {
+def ForwardMemrefAlloc : Pass<"forward-memref-allocations", "func::FuncOp"> {
   let summary = "Move non-nested memref allocations to the top of the function";
   let description = [{
       Move non-nested memref.alloc and memref.alloca operations to the top of
@@ -74,7 +74,7 @@ def ForwardMemrefAlloc : Pass<"forward-memref-allocations", "FuncOp"> {
   let constructor = "mlir::soda::createForwardMemrefAllocPass()";
 }
 
-def ForwardLinalgFill : Pass<"forward-linalg-fill", "FuncOp"> {
+def ForwardLinalgFill : Pass<"forward-linalg-fill", "func::FuncOp"> {
   let summary = "Move non-nested linalg.fill ops the top of the function";
   let description = [{
       Move non-nested linalg.fill operations to the top of function.
@@ -82,7 +82,7 @@ def ForwardLinalgFill : Pass<"forward-linalg-fill", "FuncOp"> {
   let constructor = "mlir::soda::createForwardLinalgFillPass()";
 }
 
-def ForwardMemrefCopy : Pass<"forward-memref-copy", "FuncOp"> {
+def ForwardMemrefCopy : Pass<"forward-memref-copy", "func::FuncOp"> {
   let summary = "Move non-nested linalg.copy ops the top of the function";
   let description = [{
       Move non-nested memref.copy operations to the top of function.

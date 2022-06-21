@@ -4,7 +4,7 @@
 // RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml="write-to-terminal using-bare-ptr" %s | FileCheck %s --check-prefixes=CHECK_BARE
 
 module attributes {soda.container_module}  {
-  func @driver() {
+  func.func @driver() {
     %0 = "loadA"() : () -> memref<4x7xf32>
     %1 = "loadB"() : () -> memref<7x3xf32>
     %2 = "allocateC"() : () -> memref<4x3xf32>

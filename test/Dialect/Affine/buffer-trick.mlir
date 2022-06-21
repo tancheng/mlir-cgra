@@ -4,7 +4,7 @@
 // Buffer trick from linalg:
 // -linalg-promote-subviews="test-use-alloca"
 
-// CHECK-LABEL: func @buffer_trick
+// CHECK-LABEL: func.func @buffer_trick
 // CHECK:        memref.alloc() : memref<4x4xf32>
 // CHECK-NEXT:   affine.for %{{.*}} = 0 to 4
 // CHECK-NEXT:     affine.for %{{.*}} = 0 to 4
@@ -39,7 +39,7 @@
 // CHECK-NEXT:       affine.store %{{.*}}, %{{.*}}[%{{.*}}, %{{.*}}] : memref<4x4xf32>
 
 
-func @buffer_trick(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>) -> memref<4x4xf32> {
+func.func @buffer_trick(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>) -> memref<4x4xf32> {
   affine.for %i = 0 to 4 {
     affine.for %j = 0 to 4 {
       affine.for %k = 0 to 4 {

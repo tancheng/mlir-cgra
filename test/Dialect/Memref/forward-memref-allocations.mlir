@@ -1,11 +1,11 @@
 // RUN: soda-opt %s -forward-memref-allocations | FileCheck %s
 
-func private @do_something1(memref<4x1xf32>) -> ()
-func private @do_something2(memref<4x2xf32>) -> ()
-func private @do_something3(memref<4x3xf32>) -> ()
-func private @do_something4(memref<4x4xf32>) -> ()
+func.func private @do_something1(memref<4x1xf32>) -> ()
+func.func private @do_something2(memref<4x2xf32>) -> ()
+func.func private @do_something3(memref<4x3xf32>) -> ()
+func.func private @do_something4(memref<4x4xf32>) -> ()
 
-func @forward_allocations() {
+func.func @forward_allocations() {
   %0 = memref.alloc() : memref<4x1xf32>
   call @do_something1(%0) : (memref<4x1xf32>) -> ()
 
@@ -26,7 +26,7 @@ func @forward_allocations() {
   return
 }
 
-// CHECK-LABEL: func @forward_allocations 
+// CHECK-LABEL: func.func @forward_allocations 
 // CHECK-NEXT:  %0 = memref.alloc() : memref<4x1xf32>
 // CHECK-NEXT:  %1 = memref.alloc() : memref<4x2xf32>
 // CHECK-NEXT:  %2 = memref.alloc() : memref<4x3xf32>

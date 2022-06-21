@@ -9,7 +9,7 @@
 #include "../PassDetail.h"
 #include "soda/Conversion/KernelsToSODA/OperationToSODA.h"
 
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
@@ -60,6 +60,6 @@ struct OperationMapper : public ConvertOperationToSODABase<OperationMapper> {
 
 } // namespace
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createOperationToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>> mlir::createOperationToSODAPass() {
   return std::make_unique<OperationMapper>();
 }

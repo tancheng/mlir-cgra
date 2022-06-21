@@ -24,7 +24,7 @@ add_mlir_conversion_library(SODAKERNELToSODA
   MLIRLinalg
   MLIRMemRef
   MLIRPass
-  MLIRStandard
+  MLIRFunc
   MLIRSupport
   MLIRTransforms
   )

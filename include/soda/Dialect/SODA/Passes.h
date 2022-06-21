@@ -11,8 +11,14 @@
 #define MLIR_DIALECT_SODA_PASSES_H_
 
 #include "mlir/Pass/Pass.h"
+#include "soda/Dialect/SODA/SODADialect.h"
 
 namespace mlir {
+class ModuleOp;
+namespace func {
+class FuncOp;
+} // namespace func
+
 namespace soda {
 
 /// Replaces `soda.launch` with `soda.launch_func` by moving the region into a
@@ -29,7 +35,7 @@ void populateHostGenerationConversionPatterns(RewritePatternSet &patterns);
 std::unique_ptr<Pass> createSodaHostGenerationPass();
 
 /// Rewrites a function region so that SODA ops execute async.
-std::unique_ptr<OperationPass<FuncOp>> createSodaAsyncRegionPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createSodaAsyncRegionPass();
 
 /// Collect all patterns to rewrite ops within the SODA dialect.
 inline void populateSodaRewritePatterns(MLIRContext *context,

@@ -68,7 +68,7 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
       *this, "permutation-map",
       llvm::cl::desc("Specify the loop permutation. List size must match "
                      "number of affine.for loops."),
-      llvm::cl::OneOrMore, llvm::cl::CommaSeparated};
+      llvm::cl::OneOrMore};
 
   Option<bool> noBufferTrick{
       *this, "no-buffer-trick",
@@ -156,7 +156,7 @@ void registerPassManagerMiscPass() {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));
         } else {
-          pm.addPass(createLowerToLLVMPass());
+          pm.addPass(createConvertFuncToLLVMPass());
         }
         pm.addPass(createReconcileUnrealizedCastsPass());
         pm.addPass(createCanonicalizerPass());
@@ -186,7 +186,7 @@ void registerSimpleLoweringPass() {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));
         } else {
-          pm.addPass(createLowerToLLVMPass());
+          pm.addPass(createConvertFuncToLLVMPass());
         }
         pm.addPass(createReconcileUnrealizedCastsPass());
       });
@@ -258,7 +258,7 @@ void registerOptimizedForBambuPass() {
           pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
                                               options.emitCWrappers));
         } else {
-          pm.addPass(createLowerToLLVMPass());
+          pm.addPass(createConvertFuncToLLVMPass());
         }
         pm.addPass(createReconcileUnrealizedCastsPass());
         pm.addPass(createCanonicalizerPass());

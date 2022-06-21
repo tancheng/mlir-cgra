@@ -1,7 +1,7 @@
 // RUN: soda-opt -convert-linalg-conv-to-soda %s | FileCheck  %s
 
 // CHECK: @my_conv
-func @my_conv(%filter: memref<5x5xf32>, %input: memref<32x32xf32>, %output: memref<28x28xf32>) {
+func.func @my_conv(%filter: memref<5x5xf32>, %input: memref<32x32xf32>, %output: memref<28x28xf32>) {
   // CHECK: soda.launch
   // CHECK-NEXT: linalg.conv
 

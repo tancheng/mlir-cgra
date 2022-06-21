@@ -11,8 +11,8 @@
 #include "soda/Conversion/KernelsToSODA/SCFToSODA.h"
 
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/SCF/SCF.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
@@ -66,10 +66,10 @@ struct SCFForLoopMapper : public ConvertSCFForToSODABase<SCFForLoopMapper> {
 
 } // namespace
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createAffineForToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>> mlir::createAffineForToSODAPass() {
   return std::make_unique<AffineForLoopMapper>();
 }
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createSCFForToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>> mlir::createSCFForToSODAPass() {
   return std::make_unique<SCFForLoopMapper>();
 }

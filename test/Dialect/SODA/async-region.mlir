@@ -7,10 +7,10 @@ module attributes {soda.container_module} {
     soda.func @kernel() kernel { soda.return }
   }
 
-  func private @foo() -> ()
+  func.func private @foo() -> ()
 
-  // CHECK-LABEL:func @async(%{{.*}}: index)
-  func @async(%sz : index) {
+  // CHECK-LABEL:func.func @async(%{{.*}}: index)
+  func.func @async(%sz : index) {
     // CHECK: %[[t0:.*]] = soda.wait async
     // CHECK: %[[t1:.*]] = soda.launch_func async [%[[t0]]]
     soda.launch_func @kernels::@kernel
