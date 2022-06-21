@@ -67,7 +67,7 @@ General options:
         --use-aligned-alloc                            - Use aligned_alloc in place of malloc for heap allocations
       --convert-scf-for-to-soda                        -   Convert top-level scf::for Ops to SODA kernels
       --convert-scf-to-cf                              -   Convert SCF dialect to ControlFlow dialect, replacing structured control flow with a CFG
-      --convert-std-to-llvm                            -   Convert scalar and vector operations from the Standard to the LLVM dialect
+      --convert-func-to-llvm                            -   Convert scalar and vector operations from the Standard to the LLVM dialect
         --data-layout=<string>                         - String description (LLVM format) of the data layout that is expected on the produced module
         --emit-c-wrappers                              - Emit wrappers for C-compatible pointer-to-struct memref descriptors
         --index-bitwidth=<uint>                        - Bitwidth of the index type, 0 to use size of machine word

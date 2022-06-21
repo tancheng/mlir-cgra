@@ -38,7 +38,7 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
       struct members and only generates simple C arrays with the correct size.
       This option is meant to be used with a lowering pipeline that finishes
       with:
-        `--convert-std-to-llvm=use-bare-ptr-memref-call-conv`
+        `--convert-func-to-llvm=use-bare-ptr-memref-call-conv`
 
       Note that the generated file is created at the binary execution
       location and will replace any xml files that have the same name based

@@ -35,7 +35,7 @@
 
 using namespace mlir;
 
-#define PASS_NAME "soda-convert-std-to-llvm"
+#define PASS_NAME "soda-convert-func-to-llvm"
 
 namespace {
 /// A pass converting MLIR operations into the LLVM IR dialect.

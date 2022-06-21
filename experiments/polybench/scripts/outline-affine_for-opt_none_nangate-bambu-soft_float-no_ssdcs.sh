@@ -108,7 +108,7 @@ soda-opt \
     -arith-expand \
     -memref-expand \
     --convert-arith-to-llvm \
-    -convert-std-to-llvm=use-bare-ptr-memref-call-conv  \
+    -convert-func-to-llvm=use-bare-ptr-memref-call-conv  \
     -reconcile-unrealized-casts \
     -o ${ODIR}/07-llvm.mlir \
     -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
