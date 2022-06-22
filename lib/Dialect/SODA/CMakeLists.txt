@@ -11,9 +11,9 @@ add_mlir_dialect_library(MLIRSODAOps
   MLIRSODAOpInterfacesIncGen
 
   LINK_LIBS PUBLIC
-  MLIRDLTI
+  MLIRDLTIDialect
   MLIRIR
-  MLIRMemRef
+  MLIRMemRefDialect
   MLIRSideEffectInterfaces
   MLIRSupport
   )
@@ -39,12 +39,9 @@ add_mlir_dialect_library(MLIRSODATransforms
   #MLIRAsync
   MLIRSODAOps
   MLIRIR
-  #MLIRLLVMIR
-  #MLIRLLVMToLLVMIRTranslation
-  #MLIRMemRef
   MLIRPass
-  MLIRSCF
-  MLIRFunc
+  MLIRSCFDialect
+  MLIRFuncDialect
   MLIRSupport
   MLIRTransformUtils
   )

@@ -81,9 +81,9 @@ createAffineLoopPermutationPass(const ArrayRef<unsigned> &permList);
 /// obtained at runtime.
 ///
 /// This pass is based on:
-///    https://github.com/llvm/llvm-project/blob/main/mlir/lib/Conversion/StandardToLLVM/StandardToLLVM.cpp#L1250
+///    llvm-project/mlir/lib/Conversion/FuncToLLVM/FuncToLLVM.cpp
 std::unique_ptr<OperationPass<ModuleOp>>
-createStandardToLLVMPass(bool useBarePtrCallConv, bool emitCWrappers);
+createCustomFuncToLLVMPass(bool useBarePtrCallConv);
 
 //===----------------------------------------------------------------------===//
 // Register passes

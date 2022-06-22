@@ -42,14 +42,15 @@ namespace {
 struct LLVMLoweringPass : public ConvertFuncToLLVMBase<LLVMLoweringPass> {
   LLVMLoweringPass() = default;
 
-  LLVMLoweringPass(bool useBarePtrCallConv, bool emitCWrappers) {
+  LLVMLoweringPass(bool useBarePtrCallConv) {
     this->useBarePtrCallConv = useBarePtrCallConv;
-    this->emitCWrappers = emitCWrappers;
   }
 
   /// Run the dialect converter on the module.
   void runOnOperation() override {
-    if (useBarePtrCallConv && emitCWrappers) {
+    if (useBarePtrCallConv &&
+        getOperation()->getAttrOfType<UnitAttr>(
+            LLVM::LLVMDialect::getEmitCWrapperAttrName())) {
       getOperation().emitError()
           << "incompatible conversion options: bare-pointer calling convention "
              "and C wrapper emission";
@@ -70,7 +71,6 @@ struct LLVMLoweringPass : public ConvertFuncToLLVMBase<LLVMLoweringPass> {
     LowerToLLVMOptions options(&getContext(),
                                dataLayoutAnalysis.getAtOrAbove(m));
     options.useBarePtrCallConv = useBarePtrCallConv;
-    options.emitCWrappers = emitCWrappers;
     if (indexBitwidth != kDeriveIndexBitwidthFromDataLayout)
       options.overrideIndexBitwidth(indexBitwidth);
     options.dataLayout = llvm::DataLayout(this->dataLayout);
@@ -94,7 +94,6 @@ struct LLVMLoweringPass : public ConvertFuncToLLVMBase<LLVMLoweringPass> {
 } // end namespace
 
 std::unique_ptr<OperationPass<ModuleOp>>
-mlir::soda::createStandardToLLVMPass(bool useBarePtrCallConv,
-                                     bool emitCWrappers) {
-  return std::make_unique<LLVMLoweringPass>(useBarePtrCallConv, emitCWrappers);
+mlir::soda::createCustomFuncToLLVMPass(bool useBarePtrCallConv) {
+  return std::make_unique<LLVMLoweringPass>(useBarePtrCallConv);
 }

@@ -16,14 +16,14 @@ set(LIBS
   MLIROptLib
   
   # Dialects
-  MLIRLLVMIR
-  MLIRLinalg
-  MLIRMemRef
-  MLIRAffine
-  MLIRArithmetic
-  MLIRMath
-  MLIRFunc
-  MLIRSCF
+  MLIRLLVMDialect
+  MLIRLinalgDialect
+  MLIRMemRefDialect
+  MLIRAffineDialect
+  MLIRArithmeticDialect
+  MLIRMathDialect
+  MLIRFuncDialect
+  MLIRSCFDialect
  
   # Transforms
   MLIRFuncTransforms

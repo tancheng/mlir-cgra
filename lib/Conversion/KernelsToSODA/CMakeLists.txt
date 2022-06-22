@@ -18,13 +18,13 @@ add_mlir_conversion_library(SODAKERNELToSODA
   SODAConversionPassIncGen
 
   LINK_LIBS PUBLIC
-  MLIRAffine
+  MLIRAffineDialect
   MLIRAffineToStandard
   MLIRIR
-  MLIRLinalg
-  MLIRMemRef
+  MLIRLinalgDialect
+  MLIRMemRefDialect
   MLIRPass
-  MLIRFunc
+  MLIRFuncDialect
   MLIRSupport
   MLIRTransforms
   )

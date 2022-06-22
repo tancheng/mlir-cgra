@@ -152,10 +152,11 @@ void registerPassManagerMiscPass() {
         pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
-        if (options.useBarePtrCallConv || options.emitCWrappers) {
-          pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
-                                              options.emitCWrappers));
+        if (options.useBarePtrCallConv) {
+          pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
         } else {
+          if (options.emitCWrappers)
+            pm.addPass(LLVM::createRequestCWrappersPass());
           pm.addPass(createConvertFuncToLLVMPass());
         }
         pm.addPass(createReconcileUnrealizedCastsPass());
@@ -176,18 +177,20 @@ void registerSimpleLoweringPass() {
         pm.addPass(createConvertSCFToCFPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
-        pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
-        if (options.useBarePtrCallConv || options.emitCWrappers) {
-          pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
-                                              options.emitCWrappers));
+        pm.addPass(createMemRefToLLVMPass());
+        if (options.useBarePtrCallConv) {
+          pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
         } else {
+          if (options.emitCWrappers)
+            pm.addPass(LLVM::createRequestCWrappersPass());
           pm.addPass(createConvertFuncToLLVMPass());
         }
+        pm.addPass(cf::createConvertControlFlowToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
       });
 }
@@ -254,12 +257,14 @@ void registerOptimizedForBambuPass() {
         pm.addPass(arith::createArithmeticExpandOpsPass());
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
-        if (options.useBarePtrCallConv || options.emitCWrappers) {
-          pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
-                                              options.emitCWrappers));
+        if (options.useBarePtrCallConv) {
+          pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
         } else {
+          if (options.emitCWrappers)
+            pm.addPass(LLVM::createRequestCWrappersPass());
           pm.addPass(createConvertFuncToLLVMPass());
         }
+        pm.addPass(cf::createConvertControlFlowToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
         pm.addPass(createCanonicalizerPass());
       });
