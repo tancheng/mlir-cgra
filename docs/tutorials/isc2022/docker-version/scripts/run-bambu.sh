@@ -20,7 +20,7 @@ opt -O2 -strip-debug input.ll \
 docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
 bambu -v3 --print-dot \
   -lm --soft-float \
---compiler=I386_CLANG10  \
+--compiler=I386_CLANG12  \
 -O2 \
 --device-name=xc7vx690t-3ffg1930-VVD \
 --clock-period=5 --no-iob \

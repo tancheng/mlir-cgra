@@ -9,7 +9,7 @@ pushd $BAMBUDIR
 bambu \
   -v3 \
   --print-dot -lm --soft-float \
-  --compiler=I386_CLANG10 \
+  --compiler=I386_CLANG12 \
   -O2 \
   --device-name=xc7vx690t-3ffg1930-VVD \
   --clock-period=5 --no-iob \

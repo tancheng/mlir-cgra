@@ -182,7 +182,7 @@ General options:
     =list                                              -   display the results in a merged list sorted by pass name
     =pipeline                                          -   display the results with a nested pipeline view
   --print-ir-after=<pass-arg>                          - Print IR after specified passes
-  --print-ir-after-all                                 - Print IR after each pass
+  --mlir-print-ir-after-all                                 - Print IR after each pass
   --print-ir-after-change                              - When printing the IR after a pass, only print if the IR changed
   --print-ir-after-failure                             - When printing the IR after a pass, only print if the pass failed
   --print-ir-before=<pass-arg>                         - Print IR before specified passes

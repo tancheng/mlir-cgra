@@ -20,7 +20,7 @@ opt-12 -O2 -strip-debug input.ll \
 docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm soda/soda \
 bambu -v3 --print-dot \
   -lm --soft-float \
---compiler=I386_CLANG10  \
+--compiler=I386_CLANG12  \
 -O2 \
 --device=nangate45 \
 --clock-period=5 --no-iob \
