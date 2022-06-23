@@ -18,7 +18,7 @@ Pull our production image on dockerhub:
 
 - https://hub.docker.com/r/agostini01/soda
 
-And follow one of our tutorials [here](soda-opt/docs/tutorials).
+And follow one of our tutorials [here](docs/tutorials).
 
 
 ## How to build?
