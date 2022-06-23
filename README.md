@@ -2,7 +2,7 @@
 
 This project aims to create `soda-opt`, a tool that leverages `mlir` to extract, 
 optimize, and translate high-level code snippets into LLVM IR, 
-so they can be synthesized by our high-level synthesis tool of choice.
+so that they can be synthesized by our high-level synthesis tool of choice.
 
 As a long term vision, the SODA-OPT project seeks to provide a set of
 *compiler libraries* to perform the target optimizations; *runtime libraries* 
@@ -11,6 +11,14 @@ to offload the compute from host to the selected targets; and to be
 that any project (e.i. TF, ONNX, etc) could use the exposed optimization
 passes to offload and perform HLS of selected code snippets. As a final
 goal, `soda-opt` could later be merged into the main `llvm-project` codebase.
+
+## Getting started
+
+Pull our production image on dockerhub:
+
+- https://hub.docker.com/r/agostini01/soda
+
+And follow one of our tutorials [here](soda-opt/docs/tutorials).
 
 
 ## How to build?
