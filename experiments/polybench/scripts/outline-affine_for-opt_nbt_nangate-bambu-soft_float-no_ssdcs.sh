@@ -104,10 +104,10 @@ soda-opt \
     --soda-opt-pipeline-for-bambu="use-bare-ptr-memref-call-conv no-buffer-trick" \
     ${ODIR}/06-03-isolated.mlir \
     -o ${ODIR}/07-llvm.mlir \
-    -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
+    -mlir-print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
 
 # Translate llvm.mlir to model.ll ##############################################
-mlir-translate \
+mlir-translate -opaque-pointers=0 \
   --mlir-to-llvmir \
   ${ODIR}/07-llvm.mlir \
   -o ${ODIR}/08-model.ll
