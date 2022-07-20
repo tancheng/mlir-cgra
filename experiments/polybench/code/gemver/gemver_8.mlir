@@ -1,4 +1,4 @@
-func @gemver_8(%alpha: f32, %beta: f32, 
+func.func @gemver_8(%alpha: f32, %beta: f32, 
                 %A: memref<8x8xf32>, 
                 %u1: memref<8xf32>, 
                 %v1: memref<8xf32>, 

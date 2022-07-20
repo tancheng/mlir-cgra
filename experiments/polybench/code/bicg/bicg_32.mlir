@@ -1,4 +1,4 @@
-func @bicg_32(%A: memref<32x32xf32>, %s: memref<32xf32>, %q: memref<32xf32>, %p: memref<32xf32>, %r: memref<32xf32>) {
+func.func @bicg_32(%A: memref<32x32xf32>, %s: memref<32xf32>, %q: memref<32xf32>, %p: memref<32xf32>, %r: memref<32xf32>) {
   affine.for %i = 0 to 32 {
     affine.for %j = 0 to 32 {
       %0 = affine.load %s[%j] : memref<32xf32>

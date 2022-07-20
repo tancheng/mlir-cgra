@@ -1,4 +1,4 @@
-func @gesummv_32(%alpha: f32, %beta: f32, %A: memref<32x32xf32>, %B: memref<32x32xf32>, %tmp: memref<32xf32>, %x: memref<32xf32>, %y: memref<32xf32>) {
+func.func @gesummv_32(%alpha: f32, %beta: f32, %A: memref<32x32xf32>, %B: memref<32x32xf32>, %tmp: memref<32xf32>, %x: memref<32xf32>, %y: memref<32xf32>) {
   affine.for %i = 0 to 32 {
     affine.for %j = 0 to 32 {
       %0 = affine.load %A[%i, %j] : memref<32x32xf32>

@@ -1,4 +1,4 @@
-func @gemm_4(%alpha: f32, %beta: f32, %C: memref<4x4xf32>, %A: memref<4x4xf32>, %B: memref<4x4xf32>) {
+func.func @gemm_4(%alpha: f32, %beta: f32, %C: memref<4x4xf32>, %A: memref<4x4xf32>, %B: memref<4x4xf32>) {
   affine.for %i = 0 to 4 {
     affine.for %j = 0 to 4 {
       %0 = affine.load %C[%i, %j] : memref<4x4xf32>

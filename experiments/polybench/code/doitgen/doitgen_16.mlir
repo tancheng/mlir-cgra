@@ -1,4 +1,4 @@
-func @doitgen_16(
+func.func @doitgen_16(
               %A: memref<16x16x16xf32>, 
               %C4: memref<16x16xf32>, 
               %sum: memref<16xf32>

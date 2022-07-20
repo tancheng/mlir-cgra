@@ -1,4 +1,4 @@
-func @bicg_8(%A: memref<8x8xf32>, %s: memref<8xf32>, %q: memref<8xf32>, %p: memref<8xf32>, %r: memref<8xf32>) {
+func.func @bicg_8(%A: memref<8x8xf32>, %s: memref<8xf32>, %q: memref<8xf32>, %p: memref<8xf32>, %r: memref<8xf32>) {
   affine.for %i = 0 to 8 {
     affine.for %j = 0 to 8 {
       %0 = affine.load %s[%j] : memref<8xf32>

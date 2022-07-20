@@ -1,4 +1,4 @@
-func @two_mm_32( %alpha: f32, 
+func.func @two_mm_32( %alpha: f32, 
               %beta: f32, 
               %tmp: memref<32x32xf32>, 
               %A: memref<32x32xf32>, 
