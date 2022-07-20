@@ -1,5 +1,5 @@
 #map = affine_map<(d0) -> (d0 + 1)>
-func @trmm_2(%alpha: f32, %A: memref<2x2xf32>, %B: memref<2x2xf32>) {
+func.func @trmm_2(%alpha: f32, %A: memref<2x2xf32>, %B: memref<2x2xf32>) {
   affine.for %i = 0 to 2 {
     affine.for %j = 0 to 2 {
       affine.for %k = #map(%i) to 2 {

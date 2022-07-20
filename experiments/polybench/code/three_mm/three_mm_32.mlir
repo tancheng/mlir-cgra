@@ -1,4 +1,4 @@
-func @three_mm_32(
+func.func @three_mm_32(
                   %E: memref<32x32xf32>, 
                   %A: memref<32x32xf32>, 
                   %B: memref<32x32xf32>,

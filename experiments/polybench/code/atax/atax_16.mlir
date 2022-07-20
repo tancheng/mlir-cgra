@@ -1,4 +1,4 @@
-func @atax_16( 
+func.func @atax_16( 
               %A: memref<16x16xf32>, 
               %x: memref<16xf32>,
               %y: memref<16xf32>, 

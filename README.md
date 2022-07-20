@@ -12,6 +12,7 @@ that any project (e.i. TF, ONNX, etc) could use the exposed optimization
 passes to offload and perform HLS of selected code snippets. As a final
 goal, `soda-opt` could later be merged into the main `llvm-project` codebase.
 
+
 ## Getting started
 
 Pull our production image on dockerhub:
@@ -214,6 +215,21 @@ two mechanisms:
    which apply to that software, or
 2) It will contain specific license and restriction terms at the top of every
    file. 
+
+---
+
+# Publications
+
+[IEEE Micro 2022 (Early Access)](https://ieeexplore.ieee.org/abstract/document/9786533)
+
+```
+@ARTICLE{9786533,
+  author={Bohm Agostini, Nicolas and Curzel, Serena and Zhang, Jeff and Limaye, Ankur and Tan, Cheng and Amatya, Vinay and Minutoli, Marco and Castellana, Vito Giovanni and Manzano, Joseph and Brooks, David and Wei, Gu-Yeon and Tumeo, Antonino},
+  journal={IEEE Micro}, 
+  title={Bridging Python to Silicon: The SODA Toolchain}, 
+  year={2022},
+  doi={10.1109/MM.2022.3178580}}
+```
 
 ---
 

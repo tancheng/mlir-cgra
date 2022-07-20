@@ -1,4 +1,4 @@
-func @mvt_8(
+func.func @mvt_8(
   %x1: memref<8xf32>, 
   %x2: memref<8xf32>, 
   %y1: memref<8xf32>, 

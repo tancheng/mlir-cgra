@@ -1,6 +1,6 @@
 #map0 = affine_map<(d0) -> (d0)>
 
-func @symm_8( %alpha: f32, 
+func.func @symm_8( %alpha: f32, 
               %beta: f32, 
               %C: memref<8x8xf32>, 
               %A: memref<8x8xf32>, 

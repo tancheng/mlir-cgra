@@ -1,5 +1,5 @@
 #map = affine_map<(d0) -> (d0 + 1)>
-func @syr2k_4(%alpha: f32, %beta: f32, %C: memref<4x4xf32>, %A: memref<4x4xf32>, %B: memref<4x4xf32>) {
+func.func @syr2k_4(%alpha: f32, %beta: f32, %C: memref<4x4xf32>, %A: memref<4x4xf32>, %B: memref<4x4xf32>) {
   affine.for %i = 0 to 4 {
     affine.for %j = 0 to #map(%i) {
       %0 = affine.load %C[%i, %j] : memref<4x4xf32>
