@@ -3,7 +3,7 @@
 // CHECK: module attributes {soda.container_module}
 
 // CHECK-LABEL: func @launch()
-func @launch() {
+func.func @launch() {
   // CHECK: %[[ARG0:.*]] = "op"() : () -> f32
   %0 = "op"() : () -> (f32)
   // CHECK: %[[ARG1:.*]] = "op"() : () -> memref<?xf32, 1>
@@ -39,7 +39,7 @@ func @launch() {
 
 // CHECK: module attributes {soda.container_module}
 // CHECK-LABEL: @multiple_launches
-func @multiple_launches() {
+func.func @multiple_launches() {
   // CHECK: soda.launch_func @multiple_launches_kernel::@multiple_launches_kernel
   soda.launch {
     soda.terminator
@@ -59,7 +59,7 @@ func @multiple_launches() {
 // -----
 
 // CHECK-LABEL: @extra_constants_not_inlined
-func @extra_constants_not_inlined(%arg0: memref<?xf32>) {
+func.func @extra_constants_not_inlined(%arg0: memref<?xf32>) {
   %cst2 = arith.constant 2 : index
   %c0 = arith.constant 0 : index
   %cst3 = "secret_constant"() : () -> index
@@ -78,7 +78,7 @@ func @extra_constants_not_inlined(%arg0: memref<?xf32>) {
 
 // CHECK-LABEL: @extra_constants
 // CHECK-SAME: %[[ARG0:.*]]: memref<?xf32>
-func @extra_constants(%arg0: memref<?xf32>) {
+func.func @extra_constants(%arg0: memref<?xf32>) {
   %cst = arith.constant 8 : index
   %cst2 = arith.constant 2 : index
   %c0 = arith.constant 0 : index
@@ -101,7 +101,7 @@ func @extra_constants(%arg0: memref<?xf32>) {
 
 // CHECK-LABEL: @extra_constants_noarg
 // CHECK-SAME: %[[ARG0:.*]]: memref<?xf32>, %[[ARG1:.*]]: memref<?xf32>
-func @extra_constants_noarg(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
+func.func @extra_constants_noarg(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
   %cst2 = arith.constant 2 : index
   %c0 = arith.constant 0 : index
   // CHECK: memref.dim %[[ARG1]]
@@ -122,7 +122,7 @@ func @extra_constants_noarg(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
 // -----
 
 // CHECK-LABEL: @multiple_uses
-func @multiple_uses(%arg0 : memref<?xf32>) {
+func.func @multiple_uses(%arg0 : memref<?xf32>) {
   %c1 = arith.constant 1 : index
   %c2 = arith.constant 2 : index
   // CHECK: soda.func {{.*}}
@@ -142,7 +142,7 @@ func @multiple_uses(%arg0 : memref<?xf32>) {
 // -----
 
 // CHECK-LABEL: @multiple_uses2
-func @multiple_uses2(%arg0 : memref<*xf32>) {
+func.func @multiple_uses2(%arg0 : memref<*xf32>) {
   %c1 = arith.constant 1 : index
   %c2 = arith.constant 2 : index
   %d = memref.dim %arg0, %c2 : memref<*xf32>
@@ -168,24 +168,24 @@ func @multiple_uses2(%arg0 : memref<*xf32>) {
 llvm.mlir.global internal @global(42 : i64) : i64
 
 //CHECK-LABEL: @function_call
-func @function_call(%arg0 : memref<?xf32>) {
+func.func @function_call(%arg0 : memref<?xf32>) {
   %cst = arith.constant 8 : index
   soda.launch {
-    call @device_function() : () -> ()
-    call @device_function() : () -> ()
+    func.call @device_function() : () -> ()
+    func.call @device_function() : () -> ()
     %0 = llvm.mlir.addressof @global : !llvm.ptr<i64>
     soda.terminator
   }
   return
 }
 
-func @device_function() {
-  call @recursive_device_function() : () -> ()
+func.func @device_function() {
+  func.call @recursive_device_function() : () -> ()
   return
 }
 
-func @recursive_device_function() {
-  call @recursive_device_function() : () -> ()
+func.func @recursive_device_function() {
+  func.call @recursive_device_function() : () -> ()
   return
 }
 
@@ -198,21 +198,21 @@ func @recursive_device_function() {
 //
 // CHECK:   llvm.mlir.global internal @global(42 : i64) : i64
 //
-// CHECK:   func @device_function()
-// CHECK:   func @recursive_device_function()
-// CHECK-NOT:   func @device_function
+// CHECK:   func.func @device_function()
+// CHECK:   func.func @recursive_device_function()
+// CHECK-NOT:   func.func @device_function
 
 // -----
 
 // Check if generating module,kernel names will avoid similar names to already
 // defined functions by append _m to soda.module name
 // CHECK-LABEL: @krnl
-func private @krnl_kernel_krnl_kernel(memref<?xf32>, memref<?xf32>)
-func private @dummy() -> memref<?xf32>
-func @krnl(%arg0: memref<?xf32>) {
+func.func private @krnl_kernel_krnl_kernel(memref<?xf32>, memref<?xf32>)
+func.func private @dummy() -> memref<?xf32>
+func.func @krnl(%arg0: memref<?xf32>) {
   soda.launch {
-    %0 = call @dummy() : () -> memref<?xf32>
-    call @krnl_kernel_krnl_kernel(%arg0, %0) : (memref<?xf32>, memref<?xf32>) -> ()
+    %0 = func.call @dummy() : () -> memref<?xf32>
+    func.call @krnl_kernel_krnl_kernel(%arg0, %0) : (memref<?xf32>, memref<?xf32>) -> ()
     soda.terminator
   }
   return
@@ -224,5 +224,5 @@ func @krnl(%arg0: memref<?xf32>) {
 // CHECK:     call @krnl_kernel_krnl_kernel
 // CHECK:     soda.return
 //
-// CHECK:   func private @dummy()
-// CHECK:   func private @krnl_kernel_krnl_kernel
+// CHECK:   func.func private @dummy()
+// CHECK:   func.func private @krnl_kernel_krnl_kernel

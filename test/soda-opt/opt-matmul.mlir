@@ -2,7 +2,7 @@
 // RUN: soda-opt %s --soda-opt-pipeline="cache-size=512" | FileCheck %s -check-prefix=CHECKTILE
 
 // Performs AxB accumulating results on C
-func @matmul_kernel(%A:memref<512x512xf32>, %B:memref<512x512xf32>, %C : memref<512x512xf32>) {
+func.func @matmul_kernel(%A:memref<512x512xf32>, %B:memref<512x512xf32>, %C : memref<512x512xf32>) {
   linalg.matmul ins(%A, %B : memref<512x512xf32>, memref<512x512xf32>)
                 outs(%C : memref<512x512xf32>)
   return

@@ -104,13 +104,13 @@ soda-opt \
     -arith-expand \
     -memref-expand \
     --convert-arith-to-llvm \
-    -convert-std-to-llvm=use-bare-ptr-memref-call-conv  \
+    -convert-func-to-llvm=use-bare-ptr-memref-call-conv  \
     -reconcile-unrealized-casts \
     -o ${ODIR}/07-llvm.mlir \
-    -print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
+    -mlir-print-ir-before-all 2>&1 | cat > ${ODIR}/06-04-intermediate.mlir
 
 # Translate llvm.mlir to model.ll ##############################################
-mlir-translate \
+mlir-translate -opaque-pointers=0 \
   --mlir-to-llvmir \
   ${ODIR}/07-llvm.mlir \
   -o ${ODIR}/08-model.ll

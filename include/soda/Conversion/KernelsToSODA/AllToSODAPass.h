@@ -8,12 +8,14 @@
 #include <memory>
 
 namespace mlir {
+namespace func {
 class FuncOp;
+}
 template <typename T>
 class OperationPass;
 class Pass;
 
-std::unique_ptr<OperationPass<FuncOp>> createAllToSODAPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createAllToSODAPass();
 
 } // namespace mlir
 

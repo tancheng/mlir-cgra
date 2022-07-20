@@ -3,7 +3,7 @@
 // RUN: soda-opt -convert-operation-to-soda="anchor-func=two_d_loop anchor-op=affine.for" %s | FileCheck  %s  --check-prefixes=FUNCFILTER
 
 // CHECK: @one_d_loop
-func @one_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {
+func.func @one_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {
   
   // CHECK-NEXT: soda.launch 
   // CHECK-NEXT: affine.for
@@ -20,7 +20,7 @@ func @one_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {
 
 // CHECK: @two_d_loop
 // FUNCFILTER: @two_d_loop
-func @two_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {
+func.func @two_d_loop(%A : memref<?xf32>, %B : memref<?xf32>) {
   
   // CHECK-NEXT: soda.launch 
   // CHECK-NEXT: affine.for

@@ -25,8 +25,6 @@
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
 namespace mlir {
-class FuncOp;
-
 namespace soda {
 
 // TODO Remove
@@ -51,9 +49,14 @@ void addAsyncDependency(Operation *op, Value token);
 } // end namespace soda
 } // end namespace mlir
 
+#include "soda/Dialect/SODA/SODAOpsEnums.h.inc"
+
 #include "soda/Dialect/SODA/SODAOpsDialect.h.inc"
 
 #include "soda/Dialect/SODA/SODAOpInterfaces.h.inc"
+
+#define GET_ATTRDEF_CLASSES
+#include "soda/Dialect/SODA/SODAOpsAttributes.h.inc"
 
 #define GET_OP_CLASSES
 #include "soda/Dialect/SODA/SODAOps.h.inc"

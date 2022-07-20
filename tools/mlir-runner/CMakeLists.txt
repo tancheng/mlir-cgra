@@ -14,7 +14,7 @@ target_link_libraries(mlir-runner PRIVATE
   MLIRExecutionEngine
   MLIRIR
   MLIRJitRunner
-  MLIRLLVMIR  
+  MLIRLLVMDialect  
   MLIRLLVMToLLVMIRTranslation
   MLIRParser
   MLIRTargetLLVMIRExport

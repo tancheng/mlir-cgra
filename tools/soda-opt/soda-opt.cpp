@@ -8,7 +8,7 @@
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Support/FileUtilities.h"
-#include "mlir/Support/MlirOptMain.h"
+#include "mlir/Tools/mlir-opt/MlirOptMain.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/InitLLVM.h"
 #include "llvm/Support/SourceMgr.h"
@@ -23,7 +23,7 @@
 #include "soda/Misc/Pipelines.h"
 
 #include "mlir/Dialect/Arithmetic/Transforms/Passes.h"
-#include "mlir/Dialect/StandardOps/Transforms/Passes.h"
+#include "mlir/Dialect/Func/Transforms/Passes.h"
 
 // Defined in the test directory, no public header.
 namespace mlir {
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
   mlir::registerConvertLinalgToStandardPass();
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
   mlir::registerLinalgLowerToAffineLoopsPass();
-  mlir::registerConvertStandardToLLVMPass();
+  mlir::registerConvertFuncToLLVMPass();
   mlir::registerConvertMemRefToLLVMPass();
   mlir::registerSCFToControlFlowPass();
   mlir::registerConvertAffineToStandardPass();
@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
   // clang-format off
-  registry.insert<mlir::StandardOpsDialect,
+  registry.insert<mlir::func::FuncDialect,
                   mlir::memref::MemRefDialect,
                   mlir::LLVM::LLVMDialect,
                   mlir::linalg::LinalgDialect,

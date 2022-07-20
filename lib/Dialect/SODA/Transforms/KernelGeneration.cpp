@@ -14,9 +14,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/IR/BlockAndValueMapping.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/FunctionInterfaces.h"
@@ -73,7 +73,7 @@ void SodaKernelGenerationPass::runOnOperation() {
     }
 
     BlockAndValueMapping map;
-    sodaOp.body().cloneInto(&(mop.body()), map);
+    sodaOp.body().cloneInto(&(mop.getRegion()), map);
     sodaOp.erase();
 
     modified = true;
@@ -95,10 +95,10 @@ void SodaKernelGenerationPass::runOnOperation() {
   mop.walk([this](soda::SODAFuncOp funcOp) {
     OpBuilder replacer(funcOp);
 
-    FuncOp dstFunc = replacer.create<mlir::FuncOp>(
-        funcOp.getLoc(), funcOp.getName(), funcOp.getType());
+    func::FuncOp dstFunc = replacer.create<func::FuncOp>(
+        funcOp.getLoc(), funcOp.getName(), funcOp.getFunctionType());
 
-    dstFunc.body().takeBody(funcOp.body());
+    dstFunc.getRegion().takeBody(funcOp.body());
     funcOp.erase();
 
     // Set all memref arguments to noalias
@@ -118,7 +118,7 @@ void SodaKernelGenerationPass::runOnOperation() {
 
   mop.walk([](soda::ReturnOp returnOp) {
     OpBuilder replacer(returnOp);
-    replacer.create<mlir::ReturnOp>(returnOp.getLoc());
+    replacer.create<mlir::func::ReturnOp>(returnOp.getLoc());
     returnOp.erase();
   });
 

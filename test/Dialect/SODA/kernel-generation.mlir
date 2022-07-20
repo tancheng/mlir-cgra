@@ -2,7 +2,7 @@
 // RUN: soda-opt -split-input-file -allow-unregistered-dialect -soda-outline-bambu-code -soda-generate-bambu-accelcode=no-aa %s | FileCheck %s --check-prefixes CHECKNOAA
 
 // CHECK: module attributes {soda.bambu.container_module
-func @driver() {
+func.func @driver() {
   // CHECK-NOT: "loadA"
   %A = "loadA"() : () -> (memref<512x512xf32>)
   // CHECK-NOT: "loadB"
@@ -24,13 +24,13 @@ func @driver() {
 // -----
 
 // CHECK: module attributes {soda.bambu.container_module
-func @complex() {
+func.func @complex() {
   %A = "loadA"() : () -> (memref<512x512xf32>)
-  %B = call @init_b(): () -> (memref<512x512xf32>)
+  %B = func.call @init_b(): () -> (memref<512x512xf32>)
 
   soda.launch  {
     // CHECK: call @init_c
-    %C = call @init_c(): () -> (memref<512x512xf32>)
+    %C = func.call @init_c(): () -> (memref<512x512xf32>)
     linalg.matmul ins(%A, %B : memref<512x512xf32>, memref<512x512xf32>)
                     outs(%C : memref<512x512xf32>)
     soda.terminator
@@ -39,16 +39,16 @@ func @complex() {
   return
 }
 
-// CHECK-NOT: func private @init_b
-func private @init_b() -> (memref<512x512xf32>)
-// CHECK: func private @init_c
-func private @init_c() -> (memref<512x512xf32>)
+// CHECK-NOT: func.func private @init_b
+func.func private @init_b() -> (memref<512x512xf32>)
+// CHECK: func.func private @init_c
+func.func private @init_c() -> (memref<512x512xf32>)
 
 // -----
 
-// CHECKNOAA: func @gemm_4_kernel(%arg0: memref<4x4xf32>, %arg1: f32, %arg2: memref<4x4xf32>, %arg3: memref<4x4xf32>, %arg4: f32) {
-// CHECK: func @gemm_4_kernel(%arg0: memref<4x4xf32> {llvm.noalias}, %arg1: f32, %arg2: memref<4x4xf32> {llvm.noalias}, %arg3: memref<4x4xf32> {llvm.noalias}, %arg4: f32) {
-func @gemm_4(%arg0: f32, %arg1: f32, %arg2: memref<4x4xf32>, %arg3: memref<4x4xf32>, %arg4: memref<4x4xf32>) {
+// CHECKNOAA: func.func @gemm_4_kernel(%arg0: memref<4x4xf32>, %arg1: f32, %arg2: memref<4x4xf32>, %arg3: memref<4x4xf32>, %arg4: f32) {
+// CHECK: func.func @gemm_4_kernel(%arg0: memref<4x4xf32> {llvm.noalias}, %arg1: f32, %arg2: memref<4x4xf32> {llvm.noalias}, %arg3: memref<4x4xf32> {llvm.noalias}, %arg4: f32) {
+func.func @gemm_4(%arg0: f32, %arg1: f32, %arg2: memref<4x4xf32>, %arg3: memref<4x4xf32>, %arg4: memref<4x4xf32>) {
   soda.launch {                                                                                                                            
     affine.for %arg5 = 0 to 4 {                                                                                 
       affine.for %arg6 = 0 to 4 {                                                                        

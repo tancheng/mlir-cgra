@@ -15,10 +15,10 @@ add_mlir_dialect_library(MLIRSNNOps
   LINK_LIBS PUBLIC
   MLIRDialectUtils
   MLIRIR
-  MLIRTensor
+  MLIRTensorDialect
   MLIRInferTypeOpInterface
   MLIRSideEffectInterfaces
   MLIRSupport
-  MLIRStandard
+  MLIRFuncDialect
   MLIRViewLikeInterface
   )

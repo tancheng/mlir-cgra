@@ -1,7 +1,7 @@
 #!/bin/bash
 
 docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
-tf-mlir-translate \
+tf-mlir-translate -opaque-pointers=0  \
   --graphdef-to-mlir \
   --tf-input-arrays=x1 \
   --tf-input-data-types=DT_FLOAT \

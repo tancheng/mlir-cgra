@@ -14,8 +14,8 @@
 
 #include "soda/Dialect/SODA/SODADialect.h"
 
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/IR/Attributes.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/DialectImplementation.h"
@@ -126,7 +126,7 @@ LogicalResult SODADialect::verifyOperationAttribute(Operation *op,
              << actualNumArguments << " kernel operands but expected "
              << expectedNumArguments;
 
-    auto functionType = kernelSODAFunction.getType();
+    auto functionType = kernelSODAFunction.getFunctionType();
     for (unsigned i = 0; i < expectedNumArguments; ++i) {
       if (launchOp.getKernelOperand(i).getType() != functionType.getInput(i)) {
         return launchOp.emitOpError("type of function argument ")
@@ -234,9 +234,9 @@ void LaunchOp::print(OpAsmPrinter &p) {
 ParseResult LaunchOp::parse(OpAsmParser &parser, OperationState &result) {
 
   // Region arguments to be created.
-  SmallVector<OpAsmParser::OperandType, 16> regionArgs(
+  SmallVector<OpAsmParser::UnresolvedOperand, 16> regionArgs(
       LaunchOp::kNumConfigRegionAttributes);
-  MutableArrayRef<OpAsmParser::OperandType> regionArgsRef(regionArgs);
+  MutableArrayRef<OpAsmParser::UnresolvedOperand> regionArgsRef(regionArgs);
 
   // Introduce the body region and parse it. The region has
   // kNumConfigRegionAttributes arguments that correspond to
@@ -244,9 +244,21 @@ ParseResult LaunchOp::parse(OpAsmParser &parser, OperationState &result) {
   Type index = parser.getBuilder().getIndexType();
   SmallVector<Type, LaunchOp::kNumConfigRegionAttributes> dataTypes(
       LaunchOp::kNumConfigRegionAttributes, index);
+
+  SmallVector<OpAsmParser::Argument> regionArguments;
+  for (auto ssaValueAndType : llvm::zip(regionArgs, dataTypes)) {
+    OpAsmParser::Argument arg;
+    arg.ssaName = std::get<0>(ssaValueAndType);
+    arg.type = std::get<1>(ssaValueAndType);
+    regionArguments.push_back(arg);
+  }
+
   Region *body = result.addRegion();
-  return failure(parser.parseRegion(*body, regionArgs, dataTypes) ||
-                 parser.parseOptionalAttrDict(result.attributes));
+  if (parser.parseRegion(*body, regionArguments) ||
+      parser.parseOptionalAttrDict(result.attributes)) {
+    return failure();
+  }
+  return success();
 }
 
 //===----------------------------------------------------------------------===//
@@ -285,36 +297,41 @@ Value LaunchFuncOp::getKernelOperand(unsigned i) {
   return getOperand(asyncDependencies().size() + kNumConfigOperands + i);
 }
 
-static LogicalResult verify(LaunchFuncOp op) {
-  auto module = op->getParentOfType<ModuleOp>();
+LogicalResult LaunchFuncOp::verify() {
+  auto module = (*this)->getParentOfType<ModuleOp>();
   if (!module)
-    return op.emitOpError("expected to belong to a module");
+    return emitOpError("expected to belong to a module");
+
   if (!module->getAttrOfType<UnitAttr>(
           SODADialect::getContainerModuleAttrName()))
-    return op.emitOpError(
-        "expected the closest surrounding module to have the '" +
-        SODADialect::getContainerModuleAttrName() + "'attribute");
-  auto kernelAttr = op->getAttrOfType<SymbolRefAttr>(op.getKernelAttrName());
+    return emitOpError("expected the closest surrounding module to have the '" +
+                       SODADialect::getContainerModuleAttrName() +
+                       "'attribute");
+
+  auto kernelAttr = (*this)->getAttrOfType<SymbolRefAttr>(getKernelAttrName());
   if (!kernelAttr)
-    return op.emitOpError("symbol reference attribute '" +
-                          op.getKernelAttrName() + "' must be specified");
+    return emitOpError("symbol reference attribute '" + getKernelAttrName() +
+                       "' must be specified");
 
   return success();
 }
 
-static ParseResult
-parseLaunchFuncOperands(OpAsmParser &parser,
-                        SmallVectorImpl<OpAsmParser::OperandType> &argNames,
-                        SmallVectorImpl<Type> &argTypes) {
+static ParseResult parseLaunchFuncOperands(
+    OpAsmParser &parser,
+    SmallVectorImpl<OpAsmParser::UnresolvedOperand> &argNames,
+    SmallVectorImpl<Type> &argTypes) {
   if (parser.parseOptionalKeyword("args"))
     return success();
-  SmallVector<NamedAttrList> argAttrs;
-  SmallVector<Location> argLocations;
-  bool isVariadic = false;
-  return function_interface_impl::parseFunctionArgumentList(
-      parser, /*allowAttributes=*/false,
-      /*allowVariadic=*/false, argNames, argTypes, argAttrs, argLocations,
-      isVariadic);
+
+  SmallVector<OpAsmParser::Argument> args;
+  if (parser.parseArgumentList(args, OpAsmParser::Delimiter::Paren,
+                               /*allowType=*/true))
+    return failure();
+  for (auto &arg : args) {
+    argNames.push_back(arg.ssaName);
+    argTypes.push_back(arg.type);
+  }
+  return success();
 }
 
 static void printLaunchFuncOperands(OpAsmPrinter &printer, Operation *,
@@ -342,8 +359,8 @@ BlockArgument SODAFuncOp::addWorkgroupAttribution(Type type, Location loc) {
   auto attr = (*this)->getAttrOfType<IntegerAttr>(attrName);
   (*this)->setAttr(attrName,
                    IntegerAttr::get(attr.getType(), attr.getValue() + 1));
-  return getBody().insertArgument(getType().getNumInputs() + attr.getInt(),
-                                  type, loc);
+  return getBody().insertArgument(
+      getFunctionType().getNumInputs() + attr.getInt(), type, loc);
 }
 
 /// Adds a new block argument that corresponds to buffers located in
@@ -387,31 +404,13 @@ void SODAFuncOp::build(OpBuilder &builder, OperationState &result,
 /// keyword provided as argument.
 static ParseResult
 parseAttributions(OpAsmParser &parser, StringRef keyword,
-                  SmallVectorImpl<OpAsmParser::OperandType> &args,
-                  SmallVectorImpl<Type> &argTypes) {
+                  SmallVectorImpl<OpAsmParser::Argument> &args) {
   // If we could not parse the keyword, just assume empty list and succeed.
   if (failed(parser.parseOptionalKeyword(keyword)))
     return success();
 
-  if (failed(parser.parseLParen()))
-    return failure();
-
-  // Early exit for an empty list.
-  if (succeeded(parser.parseOptionalRParen()))
-    return success();
-
-  do {
-    OpAsmParser::OperandType arg;
-    Type type;
-
-    if (parser.parseRegionArgument(arg) || parser.parseColonType(type))
-      return failure();
-
-    args.push_back(arg);
-    argTypes.push_back(type);
-  } while (succeeded(parser.parseOptionalComma()));
-
-  return parser.parseRParen();
+  return parser.parseArgumentList(args, OpAsmParser::Delimiter::Paren,
+                                  /*allowType=*/true);
 }
 
 /// Parses a SODA function.
@@ -420,12 +419,11 @@ parseAttributions(OpAsmParser &parser, StringRef keyword,
 ///                 (`->` function-result-list)? memory-attribution `kernel`?
 ///                 function-attributes? region
 ParseResult SODAFuncOp::parse(OpAsmParser &parser, OperationState &result) {
-  SmallVector<OpAsmParser::OperandType> entryArgs;
-  SmallVector<NamedAttrList> argAttrs;
-  SmallVector<NamedAttrList> resultAttrs;
-  SmallVector<Type> argTypes;
+  SmallVector<OpAsmParser::Argument> entryArgs;
+  // SmallVector<NamedAttrList> argAttrs;
+  SmallVector<DictionaryAttr> resultAttrs;
   SmallVector<Type> resultTypes;
-  SmallVector<Location> argLocations;
+  // SmallVector<Location> argLocations;
   bool isVariadic;
 
   // Parse the function name.
@@ -436,23 +434,30 @@ ParseResult SODAFuncOp::parse(OpAsmParser &parser, OperationState &result) {
 
   auto signatureLocation = parser.getCurrentLocation();
   if (failed(function_interface_impl::parseFunctionSignature(
-          parser, /*allowVariadic=*/false, entryArgs, argTypes, argAttrs,
-          argLocations, isVariadic, resultTypes, resultAttrs)))
+          parser, /*allowVariadic=*/false, entryArgs, isVariadic, resultTypes,
+          resultAttrs)))
     return failure();
 
-  if (entryArgs.empty() && !argTypes.empty())
+  if (!entryArgs.empty() && entryArgs[0].ssaName.name.empty())
     return parser.emitError(signatureLocation)
            << "soda.func requires named arguments";
 
   // Construct the function type. More types will be added to the region, but
   // not to the function type.
   Builder &builder = parser.getBuilder();
+
+  SmallVector<Type> argTypes;
+  for (auto &arg : entryArgs)
+    argTypes.push_back(arg.type);
   auto type = builder.getFunctionType(argTypes, resultTypes);
   result.addAttribute(SODAFuncOp::getTypeAttrName(), TypeAttr::get(type));
 
+  function_interface_impl::addArgAndResultAttrs(builder, result, entryArgs,
+                                                resultAttrs);
+
   // Parse workgroup memory attributions.
   if (failed(parseAttributions(parser, SODAFuncOp::getWorkgroupKeyword(),
-                               entryArgs, argTypes)))
+                               entryArgs)))
     return failure();
 
   // Store the number of operands we just parsed as the number of workgroup
@@ -463,7 +468,7 @@ ParseResult SODAFuncOp::parse(OpAsmParser &parser, OperationState &result) {
 
   // Parse private memory attributions.
   if (failed(parseAttributions(parser, SODAFuncOp::getPrivateKeyword(),
-                               entryArgs, argTypes)))
+                               entryArgs)))
     return failure();
 
   // Parse the kernel attribute if present.
@@ -474,13 +479,11 @@ ParseResult SODAFuncOp::parse(OpAsmParser &parser, OperationState &result) {
   // Parse attributes.
   if (failed(parser.parseOptionalAttrDictWithKeyword(result.attributes)))
     return failure();
-  function_interface_impl::addArgAndResultAttrs(builder, result, argAttrs,
-                                                resultAttrs);
 
   // Parse the region. If no argument names were provided, take all names
   // (including those of attributions) from the entry block.
   auto *body = result.addRegion();
-  return parser.parseRegion(*body, entryArgs, argTypes);
+  return parser.parseRegion(*body, entryArgs);
 }
 
 static void printAttributions(OpAsmPrinter &p, StringRef keyword,
@@ -499,10 +502,10 @@ void SODAFuncOp::print(OpAsmPrinter &p) {
   p << ' ';
   p.printSymbolName(getName());
 
-  FunctionType type = getType();
-  function_interface_impl::printFunctionSignature(
-      p, getOperation(), type.getInputs(),
-      /*isVariadic=*/false, type.getResults());
+  FunctionType type = getFunctionType();
+  function_interface_impl::printFunctionSignature(p, *this, type.getInputs(),
+                                                  /*isVariadic=*/false,
+                                                  type.getResults());
 
   printAttributions(p, getWorkgroupKeyword(), getWorkgroupAttributions());
   printAttributions(p, getPrivateKeyword(), getPrivateAttributions());
@@ -518,12 +521,12 @@ void SODAFuncOp::print(OpAsmPrinter &p) {
 
 /// Hook for FunctionLike verifier.
 LogicalResult SODAFuncOp::verifyType() {
-  Type type = getTypeAttr().getValue();
+  Type type = getFunctionTypeAttr().getValue();
   if (!type.isa<FunctionType>())
     return emitOpError("requires '" + getTypeAttrName() +
                        "' attribute of function type");
 
-  if (isKernel() && getType().getNumResults() != 0)
+  if (isKernel() && getFunctionType().getNumResults() != 0)
     return emitOpError() << "expected void return type for kernel function";
 
   return success();
@@ -557,7 +560,7 @@ LogicalResult SODAFuncOp::verifyBody() {
                          << numFuncArguments + numWorkgroupAttributions
                          << " arguments to body region";
 
-  ArrayRef<Type> funcArgTypes = getType().getInputs();
+  ArrayRef<Type> funcArgTypes = getFunctionType().getInputs();
   for (unsigned i = 0; i < numFuncArguments; ++i) {
     Type blockArgType = front().getArgument(i).getType();
     if (funcArgTypes[i] != blockArgType)
@@ -579,25 +582,25 @@ LogicalResult SODAFuncOp::verifyBody() {
 // ReturnOp
 //===----------------------------------------------------------------------===//
 
-static LogicalResult verify(soda::ReturnOp returnOp) {
-  SODAFuncOp function = returnOp->getParentOfType<SODAFuncOp>();
+LogicalResult soda::ReturnOp::verify() {
+  SODAFuncOp function = (*this)->getParentOfType<SODAFuncOp>();
 
-  FunctionType funType = function.getType();
+  FunctionType funType = function.getFunctionType();
 
-  if (funType.getNumResults() != returnOp.operands().size())
-    return returnOp.emitOpError()
+  if (funType.getNumResults() != operands().size())
+    return emitOpError()
         .append("expected ", funType.getNumResults(), " result operands")
         .attachNote(function.getLoc())
         .append("return type declared here");
 
-  for (auto pair : llvm::enumerate(
-           llvm::zip(function.getType().getResults(), returnOp.operands()))) {
+  for (const auto &pair : llvm::enumerate(
+           llvm::zip(function.getFunctionType().getResults(), operands()))) {
     Type type;
     Value operand;
     std::tie(type, operand) = pair.value();
     if (type != operand.getType())
-      return returnOp.emitOpError() << "unexpected type `" << operand.getType()
-                                    << "' for operand #" << pair.index();
+      return emitOpError() << "unexpected type `" << operand.getType()
+                           << "' for operand #" << pair.index();
   }
   return success();
 }
@@ -625,7 +628,7 @@ ParseResult SODAModuleOp::parse(OpAsmParser &parser, OperationState &result) {
 
   // Parse the module body.
   auto *body = result.addRegion();
-  if (parser.parseRegion(*body, None, None))
+  if (parser.parseRegion(*body, {}))
     return failure();
 
   // Ensure that this module has a valid terminator.
@@ -645,7 +648,7 @@ void SODAModuleOp::print(OpAsmPrinter &p) {
 
 static ParseResult parseAsyncDependencies(
     OpAsmParser &parser, Type &asyncTokenType,
-    SmallVectorImpl<OpAsmParser::OperandType> &asyncDependencies) {
+    SmallVectorImpl<OpAsmParser::UnresolvedOperand> &asyncDependencies) {
   auto loc = parser.getCurrentLocation();
   if (succeeded(parser.parseOptionalKeyword("async"))) {
     if (parser.getNumResults() == 0)
@@ -669,6 +672,10 @@ static void printAsyncDependencies(OpAsmPrinter &printer, Operation *op,
 }
 
 #include "soda/Dialect/SODA/SODAOpInterfaces.cpp.inc"
+#include "soda/Dialect/SODA/SODAOpsEnums.cpp.inc"
+
+#define GET_ATTRDEF_CLASSES
+#include "soda/Dialect/SODA/SODAOpsAttributes.cpp.inc"
 
 #define GET_OP_CLASSES
 #include "soda/Dialect/SODA/SODAOps.cpp.inc"

@@ -62,7 +62,7 @@ struct AffineLoopTiling : public AffineLoopTilingBase<AffineLoopTiling> {
 
 /// Creates a pass to perform loop tiling on all suitable loop nests of a
 /// Function.
-std::unique_ptr<OperationPass<FuncOp>>
+std::unique_ptr<OperationPass<func::FuncOp>>
 mlir::soda::createAffineLoopTilingPass(unsigned tileSize) {
   return std::make_unique<AffineLoopTiling>(tileSize);
 }

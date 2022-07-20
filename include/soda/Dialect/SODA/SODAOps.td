@@ -16,6 +16,7 @@
 #define SODA_OPS
 
 include "soda/Dialect/SODA/SODABase.td"
+include "mlir/IR/EnumAttr.td"
 include "mlir/Dialect/LLVMIR/LLVMOpBase.td"
 include "mlir/IR/FunctionInterfaces.td"
 include "mlir/IR/SymbolInterfaces.td"
@@ -28,10 +29,21 @@ include "mlir/Interfaces/SideEffectInterfaces.td"
 class SODA_Op<string mnemonic, list<Trait> traits = []> :
     Op<SODA_Dialect, mnemonic, traits>;
 
+def SODA_Dimension : I32EnumAttr<"Dimension",
+    "a dimension, either 'x', 'y', or 'z'",
+    [
+      I32EnumAttrCase<"x", 0>,
+      I32EnumAttrCase<"y", 1>,
+      I32EnumAttrCase<"z", 2>
+    ]>{
+  let genSpecializedAttr = 0;
+  let cppNamespace = "::mlir::soda";
+}
+def SODA_DimensionAttr : EnumAttr<SODA_Dialect, SODA_Dimension, "dim">;
+
 class SODA_IndexOp<string mnemonic, list<Trait> traits = []> :
     SODA_Op<mnemonic, !listconcat(traits, [NoSideEffect])>,
     Arguments<(ins StrAttr:$dimension)>, Results<(outs Index)> {
-  let verifier = [{ return ::verifyIndexOp(*this); }];
 }
 
 
@@ -95,6 +107,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
     attribution.
   }];
 
+  let arguments = (ins TypeAttrOf<FunctionType>:$function_type);
   let regions = (region AnyRegion:$body);
 
   let skipDefaultBuilders = 1;
@@ -134,7 +147,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
     /// the workgroup memory
     ArrayRef<BlockArgument> getWorkgroupAttributions() {
       auto begin =
-          std::next(getBody().args_begin(), getType().getNumInputs());
+          std::next(getBody().args_begin(), getFunctionType().getNumInputs());
       auto end = std::next(begin, getNumWorkgroupAttributions());
       return {begin, end};
     }
@@ -145,7 +158,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
 
     /// Returns the number of buffers located in the private memory.
     unsigned getNumPrivateAttributions() {
-      return getBody().getNumArguments() - getType().getNumInputs() -
+      return getBody().getNumArguments() - getFunctionType().getNumInputs() -
           getNumWorkgroupAttributions();
     }
 
@@ -156,7 +169,7 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
       // memory.
       auto begin =
           std::next(getBody().args_begin(),
-                    getType().getNumInputs() + getNumWorkgroupAttributions());
+                    getFunctionType().getNumInputs() + getNumWorkgroupAttributions());
       return {begin, getBody().args_end()};
     }
 
@@ -172,26 +185,24 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
 
     /// Returns the type of this function.
     /// FIXME: We should drive this via the ODS `type` param.
-    FunctionType getType() {
-      return getTypeAttr().getValue().cast<FunctionType>();
-    }
+    FunctionType getFunctionType() { return function_type(); }
 
     /// Returns the argument types of this function.
-    ArrayRef<Type> getArgumentTypes() { return getType().getInputs(); }
+    ArrayRef<Type> getArgumentTypes() { return getFunctionType().getInputs(); }
 
     /// Returns the result types of this function.
-    ArrayRef<Type> getResultTypes() { return getType().getResults(); }
+    ArrayRef<Type> getResultTypes() { return getFunctionType().getResults(); }
 
-    /// Hooks for the input/output type enumeration in FunctionLike .
-    unsigned getNumFuncArguments() { return getType().getNumInputs(); }
-    unsigned getNumFuncResults() { return getType().getNumResults(); }
+    // /// Hooks for the input/output type enumeration in FunctionLike .
+    // unsigned getNumFuncArguments() { return getFunctionType().getNumInputs(); }
+    // unsigned getNumFuncResults() { return getFunctionType().getNumResults(); }
 
     /// Returns the keywords used in the custom syntax for this Op.
     static StringRef getWorkgroupKeyword() { return "workgroup"; }
     static StringRef getPrivateKeyword() { return "private"; }
     static StringRef getKernelKeyword() { return "kernel"; }
 
-    /// Hook for FunctionLike verifier.
+    /// Hook for FunctionOpInterface verifier.
     LogicalResult verifyType();
 
     /// Verifies the body of the function.
@@ -299,13 +310,13 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
     static StringRef getKernelAttrName() { return "kernel"; }
   }];
 
-  let verifier = [{ return ::verify(*this); }];
   let assemblyFormat = [{
       custom<AsyncDependencies>(type($asyncToken), $asyncDependencies)
       $kernel
       custom<LaunchFuncOperands>($operands, type($operands))
       attr-dict
   }];
+  let hasVerifier = 1;
 }
 
 def SODA_LaunchOp : SODA_Op<"launch">,
@@ -376,7 +387,7 @@ def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, NoSideEffect,
   let builders = [OpBuilder<(ins), [{ // empty}]>];
 
   let assemblyFormat = "attr-dict ($operands^ `:` type($operands))?";
-  let verifier = [{ return ::verify(*this); }];
+  let hasVerifier = 1;
 }
 
 def SODA_TerminatorOp : SODA_Op<"terminator", [HasParent<"LaunchOp">,
@@ -501,7 +512,6 @@ def SODA_HostRegisterOp : SODA_Op<"host_register">,
   }];
 
   let assemblyFormat = "$value attr-dict `:` type($value)";
-  let verifier = [{ return success(); }];
 }
 
 def SODA_WaitOp : SODA_Op<"wait", [SODA_AsyncOpInterface]> {

@@ -1,7 +1,7 @@
 // RUN: soda-opt -allow-unregistered-dialect -soda-generate-bambu-hostcode %s -split-input-file | FileCheck %s
 
 module attributes {soda.container_module}  {
-  func @driver() {
+  func.func @driver() {
     %0 = "loadA"() : () -> memref<512x512xf32>
     %1 = "loadB"() : () -> memref<512x512xf32>
     %2 = "allocateC"() : () -> memref<512x512xf32>
@@ -18,8 +18,8 @@ module attributes {soda.container_module}  {
   }
 }
 
-// CHECK:         func private @acc_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
-// CHECK-LABEL:   func @driver()
+// CHECK:         func.func private @acc_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
+// CHECK-LABEL:   func.func @driver()
 // CHECK:             call @acc_krnl(%0, %1, %2)
 // CHECK-NOT:     soda.launch_func
 // CHECK-NOT:     soda.module
@@ -28,7 +28,7 @@ module attributes {soda.container_module}  {
 // -----
 
 module attributes {soda.container_module}  {
-  func @driver() {
+  func.func @driver() {
     %0 = "loadA"() : () -> memref<512x512xf32>
     %1 = "loadB"() : () -> memref<512x512xf32>
     %2 = "loadB"() : () -> memref<512x512xf32>
@@ -48,8 +48,8 @@ module attributes {soda.container_module}  {
   }
 }
 
-// CHECK:         func private @acc_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
-// CHECK-LABEL:   func @driver() {
+// CHECK:         func.func private @acc_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
+// CHECK-LABEL:   func.func @driver() {
 // CHECK:             call @acc_krnl(%0, %1, %3)
 // CHECK-NEXT:        call @acc_krnl(%0, %2, %4)
 
@@ -60,7 +60,7 @@ module attributes {soda.container_module}  {
 // -----
 
 module attributes {soda.container_module}  {
-  func @driver() {
+  func.func @driver() {
     %0 = "loadA"() : () -> memref<512x512xf32>
     %1 = "loadB"() : () -> memref<512x512xf32>
     %2 = "loadB"() : () -> memref<512x512xf32>
@@ -90,9 +90,9 @@ module attributes {soda.container_module}  {
   }
 }
 
-// CHECK:         func private @acc2_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
-// CHECK:         func private @acc1_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
-// CHECK-LABEL:   func @driver() {
+// CHECK:         func.func private @acc2_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
+// CHECK:         func.func private @acc1_krnl(memref<512x512xf32>, memref<512x512xf32>, memref<512x512xf32>)
+// CHECK-LABEL:   func.func @driver() {
 // CHECK:             call @acc1_krnl(%0, %1, %3)
 // CHECK-NEXT:        call @acc1_krnl(%0, %1, %3)
 // CHECK-NEXT:        call @acc2_krnl(%0, %2, %4)

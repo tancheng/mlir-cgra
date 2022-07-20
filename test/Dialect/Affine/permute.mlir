@@ -2,7 +2,7 @@
 // RUN: soda-opt %s -test-loop-permutation="permutation-map=0,2,1" | FileCheck %s --check-prefix=CHECK-021
 // RUN: soda-opt %s -test-loop-permutation="permutation-map=1,2,0" | FileCheck %s --check-prefix=CHECK-120
 
-func @permute(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>) -> memref<4x4xf32> {
+func.func @permute(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>) -> memref<4x4xf32> {
   affine.for %i = 0 to 4 {
     affine.for %j = 0 to 4 {
       affine.for %k = 0 to 4 {

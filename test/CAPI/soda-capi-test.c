@@ -15,19 +15,20 @@ int main(int argc, char **argv) {
   mlirDialectHandleRegisterDialect(mlirGetDialectHandle__soda__(), ctx);
 
   MlirModule module = mlirModuleCreateParse(
-      ctx, mlirStringRefCreateFromCString(
-               "func private @krnl_kernel_krnl_kernel(memref<?xf32>, "
-               "memref<?xf32>)\n"
-               "func private @dummy() -> memref<?xf32>\n"
-               "func @krnl(%arg0: memref<?xf32>) {\n"
-               "  soda.launch {\n"
-               "    %0 = call @dummy() : () -> memref<?xf32>\n"
-               "    call @krnl_kernel_krnl_kernel(%arg0, %0) : (memref<?xf32>, "
-               "memref<?xf32>) -> ()\n"
-               "    soda.terminator\n"
-               "  }\n"
-               "  return\n"
-               "}\n"));
+      ctx,
+      mlirStringRefCreateFromCString(
+          "func.func private @krnl_kernel_krnl_kernel(memref<?xf32>, "
+          "memref<?xf32>)\n"
+          "func.func private @dummy() -> memref<?xf32>\n"
+          "func.func @krnl(%arg0: memref<?xf32>) {\n"
+          "  soda.launch {\n"
+          "    %0 = func.call @dummy() : () -> memref<?xf32>\n"
+          "    func.call @krnl_kernel_krnl_kernel(%arg0, %0) : (memref<?xf32>, "
+          "memref<?xf32>) -> ()\n"
+          "    soda.terminator\n"
+          "  }\n"
+          "  return\n"
+          "}\n"));
   if (mlirModuleIsNull(module)) {
     printf("ERROR: Could not parse.\n");
     mlirContextDestroy(ctx);

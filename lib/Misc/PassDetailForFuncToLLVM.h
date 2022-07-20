@@ -16,10 +16,11 @@
 #include "mlir/Pass/Pass.h"
 
 #include "mlir/Conversion/GPUToROCDL/Runtimes.h"
+#include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/FunctionInterfaces.h"
 
 namespace mlir {
 class AffineDialect;
-class StandardOpsDialect;
 
 // Forward declaration from Dialect.h
 template <typename ConcreteDialect>
@@ -46,9 +47,21 @@ class GPUDialect;
 class GPUModuleOp;
 } // namespace gpu
 
+namespace func {
+class FuncDialect;
+} // namespace func
+
+namespace linalg {
+class LinalgDialect;
+} // namespace linalg
+
 namespace LLVM {
 class LLVMDialect;
 } // namespace LLVM
+
+namespace nvgpu {
+class NVGPUDialect;
+}
 
 namespace NVVM {
 class NVVMDialect;
@@ -101,6 +114,6 @@ class ArmNeonDialect;
 #define GEN_PASS_CLASSES
 #include "mlir/Conversion/Passes.h.inc"
 
-} // end namespace mlir
+} // namespace mlir
 
 #endif // MISC_CONVERSION_PASSDETAIL_H_

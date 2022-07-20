@@ -5,6 +5,7 @@
 #define DIALECT_SODA_MISC_PASSDETAIL_H_
 
 #include "mlir/Dialect/Affine/Passes.h"
+#include "mlir/IR/Dialect.h"
 #include "mlir/Pass/Pass.h"
 
 namespace mlir {

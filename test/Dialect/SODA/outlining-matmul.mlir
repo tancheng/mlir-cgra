@@ -2,8 +2,8 @@
 
 // CHECK: module attributes {soda.container_module}
 
-// CHECK-LABEL: func @driver()
-func @driver() {
+// CHECK-LABEL: func.func @driver()
+func.func @driver() {
   // CHECK: %[[ARG0:.*]] = "loadA"() : () -> memref<512x512xf32>
   %A = "loadA"() : () -> (memref<512x512xf32>)
   // CHECK: %[[ARG1:.*]] = "loadB"() : () -> memref<512x512xf32>

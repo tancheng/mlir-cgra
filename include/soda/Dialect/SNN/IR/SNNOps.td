@@ -19,11 +19,7 @@ include "mlir/Interfaces/SideEffectInterfaces.td"
 //===----------------------------------------------------------------------===//
 
 class SNN_Op<string mnemonic, list<Trait> traits = []> :
-    Op<SNN_Dialect, mnemonic, traits> {
-  let printer = [{ return ::print(p, *this); }];
-  let verifier = [{ return ::verify(*this); }];
-  let parser = [{ return ::parse$cppClass(parser, result); }];
-}
+    Op<SNN_Dialect, mnemonic, traits>;
 
 //===----------------------------------------------------------------------===//
 // DummyOp
@@ -47,7 +43,7 @@ def SNN_DummyOp : SNN_Op<"dummy", [ NoSideEffect
   let assemblyFormat = "$source attr-dict `:` type($source) `to` type($dest)";
 
   let hasCanonicalizer = 1;
-  let verifier = ?;
+  let hasVerifier = 0;
 }
 
 //===----------------------------------------------------------------------===//
@@ -72,7 +68,7 @@ def SNN_EncodeSpikeTrainOp : SNN_Op<"encode_spike_train", [ NoSideEffect
   let assemblyFormat = "$source attr-dict `:` type($source) `to` type($dest)";
 
   let hasCanonicalizer = 1;
-  let verifier = ?;
+  let hasVerifier = 0;
 }
 
 #endif // SNN_OPS

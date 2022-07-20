@@ -5,6 +5,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -63,7 +65,7 @@ Operation *getLastDominator(Operation *op) {
 
 void ForwardLinalgFill::runOnOperation() {
 
-  FuncOp funcOp = getOperation();
+  func::FuncOp funcOp = getOperation();
 
   funcOp->walk(
       [&](arith::ConstantOp op) { op->moveAfter(getLastDominator(op)); });
@@ -73,7 +75,7 @@ void ForwardLinalgFill::runOnOperation() {
 
 void ForwardMemrefCopy::runOnOperation() {
 
-  FuncOp funcOp = getOperation();
+  func::FuncOp funcOp = getOperation();
 
   funcOp->walk([&](memref::CopyOp op) { op->moveAfter(getLastDominator(op)); });
 }

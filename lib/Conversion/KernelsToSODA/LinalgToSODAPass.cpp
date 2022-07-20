@@ -9,8 +9,8 @@
 #include "../PassDetail.h"
 #include "soda/Conversion/KernelsToSODA/LinalgToSODA.h"
 
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
@@ -92,18 +92,21 @@ struct LinalgGenericMapper
 
 } // namespace
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createLinalgDotToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>> mlir::createLinalgDotToSODAPass() {
   return std::make_unique<LinalgDotMapper>();
 }
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createLinalgMatmulToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>>
+mlir::createLinalgMatmulToSODAPass() {
   return std::make_unique<LinalgMatmulMapper>();
 }
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createLinalgConvToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>>
+mlir::createLinalgConvToSODAPass() {
   return std::make_unique<LinalgConvMapper>();
 }
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createLinalgGenericToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>>
+mlir::createLinalgGenericToSODAPass() {
   return std::make_unique<LinalgGenericMapper>();
 }

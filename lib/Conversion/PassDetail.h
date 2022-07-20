@@ -6,24 +6,28 @@
 
 #include "mlir/Pass/Pass.h"
 
+#include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/FunctionInterfaces.h"
+
 namespace mlir {
 class AffineDialect;
-class StandardOpsDialect;
 
 // Forward declaration from Dialect.h
 template <typename ConcreteDialect>
 void registerDialect(DialectRegistry &registry);
+
+namespace func {
+class FuncOp;
+} // end namespace func
 
 namespace soda {
 class SODADialect;
 class SODAModuleOp;
 } // end namespace soda
 
-
 namespace scf {
 class SCFDialect;
 } // end namespace scf
-
 
 #define GEN_PASS_CLASSES
 #include "soda/Conversion/Passes.h.inc"

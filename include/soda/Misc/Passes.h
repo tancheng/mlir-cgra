@@ -13,6 +13,7 @@
 #ifndef SODA_MISC_PASSES_H
 #define SODA_MISC_PASSES_H
 
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassRegistry.h"
 #include <memory>
@@ -22,6 +23,7 @@ class Pass;
 } // namespace mlir
 
 namespace mlir {
+class ModuleOp;
 namespace memref {
 class DeallocOp;
 class AllocOp;
@@ -55,17 +57,17 @@ void populateEraseMemrefDeallocPattern(RewritePatternSet &patterns);
 /// Performs packing (or explicit copying) of accessed memref regions into
 /// buffers in the specified faster memory space through either pointwise copies
 /// or DMA operations.
-std::unique_ptr<OperationPass<FuncOp>> createAffineDataCopyGenPass(
+std::unique_ptr<OperationPass<func::FuncOp>> createAffineDataCopyGenPass(
     unsigned slowMemorySpace, unsigned fastMemorySpace,
     unsigned tagMemorySpace = 0, int minDmaTransferSize = 1024,
     uint64_t fastMemCapacityBytes = std::numeric_limits<uint64_t>::max(),
     bool generateDma = false);
 
 /// Expose affine loop tiling creation with explicit tileSize selection
-std::unique_ptr<OperationPass<FuncOp>>
+std::unique_ptr<OperationPass<func::FuncOp>>
 createAffineLoopTilingPass(unsigned tileSize);
 
-std::unique_ptr<OperationPass<FuncOp>>
+std::unique_ptr<OperationPass<func::FuncOp>>
 createAffineLoopPermutationPass(const ArrayRef<unsigned> &permList);
 
 //===----------------------------------------------------------------------===//
@@ -79,9 +81,9 @@ createAffineLoopPermutationPass(const ArrayRef<unsigned> &permList);
 /// obtained at runtime.
 ///
 /// This pass is based on:
-///    https://github.com/llvm/llvm-project/blob/main/mlir/lib/Conversion/StandardToLLVM/StandardToLLVM.cpp#L1250
+///    llvm-project/mlir/lib/Conversion/FuncToLLVM/FuncToLLVM.cpp
 std::unique_ptr<OperationPass<ModuleOp>>
-createStandardToLLVMPass(bool useBarePtrCallConv, bool emitCWrappers);
+createCustomFuncToLLVMPass(bool useBarePtrCallConv);
 
 //===----------------------------------------------------------------------===//
 // Register passes

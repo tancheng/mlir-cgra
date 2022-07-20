@@ -14,12 +14,12 @@
 
 #include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/IR/BlockAndValueMapping.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/SymbolTable.h"
-#include "mlir/Parser.h"
+#include "mlir/Parser/Parser.h"
 #include "mlir/Support/LLVM.h"
 #include "mlir/Transforms/RegionUtils.h"
 
@@ -34,8 +34,8 @@ using namespace mlir;
 /// operations may not have side-effects, as otherwise sinking (and hence
 /// duplicating them) is not legal.
 static bool isSinkingBeneficiary(Operation *op) {
-  return isa<arith::ConstantOp, ConstantOp, memref::DimOp, arith::SelectOp,
-             arith::CmpIOp>(op);
+  return isa<arith::ConstantOp, func::ConstantOp, memref::DimOp,
+             arith::SelectOp, arith::CmpIOp>(op);
 }
 
 /// For a given operation `op`, computes whether it is beneficial to sink the
@@ -212,21 +212,22 @@ public:
   void runOnOperation() override {
     SymbolTable symbolTable(getOperation());
     bool modified = false;
-    for (auto func : getOperation().getOps<FuncOp>()) {
+    for (auto func : getOperation().getOps<func::FuncOp>()) {
       // Insert just after the function.
       Block::iterator insertPt(func.getOperation()->getNextNode());
       auto funcWalkResult = func.walk([&](soda::LaunchOp op) {
         llvm::SetVector<Value> operands;
         std::string kernelFnName =
-            Twine(op->getParentOfType<FuncOp>().getName(), "_kernel").str();
+            Twine(op->getParentOfType<func::FuncOp>().getName(), "_kernel")
+                .str();
 
         // func.emitWarning()<< kernelFnName;
         // auto newName =
         //     (Twine(op.getKernelModuleName(), "_" +
         //     Twine(kernelFnName)).str();
 
-        // // auto func = getOperation().lookupSymbol<FuncOp>(newName);
-        // if(getOperation().lookupSymbol<FuncOp>(newName)){
+        // // auto func = getOperation().lookupSymbol<func::FuncOp>(newName);
+        // if(getOperation().lookupSymbol<func::FuncOp>(newName)){
         //   kernelFnName = kernelFnName+"_kernel";
         // }
 
@@ -271,7 +272,7 @@ private:
     std::string newModuleName = kernelFunc.getName().str();
     std::string possibleConflict =
         (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();
-    while (parentSymbolTable.lookup<FuncOp>(possibleConflict)) {
+    while (parentSymbolTable.lookup<func::FuncOp>(possibleConflict)) {
       newModuleName = newModuleName + "_m";
       possibleConflict =
           (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();

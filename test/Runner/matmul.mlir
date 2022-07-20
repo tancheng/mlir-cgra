@@ -6,7 +6,7 @@
 // RUN: -arith-expand   \
 // RUN: -memref-expand  \
 // RUN: --convert-arith-to-llvm \
-// RUN: --convert-std-to-llvm --reconcile-unrealized-casts \
+// RUN: --convert-func-to-llvm --reconcile-unrealized-casts \
 // RUN: | mlir-runner -e matmul_driver -entry-point-result=f32 \
 // RUN: | FileCheck %s
 
@@ -14,21 +14,21 @@
 // llvm-project/mlir/test/mlir-cpu-runner/linalg_integration_test.mlir
 
 // Performs AxB accumulating results on C
-func @matmul_kernel(%A:memref<?x?xf32>, %B:memref<?x?xf32>, %C : memref<?x?xf32>) {
+func.func @matmul_kernel(%A:memref<?x?xf32>, %B:memref<?x?xf32>, %C : memref<?x?xf32>) {
   linalg.matmul ins(%A, %B : memref<?x?xf32>, memref<?x?xf32>)
                 outs(%C : memref<?x?xf32>)
   return
 }
 
 // Creates and returns a 1-D buffer of size %s filled with the value %f
-func @alloc_filled_f32(%s : index, %f : f32) -> memref<?xi8> {
+func.func @alloc_filled_f32(%s : index, %f : f32) -> memref<?xi8> {
   %c0 = arith.constant 0 : index
   %c1 = arith.constant 1 : index
   %c4 = arith.constant 4 : index // 4 bytes in one f32 value
   %s4 = arith.muli %s, %c4: index
   %buf = memref.alloc(%s4) {alignment = 256} : memref<?xi8>
   %V = memref.view %buf[%c0][%s] : memref<?xi8> to memref<?xf32>
-  linalg.fill(%f, %V) : f32, memref<?xf32>
+  linalg.fill ins(%f:f32) outs(%V:memref<?xf32>)
   return %buf : memref<?xi8>
 }
 
@@ -39,7 +39,7 @@ func @alloc_filled_f32(%s : index, %f : f32) -> memref<?xi8> {
     // B=np.full((16, 2), 1.)
     // C=np.matmul(A,B)+10.
     // print(C[0,1])
-func @matmul_driver() -> f32 {
+func.func @matmul_driver() -> f32 {
   // Index of returned value
   %c0 = arith.constant 0 : index    // x, also 0 shift on the memref view
   %c1 = arith.constant 1 : index    // y

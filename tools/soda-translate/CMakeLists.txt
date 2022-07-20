@@ -16,7 +16,7 @@ target_link_libraries(soda-translate
   MLIRIR
   MLIRParser
   MLIRPass
-  MLIRTranslation
+  MLIRTranslateLib
   MLIRSupport
   )
 

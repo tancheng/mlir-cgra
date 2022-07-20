@@ -24,7 +24,7 @@ struct ForwardMemrefAlloc : public ForwardMemrefAllocBase<ForwardMemrefAlloc> {
 
 void ForwardMemrefAlloc::runOnOperation() {
 
-  FuncOp funcOp = getOperation();
+  func::FuncOp funcOp = getOperation();
 
   if (funcOp.isExternal())
     return;

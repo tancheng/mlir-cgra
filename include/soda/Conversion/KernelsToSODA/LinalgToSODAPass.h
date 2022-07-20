@@ -8,16 +8,18 @@
 #include <memory>
 
 namespace mlir {
+namespace func {
 class FuncOp;
+}
 template <typename T>
 class OperationPass;
 class Pass;
 
 /// Create a pass that converts linalg ops into soda launch ops.
-std::unique_ptr<OperationPass<FuncOp>> createLinalgDotToSODAPass();
-std::unique_ptr<OperationPass<FuncOp>> createLinalgMatmulToSODAPass();
-std::unique_ptr<OperationPass<FuncOp>> createLinalgConvToSODAPass();
-std::unique_ptr<OperationPass<FuncOp>> createLinalgGenericToSODAPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createLinalgDotToSODAPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createLinalgMatmulToSODAPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createLinalgConvToSODAPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createLinalgGenericToSODAPass();
 
 } // namespace mlir
 

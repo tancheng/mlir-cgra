@@ -369,7 +369,7 @@ class TestArgumentsToXMLPass
           //   int64_t strides[Rank]; // omitted when rank == 0
           // };
 
-          // But with `--convert-std-to-llvm=use-bare-ptr-memref-call-conv` we
+          // But with `--convert-func-to-llvm=use-bare-ptr-memref-call-conv` we
           // only have one pointer per memref, thus we only use need the number
           // of elements to generate the array and we can ignore the other
           // members

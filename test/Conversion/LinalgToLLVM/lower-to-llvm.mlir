@@ -2,7 +2,7 @@
 // RUN: soda-opt %s --soda-opt-pipeline-for-bambu="no-buffer-trick no-scalar-replacement no-alloca-promotion number-of-full-unrolls=0 emit-c-wrappers" | FileCheck %s -check-prefix=CHECK-WRAPPERS
 // RUN: soda-opt %s --soda-opt-pipeline-for-bambu="no-buffer-trick no-scalar-replacement no-alloca-promotion number-of-full-unrolls=0 use-bare-ptr-memref-call-conv" | FileCheck %s -check-prefix=CHECK-BARE
 
-func @matmul_kernel(%A:memref<4x4xf32>, %B:memref<4x4xf32>, %C : memref<4x4xf32>) {
+func.func @matmul_kernel(%A:memref<4x4xf32>, %B:memref<4x4xf32>, %C : memref<4x4xf32>) {
   linalg.matmul ins(%A, %B : memref<4x4xf32>, memref<4x4xf32>)
                 outs(%C : memref<4x4xf32>)
   return

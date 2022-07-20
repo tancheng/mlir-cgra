@@ -8,7 +8,7 @@
 #include "soda/Conversion/KernelsToSODA/AllToSODAPass.h"
 #include "../PassDetail.h"
 
-#include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
@@ -37,7 +37,7 @@ struct ConvertAllToSODAPass
   }
 
   void runOnOperation() override {
-    FuncOp funcOp = getOperation();
+    func::FuncOp funcOp = getOperation();
 
     if (!anchorFuncName.empty() && funcOp.getName() != anchorFuncName)
       return;
@@ -45,7 +45,7 @@ struct ConvertAllToSODAPass
     // Clone all ops
     std::vector<Operation *> opsToClone;
     for (Operation &op : llvm::make_early_inc_range(funcOp.getOps())) {
-      if (!(isa<ReturnOp>(&op))) {
+      if (!(isa<func::ReturnOp>(&op))) {
         opsToClone.push_back(&op);
       }
     }
@@ -76,6 +76,6 @@ struct ConvertAllToSODAPass
 
 } // namespace
 
-std::unique_ptr<OperationPass<FuncOp>> mlir::createAllToSODAPass() {
+std::unique_ptr<OperationPass<func::FuncOp>> mlir::createAllToSODAPass() {
   return std::make_unique<ConvertAllToSODAPass>();
 }
