@@ -136,7 +136,7 @@ struct OptForVitisHLSOptions : public PassPipelineOptions<OptForVitisHLSOptions>
       *this, "permutation-map",
       llvm::cl::desc("Specify the loop permutation. List size must match "
                      "number of affine.for loops."),
-      llvm::cl::OneOrMore, llvm::cl::CommaSeparated};
+      llvm::cl::OneOrMore};
 
   Option<bool> noBufferTrick{
       *this, "no-buffer-trick",
