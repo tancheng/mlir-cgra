@@ -401,11 +401,11 @@ void registerOptimizedForVitisHLSPass() {
         pm.addPass(arith::createConvertArithmeticToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
-          pm.addPass(createStandardToLLVMPass(options.useBarePtrCallConv,
-                                              options.emitCWrappers));
+          pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
         } else {
-          pm.addPass(createLowerToLLVMPass());
+          pm.addPass(createConvertFuncToLLVMPass());
         }
+        pm.addPass(cf::createConvertControlFlowToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
       });
 }
