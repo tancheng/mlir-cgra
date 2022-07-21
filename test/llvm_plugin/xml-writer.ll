@@ -1,5 +1,5 @@
 ; RUN: opt %s -load %sodashlibdir/XMLWriter%shlibext \
-; RUN:   -S -debug-pass-manager -enable-new-pm=0 -xml-mem-writer 
+; RUN:   -S -enable-new-pm=0 -xml-mem-writer 
 ; RUN: FileCheck %s -input-file=memory_allocation.xml --check-prefixes=CHECK_FILE
 
 declare i8* @malloc(i64)

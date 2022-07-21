@@ -17,6 +17,7 @@ set(SODA_TEST_DEPENDS
         mlir-runner
         AllocaNamer
         XMLWriter
+        VhlsLLVMRewriter
         )
 
 if(MLIR_ENABLE_BINDINGS_PYTHON)
