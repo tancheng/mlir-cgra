@@ -9,7 +9,7 @@ pushd $BAMBUDIR
 
 # docker run -u $(id -u):$(id -g) -v $PWD:/Panda-flow -v $PWD:/working_dir --rm agostini01/panda_openroad:latest \
 
-docker run -u $(id -u):$(id -g) -v $PWD:/working_dir --rm soda/soda:latest \
+docker run -u $(id -u):$(id -g) -v $PWD:/working_dir --rm agostini01/soda:latest \
 /bin/bash /working_dir/synthesize_Synthesis_main_kernel.sh
 
 popd
