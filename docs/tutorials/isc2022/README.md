@@ -31,7 +31,7 @@ Create a python environment with needed dependencies
 #    with virtualenv, vscode current_project_root_folder must contain the .venv_isc2022 folder
 virtualenv .venv_isc2022
 source .venv_isc2022/bin/activate
-pip install tensorflow-cpu pandas lxml
+pip install tensorflow pandas lxml
 
 # Option 2 - using conda
 conda create --name isc2022 tensorflow-cpu pandas lxml
