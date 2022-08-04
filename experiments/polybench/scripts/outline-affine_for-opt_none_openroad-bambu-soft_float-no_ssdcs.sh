@@ -44,11 +44,12 @@ LIST1=(
   # Generic compilation scripts
   ${SCRIPTDIR}/bambu-config-values-nangate.sh
   ${SCRIPTDIR}/bambu-debug-flags-nangate.sh
-  ${SCRIPTDIR}/to_copy/config.mk
-  ${SCRIPTDIR}/to_copy/synthesize_Synthesis_kernelname.sh
+  ${SCRIPTDIR}/to_copy/nangate45_config.mk
+  ${SCRIPTDIR}/to_copy/asap7_config.mk
+  ${SCRIPTDIR}/to_copy/synthesize_Synthesis_kernelname_openroad.sh
   ${SCRIPTDIR}/needs_rerun.sh
-  ${SCRIPTDIR}/patch_nangate_synt.sh
-  ${SCRIPTDIR}/outline-affine_for-opt_none_nangate-bambu-soft_float-no_ssdcs.sh
+  ${SCRIPTDIR}/patch_openroad_synt.sh
+  ${SCRIPTDIR}/outline-affine_for-opt_none_openroad-bambu-soft_float-no_ssdcs.sh
 
   # Kernel Specific
   ${KERNELDIR}/${FILENAME}
