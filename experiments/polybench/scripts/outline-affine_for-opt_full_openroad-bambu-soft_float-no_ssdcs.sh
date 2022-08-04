@@ -19,6 +19,9 @@
 # source ${KERNELDIR}/../../../scripts/<name-of-this-file>.sh
 ####
 
+set -e
+set -o pipefail
+
 KERNEL=${NAME}_${KSIZE}
 FILENAME=${KERNEL}.mlir
 KERNELNAME=${KERNEL}_kernel
