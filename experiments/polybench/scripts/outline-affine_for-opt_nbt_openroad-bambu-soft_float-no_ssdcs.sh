@@ -25,13 +25,15 @@ KERNELNAME=${KERNEL}_kernel
 
 # Directories
 WORKDIR=$(pwd)
-ODIR=${KERNELDIR}/output/${KERNEL}/opt_nbt_nangate-soft_float-no_ssdcs
+ODIR=${KERNELDIR}/output/${KERNEL}/opt_nbt_openroad-soft_float-no_ssdcs
 BAMBUDIR=${ODIR}/bambu
 SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Bambu configs
 CLKPERIOD=${CLKPERIOD}
 CHANNELSNUMBER=${CHANNELSNUMBER}
+PLATFORM=${PLATFORM}
+DEVICE=${DEVICE}
 
 # Preparing folders
 mkdir -p ${BAMBUDIR}
@@ -42,13 +44,14 @@ source ${SCRIPTDIR}/needs_rerun.sh
 
 LIST1=(
   # Generic compilation scripts
-  ${SCRIPTDIR}/bambu-config-values-nangate.sh
-  ${SCRIPTDIR}/bambu-debug-flags-nangate.sh
-  ${SCRIPTDIR}/to_copy/config.mk
-  ${SCRIPTDIR}/to_copy/synthesize_Synthesis_kernelname.sh
+  ${SCRIPTDIR}/bambu-config-values-openroad.sh
+  ${SCRIPTDIR}/bambu-debug-flags-openroad.sh
+  ${SCRIPTDIR}/to_copy/nangate45_config.mk
+  ${SCRIPTDIR}/to_copy/asap7_config.mk
+  ${SCRIPTDIR}/to_copy/synthesize_Synthesis_kernelname_openroad.sh
   ${SCRIPTDIR}/needs_rerun.sh
-  ${SCRIPTDIR}/patch_nangate_synt.sh
-  ${SCRIPTDIR}/outline-affine_for-opt_nbt_nangate-bambu-soft_float-no_ssdcs.sh
+  ${SCRIPTDIR}/patch_openroad_synt.sh
+  ${SCRIPTDIR}/outline-affine_for-opt_nbt_openroad-bambu-soft_float-no_ssdcs.sh
 
   # Kernel Specific
   ${KERNELDIR}/${FILENAME}
@@ -129,7 +132,7 @@ bambu \
   -lm --soft-float \
   --compiler=I386_CLANG12  \
   -O2 \
-  --device=nangate45 \
+  --device=${DEVICE} \
   --clock-period=${CLKPERIOD} --no-iob \
   --experimental-setup=BAMBU-BALANCED-MP \
   --channels-number=${CHANNELSNUMBER} \
@@ -140,7 +143,9 @@ bambu \
   --top-fname=${KERNELNAME} \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
 
-  source ${SCRIPTDIR}/patch_nangate_synt.sh
+  source ${SCRIPTDIR}/patch_openroad_synt.sh
+
+  ${BAMBUDIR}/synthesize_Synthesis_${KERNELNAME}.sh
 
 popd
 
