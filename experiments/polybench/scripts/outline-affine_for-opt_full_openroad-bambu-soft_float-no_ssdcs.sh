@@ -64,7 +64,7 @@ LIST2=(
   # Output files of the kernel
   ${ODIR}/model.ll
   ${BAMBUDIR}/results.txt
-  #${BAMBUDIR}/HLS_output/Synthesis/bash_flow/openroad/results/nangate45/${KERNELNAME}/base/6_final.gds
+  ${BAMBUDIR}/HLS_output/Synthesis/bash_flow/openroad/results/${PLATFORM}/${KERNELNAME}/base/6_final.gds
 )
 
 RERUN=false
