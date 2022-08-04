@@ -25,13 +25,15 @@ KERNELNAME=${KERNEL}_kernel
 
 # Directories
 WORKDIR=$(pwd)
-ODIR=${KERNELDIR}/output/${KERNEL}/opt_none_nangate-soft_float-no_ssdcs
+ODIR=${KERNELDIR}/output/${KERNEL}/opt_none_openroad-soft_float-no_ssdcs
 BAMBUDIR=${ODIR}/bambu
 SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Bambu configs
 CLKPERIOD=${CLKPERIOD}
 CHANNELSNUMBER=${CHANNELSNUMBER}
+PLATFORM=${PLATFORM}
+DEVICE=${DEVICE}
 
 # Preparing folders
 mkdir -p ${BAMBUDIR}
@@ -42,8 +44,7 @@ source ${SCRIPTDIR}/needs_rerun.sh
 
 LIST1=(
   # Generic compilation scripts
-  ${SCRIPTDIR}/bambu-config-values-openroad-nangate45.sh
-  ${SCRIPTDIR}/bambu-config-values-openroad-asap7.sh
+  ${SCRIPTDIR}/bambu-config-values-openroad.sh
   ${SCRIPTDIR}/bambu-debug-flags-openroad.sh
   ${SCRIPTDIR}/to_copy/nangate45_config.mk
   ${SCRIPTDIR}/to_copy/asap7_config.mk
@@ -122,7 +123,7 @@ mlir-translate -opaque-pointers=0 \
   -o ${ODIR}/08-model.ll
 
 # Remove debug info to make output file smaller ################################
-opt-10 \
+opt-12 \
   --strip-debug -O2 \
   ${ODIR}/08-model.ll \
   -S -o ${ODIR}/model.ll
@@ -138,7 +139,7 @@ bambu \
   -lm --soft-float \
   --compiler=I386_CLANG12  \
   -O2 \
-  --device=nangate45 \
+  --device=${DEVICE} \
   --clock-period=${CLKPERIOD} --no-iob \
   --experimental-setup=BAMBU-BALANCED-MP \
   --channels-number=${CHANNELSNUMBER} \
@@ -149,11 +150,9 @@ bambu \
   --top-fname=${KERNELNAME} \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
 
-  source ${SCRIPTDIR}/patch_nangate_synt.sh
+  source ${SCRIPTDIR}/patch_openroad_synt.sh
 
-  ${BAMBUDIR}/synthesize_Synthesis_{KERNELNAME}.sh
-
-  
+  ${BAMBUDIR}/synthesize_Synthesis_${KERNELNAME}.sh
 
 popd
 
