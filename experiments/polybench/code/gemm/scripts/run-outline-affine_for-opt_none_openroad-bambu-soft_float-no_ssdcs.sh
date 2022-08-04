@@ -21,10 +21,10 @@ KSIZE=$1
 KERNELDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"/..
 
 # Bambu configs
-source ${KERNELDIR}/../../scripts/bambu-config-values-nangate.sh
+source ${KERNELDIR}/../../scripts/bambu-config-values-openroad.sh
 
 # Load debug flags for bambu
-source ${KERNELDIR}/../../scripts/bambu-debug-flags-nangate.sh
+source ${KERNELDIR}/../../scripts/bambu-debug-flags-openroad.sh
 
 # Execute
-source ${KERNELDIR}/../../scripts/outline-affine_for-opt_none_nangate-bambu-soft_float-no_ssdcs.sh
+source ${KERNELDIR}/../../scripts/outline-affine_for-opt_none_openroad-bambu-soft_float-no_ssdcs.sh
