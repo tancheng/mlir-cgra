@@ -27,9 +27,15 @@ cd soda-opt/docs/tutorials/date2022/docker-version
 Create a python environment with needed dependencies
 
 ```
-virtualenv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Option 1 - using virtualenv
+#    with virtualenv, vscode current_project_root_folder must contain the .venv_date2022 folder
+virtualenv .venv_date2022
+source .venv_date2022/bin/activate
+pip install tensorflow pandas lxml
+
+# Option 2 - using conda
+conda create --name date2022 tensorflow-cpu pandas lxml
+conda activate date2022
 ```
 
 Enter the DATE tutorial directory with vscode or another tool capable of rendering jupyter notebooks
