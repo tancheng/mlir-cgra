@@ -42,8 +42,9 @@ source ${SCRIPTDIR}/needs_rerun.sh
 
 LIST1=(
   # Generic compilation scripts
-  ${SCRIPTDIR}/bambu-config-values-nangate.sh
-  ${SCRIPTDIR}/bambu-debug-flags-nangate.sh
+  ${SCRIPTDIR}/bambu-config-values-openroad-nangate45.sh
+  ${SCRIPTDIR}/bambu-config-values-openroad-asap7.sh
+  ${SCRIPTDIR}/bambu-debug-flags-openroad.sh
   ${SCRIPTDIR}/to_copy/nangate45_config.mk
   ${SCRIPTDIR}/to_copy/asap7_config.mk
   ${SCRIPTDIR}/to_copy/synthesize_Synthesis_kernelname_openroad.sh
@@ -149,6 +150,10 @@ bambu \
   ${ODIR}/model.ll 2>&1 | tee ${ODIR}/bambu-exec-log
 
   source ${SCRIPTDIR}/patch_nangate_synt.sh
+
+  ${BAMBUDIR}/synthesize_Synthesis_{KERNELNAME}.sh
+
+  
 
 popd
 
