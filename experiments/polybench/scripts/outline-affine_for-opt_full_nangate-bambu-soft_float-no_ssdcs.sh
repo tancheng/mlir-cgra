@@ -112,7 +112,7 @@ mlir-translate -opaque-pointers=0 \
   -o ${ODIR}/08-model.ll
 
 # Remove debug info to make output file smaller ################################
-opt-10 \
+opt-12 \
   --strip-debug -O2 \
   ${ODIR}/08-model.ll \
   -S -o ${ODIR}/model.ll
@@ -126,7 +126,7 @@ pushd ${BAMBUDIR}
 bambu \
   ${BAMBUDEBUGFLAGS} \
   -lm --soft-float \
-  --compiler=I386_CLANG10  \
+  --compiler=I386_CLANG12  \
   -O2 \
   --device=nangate45 \
   --clock-period=${CLKPERIOD} --no-iob \

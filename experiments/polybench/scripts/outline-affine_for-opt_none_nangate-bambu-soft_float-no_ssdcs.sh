@@ -120,7 +120,7 @@ mlir-translate -opaque-pointers=0 \
   -o ${ODIR}/08-model.ll
 
 # Remove debug info to make output file smaller ################################
-opt-10 \
+opt-12 \
   --strip-debug -O2 \
   ${ODIR}/08-model.ll \
   -S -o ${ODIR}/model.ll
