@@ -12,6 +12,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <iostream>
+
 #include "soda/Dialect/SODA/SODADialect.h"
 
 #include "mlir/Dialect/Func/IR/FuncOps.h"

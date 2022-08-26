@@ -24,6 +24,7 @@ class Value;
 namespace soda {
 class SODAFuncOp;
 class LaunchOp;
+class MatmulOp;
 } // namespace soda
 
 /// Get a soda.func created from outlining the region of a soda.launch op with the

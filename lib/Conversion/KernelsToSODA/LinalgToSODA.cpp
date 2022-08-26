@@ -5,11 +5,13 @@
 // SODA launch operations.
 //
 //===----------------------------------------------------------------------===//
+#include <iostream>
 
 #include "soda/Conversion/KernelsToSODA/LinalgToSODA.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
+#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Location.h"
 
@@ -43,18 +45,48 @@ void LinalgToSodaConverter::createLaunch(T rootLinalgOp) {
   builder.create<soda::TerminatorOp>(loc);
   builder.setInsertionPointToStart(&launchOp.body().front());
 
-  // Clone the linalg op.
-  auto *newOp = Operation::create(
+  Operation* newOp = NULL;
+
+  if (dyn_cast<linalg::MatmulOp>(&rootLinalgOp) != nullptr) {
+
+    // std::cout<<"detected linalg.matmul operation!!"<<std::endl;
+    newOp = builder.create<soda::MatmulOp>(loc, rootLinalgOp->getOperands());
+
+  } else if (dyn_cast<linalg::GenericOp>(&rootLinalgOp) != nullptr) {
+
+    // TODO: fuse the operations into single CGRA operation
+    auto genericOp = dyn_cast<linalg::GenericOp>(&rootLinalgOp);
+    for (Operation &arithOp : llvm::make_early_inc_range(genericOp->getRegion().front().getOperations())) {
+      if (auto maxOp = dyn_cast<arith::MaxFOp>(&arithOp)) {
+        std::cout<<"There exists arithMaxOP!!"<<std::endl;
+        mlir::Value maxInput = maxOp.getOperand(0);
+        auto maxInputOp = maxInput.getDefiningOp<arith::AddFOp>();
+	if (maxInputOp) {
+          newOp = builder.create<soda::AddMaxOp>(loc, rootLinalgOp->getOperands());
+	}
+      }
+    }
+
+
+  } else {
+
+    // Clone the linalg op.
+    newOp = Operation::create(
       rootLinalgOp->getLoc(), rootLinalgOp->getName(),
       rootLinalgOp->getResultTypes(), rootLinalgOp->getOperands(),
       rootLinalgOp->getAttrDictionary(), rootLinalgOp->getSuccessors(),
       rootLinalgOp->getRegions());
 
-  // Insert the clone into the soda launch.
-  auto results = newOp->getResults();
-  builder.insert(newOp);
-  rootLinalgOp->replaceAllUsesWith(results);
-  rootLinalgOp->erase();
+    // Insert the clone into the soda launch.
+    builder.insert(newOp);
+  }
+
+  if (newOp != NULL) {
+    auto results = newOp->getResults();
+    rootLinalgOp->replaceAllUsesWith(results);
+    rootLinalgOp->erase();
+  }
+
 }
 
 static LogicalResult convertLinalgDotToSODALaunch(linalg::DotOp op) {

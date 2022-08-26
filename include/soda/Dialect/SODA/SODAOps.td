@@ -374,6 +374,42 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   let hasVerifier = 1;
 }
 
+def SODA_MatmulOp : SODA_Op<"cgra.matmul", [HasParent<"LaunchOp">, NoSideEffect]>,
+    Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
+  let summary = "CGRA Matmul operation.";
+  let description = [{
+    An soda operation `soda.cgra.matmul` to replace `linalg.matmul`. The operands and
+    output are the same.
+  }];
+
+  let builders = [OpBuilder<(ins), [{ // empty}]>];
+
+  let arguments = (ins Variadic<AnyType>:$operands);
+  // let arguments = (ins AnyType:$operandA, AnyType:$operandB, AnyType:$operandC);
+
+  let assemblyFormat = "attr-dict ($operands^ `:` type($operands))?";
+
+  // let hasVerifier = 1;
+}
+
+def SODA_AddMaxOp : SODA_Op<"cgra.addmax", [HasParent<"LaunchOp">, NoSideEffect]>,
+    Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
+  let summary = "CGRA AddMax operation.";
+  let description = [{
+    An soda operation `soda.cgra.addmax` to replace `arith.add` followed by `arith.max`. The operands and
+    output are the same.
+  }];
+
+  let builders = [OpBuilder<(ins), [{ // empty}]>];
+
+  let arguments = (ins Variadic<AnyType>:$operands);
+  // let arguments = (ins AnyType:$operandA, AnyType:$operandB, AnyType:$operandC);
+
+  let assemblyFormat = "attr-dict ($operands^ `:` type($operands))?";
+
+  // let hasVerifier = 1;
+}
+
 def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, NoSideEffect,
                                      Terminator]>,
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {

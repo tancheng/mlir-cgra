@@ -11,6 +11,7 @@
 
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
+#include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
@@ -52,6 +53,13 @@ struct LinalgMatmulMapper
       if (auto matmulOp = dyn_cast<linalg::MatmulOp>(&op)) {
         if (failed(convertLinalgMatmulToSODALaunch(matmulOp)))
           signalPassFailure();
+      } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
+        for (Operation &innerOp : llvm::make_early_inc_range(forOp.getBody()->getOperations())) {
+          if (auto innerMatmulOp = dyn_cast<linalg::MatmulOp>(&innerOp)) {
+            if (failed(convertLinalgMatmulToSODALaunch(innerMatmulOp)))
+              signalPassFailure();
+	  }
+        }
       }
     }
   }
@@ -85,6 +93,13 @@ struct LinalgGenericMapper
       if (auto genericOp = dyn_cast<linalg::GenericOp>(&op)) {
         if (failed(convertLinalgGenericToSODALaunch(genericOp)))
           signalPassFailure();
+      } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
+        for (Operation &innerOp : llvm::make_early_inc_range(forOp.getBody()->getOperations())) {
+          if (auto innerGenericOp = dyn_cast<linalg::GenericOp>(&innerOp)) {
+            if (failed(convertLinalgGenericToSODALaunch(innerGenericOp)))
+              signalPassFailure();
+	  }
+        }
       }
     }
   }
