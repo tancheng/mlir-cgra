@@ -24,7 +24,11 @@ namespace {
 // conversion.
 struct LinalgToSodaConverter {
   template <class T>
-  void createLaunch(T rootMatmulOp);
+  void createLaunch(T rootOp);
+  template <class T>
+  void createMatmulLaunch(T rootOp);
+  template <class T>
+  void createGenericLaunch(T rootOp);
 };
 
 } // namespace
@@ -45,20 +49,61 @@ void LinalgToSodaConverter::createLaunch(T rootLinalgOp) {
   builder.create<soda::TerminatorOp>(loc);
   builder.setInsertionPointToStart(&launchOp.body().front());
 
-  Operation* newOp = NULL;
+  auto *newOp = Operation::create(
+      rootLinalgOp->getLoc(), rootLinalgOp->getName(),
+      rootLinalgOp->getResultTypes(), rootLinalgOp->getOperands(),
+      rootLinalgOp->getAttrDictionary(), rootLinalgOp->getSuccessors(),
+      rootLinalgOp->getRegions());
+
+  // Insert the clone into the soda launch.
+  auto results = newOp->getResults();
+  builder.insert(newOp);
+  rootLinalgOp->replaceAllUsesWith(results);
+  rootLinalgOp->erase();
+}
+
+/// Add a CGRA launch operation around the "linalg.matmul" op.
+template <class T>
+void LinalgToSodaConverter::createMatmulLaunch(T rootLinalgOp) {
+  OpBuilder builder(rootLinalgOp.getOperation());
 
   if (dyn_cast<linalg::MatmulOp>(&rootLinalgOp) != nullptr) {
 
-    // std::cout<<"detected linalg.matmul operation!!"<<std::endl;
-    newOp = builder.create<soda::MatmulOp>(loc, rootLinalgOp->getOperands());
+    // Create a launch op and move target op into the region
+    Location loc = rootLinalgOp.getLoc();
+    auto launchOp = builder.create<soda::LaunchOp>(loc);
+    builder.setInsertionPointToEnd(&launchOp.body().front());
+    builder.create<soda::TerminatorOp>(loc);
+    builder.setInsertionPointToStart(&launchOp.body().front());
+  
+    Operation* newOp = builder.create<soda::MatmulOp>(loc, rootLinalgOp->getOperands());
 
-  } else if (dyn_cast<linalg::GenericOp>(&rootLinalgOp) != nullptr) {
+    auto results = newOp->getResults();
+    rootLinalgOp->replaceAllUsesWith(results);
+    rootLinalgOp->erase();
+  }
+}
 
-    // TODO: fuse the operations into single CGRA operation
+/// Add a CGRA launch operation around the "linalg.generic" op.
+template <class T>
+void LinalgToSodaConverter::createGenericLaunch(T rootLinalgOp) {
+  OpBuilder builder(rootLinalgOp.getOperation());
+
+  if (dyn_cast<linalg::GenericOp>(&rootLinalgOp) != nullptr) {
+
+    // Create a launch op and move target op into the region
+    Location loc = rootLinalgOp.getLoc();
+    auto launchOp = builder.create<soda::LaunchOp>(loc);
+    builder.setInsertionPointToEnd(&launchOp.body().front());
+    builder.create<soda::TerminatorOp>(loc);
+    builder.setInsertionPointToStart(&launchOp.body().front());
+  
+    Operation* newOp = NULL;
+
+    // TODO: fuse arbitrary operations into single CGRA operation
     auto genericOp = dyn_cast<linalg::GenericOp>(&rootLinalgOp);
     for (Operation &arithOp : llvm::make_early_inc_range(genericOp->getRegion().front().getOperations())) {
       if (auto maxOp = dyn_cast<arith::MaxFOp>(&arithOp)) {
-        std::cout<<"There exists arithMaxOP!!"<<std::endl;
         mlir::Value maxInput = maxOp.getOperand(0);
         auto maxInputOp = maxInput.getDefiningOp<arith::AddFOp>();
 	if (maxInputOp) {
@@ -67,26 +112,12 @@ void LinalgToSodaConverter::createLaunch(T rootLinalgOp) {
       }
     }
 
-
-  } else {
-
-    // Clone the linalg op.
-    newOp = Operation::create(
-      rootLinalgOp->getLoc(), rootLinalgOp->getName(),
-      rootLinalgOp->getResultTypes(), rootLinalgOp->getOperands(),
-      rootLinalgOp->getAttrDictionary(), rootLinalgOp->getSuccessors(),
-      rootLinalgOp->getRegions());
-
-    // Insert the clone into the soda launch.
-    builder.insert(newOp);
+    if (newOp != NULL) {
+      auto results = newOp->getResults();
+      rootLinalgOp->replaceAllUsesWith(results);
+      rootLinalgOp->erase();
+    }
   }
-
-  if (newOp != NULL) {
-    auto results = newOp->getResults();
-    rootLinalgOp->replaceAllUsesWith(results);
-    rootLinalgOp->erase();
-  }
-
 }
 
 static LogicalResult convertLinalgDotToSODALaunch(linalg::DotOp op) {
@@ -104,7 +135,7 @@ LogicalResult mlir::convertLinalgDotToSODALaunch(linalg::DotOp op) {
 static LogicalResult convertLinalgMatmulToSODALaunch(linalg::MatmulOp op) {
 
   LinalgToSodaConverter converter;
-  converter.createLaunch(op);
+  converter.createMatmulLaunch(op);
 
   return success();
 }
@@ -128,7 +159,7 @@ LogicalResult mlir::convertLinalgConvToSODALaunch(linalg::Conv2DOp op) {
 static LogicalResult convertLinalgGenericToSODALaunch(linalg::GenericOp op) {
 
   LinalgToSodaConverter converter;
-  converter.createLaunch(op);
+  converter.createGenericLaunch(op);
 
   return success();
 }

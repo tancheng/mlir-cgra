@@ -18,6 +18,8 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/Support/CommandLine.h"
 
+#include <iostream>
+
 using namespace mlir;
 
 namespace {
@@ -48,18 +50,25 @@ struct LinalgMatmulMapper
     : public ConvertLinalgMatmulToSODABase<LinalgMatmulMapper> {
   LinalgMatmulMapper() = default;
 
+  void runOnInnerOp(scf::ForOp& forOp) {
+    for (Operation &innerOp : llvm::make_early_inc_range(forOp.getBody()->getOperations())) {
+      if (auto innerMatmulOp = dyn_cast<linalg::MatmulOp>(&innerOp)) {
+        if (failed(convertLinalgMatmulToSODALaunch(innerMatmulOp))) {
+          signalPassFailure();
+        }
+      } else if (auto forOp = dyn_cast<scf::ForOp>(&innerOp)) {
+        runOnInnerOp(forOp);
+      }
+    }
+  }
+
   void runOnOperation() override {
     for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto matmulOp = dyn_cast<linalg::MatmulOp>(&op)) {
         if (failed(convertLinalgMatmulToSODALaunch(matmulOp)))
           signalPassFailure();
       } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
-        for (Operation &innerOp : llvm::make_early_inc_range(forOp.getBody()->getOperations())) {
-          if (auto innerMatmulOp = dyn_cast<linalg::MatmulOp>(&innerOp)) {
-            if (failed(convertLinalgMatmulToSODALaunch(innerMatmulOp)))
-              signalPassFailure();
-	  }
-        }
+	runOnInnerOp(forOp);
       }
     }
   }
@@ -88,18 +97,26 @@ struct LinalgGenericMapper
     : public ConvertLinalgGenericToSODABase<LinalgGenericMapper> {
   LinalgGenericMapper() = default;
 
+  void runOnInnerOp(scf::ForOp& forOp) {
+
+    for (Operation &innerOp : llvm::make_early_inc_range(forOp.getBody()->getOperations())) {
+      if (auto innerGenericOp = dyn_cast<linalg::GenericOp>(&innerOp)) {
+        if (failed(convertLinalgGenericToSODALaunch(innerGenericOp))) {
+          signalPassFailure();
+        }
+      } else if (auto forOp = dyn_cast<scf::ForOp>(&innerOp)) {
+        runOnInnerOp(forOp);
+      }
+    }
+  }
+
   void runOnOperation() override {
     for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
       if (auto genericOp = dyn_cast<linalg::GenericOp>(&op)) {
         if (failed(convertLinalgGenericToSODALaunch(genericOp)))
           signalPassFailure();
       } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
-        for (Operation &innerOp : llvm::make_early_inc_range(forOp.getBody()->getOperations())) {
-          if (auto innerGenericOp = dyn_cast<linalg::GenericOp>(&innerOp)) {
-            if (failed(convertLinalgGenericToSODALaunch(innerGenericOp)))
-              signalPassFailure();
-	  }
-        }
+	runOnInnerOp(forOp);
       }
     }
   }
