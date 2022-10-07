@@ -1,12 +1,12 @@
-# ISC-2022 Tutorial - SODA-OPT
+# PACT-2022 Tutorial - SODA-OPT
 
-Part of the *Modern High-Level Synthesis for Complex Data Science Applications* toturial in the ISC2022 conference: 
+Part of the *SODA Synthesizer: Accelerating Data Science Applications with an end-to-end Silicon Compiler* toturial in the PACT2022 conference: 
 
-* [Tutorial website](https://app.swapcard.com/widget/event/isc-high-performance-2022/planning/UGxhbm5pbmdfODYxMTU1)
+* [Tutorial website](https://pact22.cs.illinois.edu/tutorials.html#tut1-1)
 
 
-* Presentation date: Sunday, May 29, 2022 
-* Time: 3:00 PM to 3:45 PM (CEST)
+* Presentation date: Sunday, Oct 09, 2022 
+* Time: 9:00 AM to 5:45 PM (CDT)
 
 In this section you will learn how to use our compiler frontend to perform hardware software partitioning of high-level applications and automatic optimization of selected kernels.
 
@@ -21,33 +21,39 @@ git clone https://gitlab.pnnl.gov/sodalite/soda-opt
 Navigate to the turorial folder
 
 ```
-cd soda-opt/docs/tutorials/isc2022/docker-version
+cd soda-opt/docs/tutorials/pact2022/docker-version
+```
+
+Update/download the `soda` docker image
+
+```
+docker pull agostini01/soda
 ```
 
 Create a python environment with needed dependencies
 
 ```
 # Option 1 - using virtualenv
-#    with virtualenv, vscode current_project_root_folder must contain the .venv_isc2022 folder
-virtualenv .venv_isc2022
-source .venv_isc2022/bin/activate
+#    with virtualenv, vscode current_project_root_folder must contain the .venv_pact2022 folder
+virtualenv .venv_pact2022
+source .venv_pact2022/bin/activate
 pip install tensorflow pandas lxml
 
 # Option 2 - using conda
-conda create --name isc2022 tensorflow-cpu pandas lxml
-conda activate isc2022
+conda create --name pact2022 tensorflow-cpu pandas lxml
+conda activate pact2022
 ```
 
-Enter the ISC tutorial directory with vscode or another tool capable of rendering jupyter notebooks.
+Enter the PACT tutorial directory with vscode or another tool capable of rendering jupyter notebooks.
 
 ```
-vscode soda-opt/docs/tutorials/isc2022/docker-version
+vscode soda-opt/docs/tutorials/pact2022/docker-version
 # Open this folder with vscode
 ```
 
 Open the tutorial file `tutorial.ipynb` and select the correct virtual env.
-If required, grant permissions for vscode to install any missing dependencies.
+If required, **grant permissions for vscode to install any missing dependencies**.
 
 # Instructions for users without docker access
 
-Please follow the tutorial using the files and folders available [here](docs/tutorials/isc2022/docker-version-executed).
+Please follow the tutorial using the files and folders available [here](docs/tutorials/pact2022/docker-version-executed).
