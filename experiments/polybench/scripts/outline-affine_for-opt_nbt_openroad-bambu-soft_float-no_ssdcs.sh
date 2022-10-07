@@ -28,7 +28,7 @@ KERNELNAME=${KERNEL}_kernel
 
 # Directories
 WORKDIR=$(pwd)
-ODIR=${KERNELDIR}/output/${KERNEL}/opt_nbt_openroad-soft_float-no_ssdcs
+ODIR=${KERNELDIR}/output-${DEVICE}-1G/${KERNEL}/opt_nbt_openroad-soft_float-no_ssdcs
 BAMBUDIR=${ODIR}/bambu
 SCRIPTDIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
@@ -41,6 +41,10 @@ DEVICE=${DEVICE}
 # Preparing folders
 mkdir -p ${BAMBUDIR}
 mkdir -p ${ODIR}
+
+# Results folder
+RESULTSDIR=${ODIR}/results
+mkdir -p ${RESULTSDIR}
 
 # Decide if needs rerun
 source ${SCRIPTDIR}/needs_rerun.sh
@@ -62,9 +66,12 @@ LIST1=(
   
 LIST2=(
   # Output files of the kernel
-  ${ODIR}/model.ll
-  ${BAMBUDIR}/results.txt
-  ${BAMBUDIR}/HLS_output/Synthesis/bash_flow/openroad/results/${PLATFORM}/${KERNELNAME}/base/6_final.gds
+  # ${ODIR}/model.ll
+  # ${BAMBUDIR}/results.txt
+  # ${BAMBUDIR}/HLS_output/Synthesis/bash_flow/openroad/results/${PLATFORM}/${KERNELNAME}/base/6_final.gds
+  ${RESULTSDIR}/bambu-exec-log
+  ${RESULTSDIR}/synthesis.out.log
+  ${RESULTSDIR}/6_1_merged.gds
 )
 
 RERUN=false
@@ -156,3 +163,12 @@ set +x
 else
   echo "ALREADY COMPLETED (and did not rerun): ${KERNELDIR}/${FILENAME}"
 fi
+
+mv ${ODIR}/bambu-exec-log ${RESULTSDIR}/
+mv ${BAMBUDIR}/synthesis.out.log ${RESULTSDIR}/
+GDSFILE=${BAMBUDIR}/HLS_output/Synthesis/bash_flow/openroad/results/${PLATFORM}/${KERNELNAME}/base/6_1_merged.gds
+if test -f "$GDSFILE"; then
+  mv ${GDSFILE} ${RESULTSDIR}/
+fi
+
+rm -rf ${BAMBUDIR}/HLS_output/Synthesis/bash_flow/openroad/results/
