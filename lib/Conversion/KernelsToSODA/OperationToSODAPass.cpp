@@ -10,6 +10,8 @@
 #include "soda/Conversion/KernelsToSODA/OperationToSODA.h"
 
 #include "mlir/Dialect/Func/IR/FuncOps.h"
+#include "mlir/Dialect/Linalg/IR/Linalg.h"
+#include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 
@@ -38,23 +40,40 @@ struct OperationMapper : public ConvertOperationToSODABase<OperationMapper> {
     this->anchorOpName.setValue(opName.str());
   }
 
+  void runOnInnerOp(scf::ForOp& forOp) {
+
+    for (Operation &innerOp : llvm::make_early_inc_range(forOp.getBody()->getOperations())) {
+      if (auto op = dyn_cast<scf::ForOp>(&innerOp)) {
+        runOnInnerOp(op);
+      } else {
+        if (innerOp.getName().getStringRef() == anchorOpName) {
+          if (failed(convertOperationToSODALaunch((&innerOp))))
+            signalPassFailure();
+	}
+      }
+    }
+  }
+
   void runOnOperation() override {
     auto funcOp = getOperation();
     if (!anchorFuncName.empty() && funcOp.getName() != anchorFuncName)
       return;
 
-    bool foundMatch = false;
+    // bool foundMatch = false;
     for (Operation &op : llvm::make_early_inc_range(funcOp.getOps())) {
       if (op.getName().getStringRef() == anchorOpName) {
-        foundMatch = true;
+        // foundMatch = true;
         if (failed(convertOperationToSODALaunch((&op))))
           signalPassFailure();
+      } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
+        runOnInnerOp(forOp);
       }
+
     }
-    if (!foundMatch) {
-      funcOp.emitWarning() << "Could not find any operation to mark "
-                              "for future outlining in this function.";
-    }
+    // if (!foundMatch) {
+    //   funcOp.emitWarning() << "Could not find any operation to mark "
+    //                           "for future outlining in this function.";
+    // }
   }
 };
 
