@@ -378,7 +378,7 @@ def SODA_MatmulOp : SODA_Op<"cgra.matmul", [HasParent<"LaunchOp">, NoSideEffect]
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
   let summary = "CGRA Matmul operation.";
   let description = [{
-    An soda operation `soda.cgra.matmul` to replace `linalg.matmul`. The operands and
+    An soda operation `cgra.matmul` to replace `linalg.matmul`. The operands and
     output are the same.
   }];
 
@@ -396,7 +396,7 @@ def SODA_AddMaxOp : SODA_Op<"cgra.addmax", [HasParent<"LaunchOp">, NoSideEffect]
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
   let summary = "CGRA AddMax operation.";
   let description = [{
-    An soda operation `soda.cgra.addmax` to replace `arith.add` followed by `arith.max`. The operands and
+    An soda operation `cgra.addmax` to replace `arith.add` followed by `arith.max`. The operands and
     output are the same.
   }];
 

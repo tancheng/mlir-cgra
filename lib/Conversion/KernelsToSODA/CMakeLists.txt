@@ -8,6 +8,12 @@ add_mlir_conversion_library(SODAKERNELToSODA
   OperationToSODA.cpp
   OperationToSODAPass.cpp
   
+  LinalgToCGRA.cpp
+  LinalgToCGRAPass.cpp
+ 
+  PatternToCGRA.cpp
+  PatternToCGRAPass.cpp
+ 
   AllToSODAPass.cpp
 
   ADDITIONAL_HEADER_DIRS

@@ -11,7 +11,9 @@
 
 #include "soda/Conversion/KernelsToSODA/AllToSODAPass.h"
 #include "soda/Conversion/KernelsToSODA/LinalgToSODAPass.h"
+#include "soda/Conversion/KernelsToSODA/LinalgToCGRAPass.h"
 #include "soda/Conversion/KernelsToSODA/OperationToSODAPass.h"
+#include "soda/Conversion/KernelsToSODA/PatternToCGRAPass.h"
 #include "soda/Conversion/KernelsToSODA/SCFToSODAPass.h"
 
 namespace mlir {

@@ -25,10 +25,6 @@ namespace {
 struct LinalgToSodaConverter {
   template <class T>
   void createLaunch(T rootOp);
-  template <class T>
-  void createMatmulLaunch(T rootOp);
-  template <class T>
-  void createGenericLaunch(T rootOp);
 };
 
 } // namespace
@@ -62,64 +58,6 @@ void LinalgToSodaConverter::createLaunch(T rootLinalgOp) {
   rootLinalgOp->erase();
 }
 
-/// Add a CGRA launch operation around the "linalg.matmul" op.
-template <class T>
-void LinalgToSodaConverter::createMatmulLaunch(T rootLinalgOp) {
-  OpBuilder builder(rootLinalgOp.getOperation());
-
-  if (dyn_cast<linalg::MatmulOp>(&rootLinalgOp) != nullptr) {
-
-    // Create a launch op and move target op into the region
-    Location loc = rootLinalgOp.getLoc();
-    auto launchOp = builder.create<soda::LaunchOp>(loc);
-    builder.setInsertionPointToEnd(&launchOp.body().front());
-    builder.create<soda::TerminatorOp>(loc);
-    builder.setInsertionPointToStart(&launchOp.body().front());
-  
-    Operation* newOp = builder.create<soda::MatmulOp>(loc, rootLinalgOp->getOperands());
-
-    auto results = newOp->getResults();
-    rootLinalgOp->replaceAllUsesWith(results);
-    rootLinalgOp->erase();
-  }
-}
-
-/// Add a CGRA launch operation around the "linalg.generic" op.
-template <class T>
-void LinalgToSodaConverter::createGenericLaunch(T rootLinalgOp) {
-  OpBuilder builder(rootLinalgOp.getOperation());
-
-  if (dyn_cast<linalg::GenericOp>(&rootLinalgOp) != nullptr) {
-
-    // Create a launch op and move target op into the region
-    Location loc = rootLinalgOp.getLoc();
-    auto launchOp = builder.create<soda::LaunchOp>(loc);
-    builder.setInsertionPointToEnd(&launchOp.body().front());
-    builder.create<soda::TerminatorOp>(loc);
-    builder.setInsertionPointToStart(&launchOp.body().front());
-  
-    Operation* newOp = NULL;
-
-    // TODO: fuse arbitrary operations into single CGRA operation
-    auto genericOp = dyn_cast<linalg::GenericOp>(&rootLinalgOp);
-    for (Operation &arithOp : llvm::make_early_inc_range(genericOp->getRegion().front().getOperations())) {
-      if (auto maxOp = dyn_cast<arith::MaxFOp>(&arithOp)) {
-        mlir::Value maxInput = maxOp.getOperand(0);
-        auto maxInputOp = maxInput.getDefiningOp<arith::AddFOp>();
-	if (maxInputOp) {
-          newOp = builder.create<soda::AddMaxOp>(loc, rootLinalgOp->getOperands());
-	}
-      }
-    }
-
-    if (newOp != NULL) {
-      auto results = newOp->getResults();
-      rootLinalgOp->replaceAllUsesWith(results);
-      rootLinalgOp->erase();
-    }
-  }
-}
-
 static LogicalResult convertLinalgDotToSODALaunch(linalg::DotOp op) {
 
   LinalgToSodaConverter converter;
@@ -135,7 +73,7 @@ LogicalResult mlir::convertLinalgDotToSODALaunch(linalg::DotOp op) {
 static LogicalResult convertLinalgMatmulToSODALaunch(linalg::MatmulOp op) {
 
   LinalgToSodaConverter converter;
-  converter.createMatmulLaunch(op);
+  converter.createLaunch(op);
 
   return success();
 }
@@ -159,7 +97,7 @@ LogicalResult mlir::convertLinalgConvToSODALaunch(linalg::Conv2DOp op) {
 static LogicalResult convertLinalgGenericToSODALaunch(linalg::GenericOp op) {
 
   LinalgToSodaConverter converter;
-  converter.createGenericLaunch(op);
+  converter.createLaunch(op);
 
   return success();
 }

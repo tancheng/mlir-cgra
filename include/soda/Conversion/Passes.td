@@ -81,4 +81,26 @@ def ConvertAllToSODA : Pass<"convert-all-to-soda", "func::FuncOp"> {
   ];
 }
 
+def ConvertLinalgMatmulToCGRA : Pass<"convert-linalg-matmul-to-cgra", "func::FuncOp"> {
+  let summary = "Offload (nested) linalg::matmul Ops for CGRA acceleration";
+  let constructor = "mlir::createLinalgMatmulToCGRAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
+def ConvertLinalgConvToCGRA : Pass<"convert-linalg-conv-to-cgra", "func::FuncOp"> {
+  let summary = "Offload (nested) linalg::conv Ops for CGRA acceleration";
+  let constructor = "mlir::createLinalgConvToCGRAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
+def ConvertPatternToCGRA: Pass<"convert-pattern-to-cgra", "func::FuncOp"> {
+  let summary = "Convert selected elementwise operation chain into single CGRA call";
+  let constructor = "mlir::createPatternToCGRAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+  let options = [
+    Option<"targetPatterns", "target-patterns", "std::string", /*default=*/"",
+      "The patterns need to be fused for CGRA acceleration.">,
+  ];
+}
+
 #endif // SODA_CONVERSION_PASSES
