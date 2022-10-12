@@ -392,11 +392,11 @@ def SODA_MatmulOp : SODA_Op<"cgra.matmul", [HasParent<"LaunchOp">, NoSideEffect]
   // let hasVerifier = 1;
 }
 
-def SODA_AddMaxOp : SODA_Op<"cgra.addmax", [HasParent<"LaunchOp">, NoSideEffect]>,
+def SODA_AddMaxOp : SODA_Op<"cgra.fusion", [HasParent<"LaunchOp">, NoSideEffect]>,
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
-  let summary = "CGRA AddMax operation.";
+  let summary = "CGRA fused operation.";
   let description = [{
-    An soda operation `cgra.addmax` to replace `arith.add` followed by `arith.max`. The operands and
+    An soda operation `cgra.fusion` to replace arith operation pattern. The operands and
     output are the same.
   }];
 

@@ -41,8 +41,9 @@ struct OperationMapper : public ConvertPatternToCGRABase<OperationMapper> {
       if (auto op = dyn_cast<scf::ForOp>(&innerOp)) {
         runOnInnerOp(op);
       } else {
-        if (innerOp.getName().getStringRef() == targetPatterns) {
-          if (failed(convertPatternToCGRALaunch((&innerOp))))
+        // if (innerOp.getName().getStringRef() == targetPatterns) {
+        if (auto genericOp = dyn_cast<linalg::GenericOp>(&innerOp)) {
+          if (failed(convertPatternToCGRALaunch(&innerOp, targetPatterns)))
             signalPassFailure();
 	}
       }
@@ -52,8 +53,9 @@ struct OperationMapper : public ConvertPatternToCGRABase<OperationMapper> {
   void runOnOperation() override {
     auto funcOp = getOperation();
     for (Operation &op : llvm::make_early_inc_range(funcOp.getOps())) {
-      if (op.getName().getStringRef() == targetPatterns) {
-        if (failed(convertPatternToCGRALaunch((&op))))
+      // if (op.getName().getStringRef() == targetPatterns) {
+      if (auto genericOp = dyn_cast<linalg::GenericOp>(&op)) {
+        if (failed(convertPatternToCGRALaunch(&op, targetPatterns)))
           signalPassFailure();
       } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
         runOnInnerOp(forOp);
