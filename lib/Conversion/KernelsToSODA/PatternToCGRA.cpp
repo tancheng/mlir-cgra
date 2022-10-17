@@ -89,8 +89,12 @@ void PatternToCGRAConverter::createLaunch(Operation *op, string patterns) {
     arithOptList.push_back(string(arithOp.getName().getStringRef()));
   }
 
-  if (getMatchedPattern(arithOptList, patterns) != "")
-    newOp = builder.create<soda::AddMaxOp>(loc, genericOp->getOperands());
+  auto matchedPattern = getMatchedPattern(arithOptList, patterns);
+  if (matchedPattern != "") {
+    auto ctx  = builder.getContext();
+    newOp = builder.create<soda::FusionOp>(loc, genericOp->getOperands());
+    newOp->setAttr("pattern", StringAttr::get(ctx, matchedPattern));
+  }
 
 /*
   for (Operation &arithOp : llvm::make_early_inc_range(genericOp.getRegion().front().getOperations())) {

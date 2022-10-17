@@ -1,0 +1,2 @@
+../../build/bin/soda-opt -soda-outline-bambu-code -soda-generate-bambu-hostcode -lower-all-to-llvm gemmreluadd.linalg.tiled.mlir
+../../build/bin/soda-opt -soda-outline-bambu-code -soda-generate-bambu-hostcode -lower-all-to-llvm gemmreluadd.cgra.mlir

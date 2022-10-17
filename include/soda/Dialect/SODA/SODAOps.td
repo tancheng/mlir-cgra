@@ -374,7 +374,7 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   let hasVerifier = 1;
 }
 
-def SODA_MatmulOp : SODA_Op<"cgra.matmul", [HasParent<"LaunchOp">, NoSideEffect]>,
+def SODA_MatmulOp : SODA_Op<"cgra.matmul", [NoSideEffect]>,
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
   let summary = "CGRA Matmul operation.";
   let description = [{
@@ -392,7 +392,7 @@ def SODA_MatmulOp : SODA_Op<"cgra.matmul", [HasParent<"LaunchOp">, NoSideEffect]
   // let hasVerifier = 1;
 }
 
-def SODA_AddMaxOp : SODA_Op<"cgra.fusion", [HasParent<"LaunchOp">, NoSideEffect]>,
+def SODA_FusionOp : SODA_Op<"cgra.fusion", [NoSideEffect]>,
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
   let summary = "CGRA fused operation.";
   let description = [{
