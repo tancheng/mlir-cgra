@@ -1,2 +1,8 @@
-../../build/bin/soda-opt -soda-outline-bambu-code -soda-generate-bambu-hostcode -lower-all-to-llvm gemmreluadd.linalg.tiled.mlir
+
+../../build/bin/soda-opt -lower-all-to-llvm gemmreluadd.linalg.tiled.mlir > gemmreluadd.linalg.tiled.llvm.mlir
+mlir-translate --mlir-to-llvmir gemmreluadd.linalg.tiled.llvm.mlir > gemmreluadd.linalg.tiled.ll
+llc -filetype=obj gemmreluadd.linalg.tiled.ll
+clang++-12 gemmreluadd.linalg.tiled.o main.cpp
+./a.out
+
 ../../build/bin/soda-opt -soda-outline-bambu-code -soda-generate-bambu-hostcode -lower-all-to-llvm gemmreluadd.cgra.mlir
