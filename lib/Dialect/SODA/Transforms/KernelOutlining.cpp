@@ -196,6 +196,17 @@ static void convertToLaunchFuncOp(soda::LaunchOp launchOp,
   launchOp.erase();
 }
 
+/// Replace `soda.launch` operations with an `soda.launch_cgra` operation
+/// launching `kernelFunc`. The kernel func contains the body of the
+/// `soda.launch` with constant region arguments inlined.
+static void convertToLaunchCGRAOp(soda::LaunchOp launchOp,
+                                  soda::SODAFuncOp kernelFunc,
+                                  ValueRange operands) {
+  OpBuilder builder(launchOp);
+  builder.create<soda::LaunchCGRAOp>(launchOp.getLoc(), kernelFunc, operands);
+  launchOp.erase();
+}
+
 namespace {
 /// Pass that moves the kernel of each LaunchOp into its separate nested module.
 ///
@@ -217,9 +228,9 @@ public:
       Block::iterator insertPt(func.getOperation()->getNextNode());
       auto funcWalkResult = func.walk([&](soda::LaunchOp op) {
         llvm::SetVector<Value> operands;
-        std::string kernelFnName =
-            Twine(op->getParentOfType<func::FuncOp>().getName(), "_kernel")
-                .str();
+        std::string kernelFnName = "see";
+            // Twine(op->getParentOfType<func::FuncOp>().getName(), "_kernel")
+            //     .str();
 
         // func.emitWarning()<< kernelFnName;
         // auto newName =
@@ -307,9 +318,125 @@ private:
   }
 };
 
+/// Pass that moves the kernel of each LaunchOp into its separate nested module.
+///
+/// This pass moves the kernel code of each LaunchOp into a function created
+/// inside a nested module. It also creates an external function of the same
+/// name in the parent module.
+///
+/// The soda.modules are intended to be compiled to different targets
+/// independently in a separate pass. The external functions can then be
+/// annotated with the symbol of the accessor function.
+class CGRAKernelOutliningPass
+    : public CGRAKernelOutliningBase<CGRAKernelOutliningPass> {
+public:
+  void runOnOperation() override {
+    SymbolTable symbolTable(getOperation());
+    bool modified = false;
+    for (auto func : getOperation().getOps<func::FuncOp>()) {
+      // Insert just after the function.
+      Block::iterator insertPt(func.getOperation()->getNextNode());
+      auto funcWalkResult = func.walk([&](soda::LaunchOp op) {
+        llvm::SetVector<Value> operands;
+        std::string kernelFnName = "cgra";
+
+        //     Twine(op->getParentOfType<func::FuncOp>().getName(), "_kernel")
+        //         .str();
+
+        // func.emitWarning()<< kernelFnName;
+        // auto newName =
+        //     (Twine(op.getKernelModuleName(), "_" +
+        //     Twine(kernelFnName)).str();
+
+        // // auto func = getOperation().lookupSymbol<func::FuncOp>(newName);
+        // if(getOperation().lookupSymbol<func::FuncOp>(newName)){
+        //   kernelFnName = kernelFnName+"_kernel";
+        // }
+
+        // Pull in instructions that can be sunk
+        if (failed(sinkOperationsIntoLaunchOp(op)))
+          return WalkResult::interrupt();
+        soda::SODAFuncOp outlinedFunc =
+            outlineKernelFuncImpl(op, kernelFnName, operands);
+
+        // Create nested module and insert outlinedFunc. The module will
+        // originally get the same name as the function, but may be renamed on
+        // insertion into the parent module.
+        auto kernelModule = createCGRAKernelModule(outlinedFunc, symbolTable);
+        symbolTable.insert(kernelModule, insertPt);
+
+        convertToLaunchCGRAOp(op, outlinedFunc, operands.getArrayRef());
+        modified = true;
+        return WalkResult::advance();
+      });
+      if (funcWalkResult.wasInterrupted())
+        return signalPassFailure();
+    }
+
+    // If any new module was inserted in this module, annotate this module as
+    // a container module.
+    if (modified)
+      getOperation()->setAttr(soda::SODADialect::getContainerModuleAttrName(),
+                              UnitAttr::get(&getContext()));
+  }
+
+private:
+  /// Returns a soda.module containing kernelFunc and all callees (recursive).
+  soda::SODAModuleOp createCGRAKernelModule(soda::SODAFuncOp kernelFunc,
+                                        const SymbolTable &parentSymbolTable) {
+    // TODO: This code cannot use an OpBuilder because it must be inserted into
+    // a SymbolTable by the caller. SymbolTable needs to be refactored to
+    // prevent manual building of Ops with symbols in code using SymbolTables
+    // and then this needs to use the OpBuilder.
+
+    // Prevent module and kernel name combination aliasing to an existing
+    // function name in the symbol table
+    std::string newModuleName = kernelFunc.getName().str();
+    std::string possibleConflict =
+        (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();
+    while (parentSymbolTable.lookup<func::FuncOp>(possibleConflict)) {
+      newModuleName = newModuleName + "_m";
+      possibleConflict =
+          (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();
+    }
+
+    auto context = getOperation().getContext();
+    OpBuilder builder(context);
+    auto kernelModule =
+        builder.create<soda::SODAModuleOp>(kernelFunc.getLoc(), newModuleName);
+    SymbolTable symbolTable(kernelModule);
+    symbolTable.insert(kernelFunc);
+
+    SmallVector<Operation *, 8> symbolDefWorklist = {kernelFunc};
+    while (!symbolDefWorklist.empty()) {
+      if (Optional<SymbolTable::UseRange> symbolUses =
+              SymbolTable::getSymbolUses(symbolDefWorklist.pop_back_val())) {
+        for (SymbolTable::SymbolUse symbolUse : *symbolUses) {
+          StringRef symbolName =
+              symbolUse.getSymbolRef().cast<FlatSymbolRefAttr>().getValue();
+          if (symbolTable.lookup(symbolName))
+            continue;
+
+          Operation *symbolDefClone =
+              parentSymbolTable.lookup(symbolName)->clone();
+          symbolDefWorklist.push_back(symbolDefClone);
+          symbolTable.insert(symbolDefClone);
+        }
+      }
+    }
+
+    return kernelModule;
+  }
+};
+
 } // namespace
 
 std::unique_ptr<OperationPass<ModuleOp>>
 mlir::soda::createSodaKernelOutliningPass() {
   return std::make_unique<SodaKernelOutliningPass>();
+}
+
+std::unique_ptr<OperationPass<ModuleOp>>
+mlir::soda::createCGRAKernelOutliningPass() {
+  return std::make_unique<CGRAKernelOutliningPass>();
 }

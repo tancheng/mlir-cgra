@@ -319,6 +319,62 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
   let hasVerifier = 1;
 }
 
+def SODA_LaunchCGRAOp : SODA_Op<"launch_cgra", [SODA_AsyncOpInterface,
+                                                AttrSizedOperandSegments]>,
+    Arguments<(ins Variadic<SODA_AsyncToken>:$asyncDependencies,
+                   SymbolRefAttr:$kernel,
+                   Variadic<AnyType>:$operands)>,
+    Results<(outs Optional<SODA_AsyncToken>:$asyncToken)> {
+  let summary = "Launches a function as a CGRA kernel";
+
+  let description = [{
+    Launch a CGRA kernel via function call.
+    }
+    ```
+  }];
+
+  let skipDefaultBuilders = 1;
+
+  let builders = [
+    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands)>
+  ];
+
+  let extraClassDeclaration = [{
+    /// The number of operands passed to the kernel function.
+    unsigned getNumKernelOperands();
+
+    /// The name of the kernel's containing module.
+    StringAttr getKernelModuleName();
+
+    /// The name of the kernel.
+    StringAttr getKernelName();
+
+    /// The i-th operand passed to the kernel function.
+    Value getKernelOperand(unsigned i);
+
+    /// The number of launch configuration operands, placed at the leading
+    /// positions of the operand list.
+    /// Parameter inherited from GPU dialect.
+    static constexpr unsigned kNumConfigOperands = 0;
+
+    // This needs to quietly verify if attributes with names defined below are
+    // present since it is run before the verifier of this op.
+    friend LogicalResult SODADialect::verifyOperationAttribute(Operation *,
+                                                              NamedAttribute);
+
+    /// The name of the symbol reference attribute specifying the kernel to launch.
+    static StringRef getKernelAttrName() { return "kernel"; }
+  }];
+
+  let assemblyFormat = [{
+      custom<AsyncDependencies>(type($asyncToken), $asyncDependencies)
+      $kernel
+      custom<LaunchFuncOperands>($operands, type($operands))
+      attr-dict
+  }];
+  let hasVerifier = 1;
+}
+
 def SODA_LaunchOp : SODA_Op<"launch">,
     Arguments<(ins)>,
     Results<(outs)> {

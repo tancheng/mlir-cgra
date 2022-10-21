@@ -25,6 +25,10 @@ namespace soda {
 /// separate kernel function.
 std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelOutliningPass();
 
+/// Replaces `soda.launch` with `soda.launch_cgra` by moving the region into a
+/// separate kernel function.
+std::unique_ptr<OperationPass<ModuleOp>> createCGRAKernelOutliningPass();
+
 /// Extract code called by `soda.launch_func` into isolated mlir module/file,
 /// with no host code information. This file can be later lowered and consumed
 /// by bambu

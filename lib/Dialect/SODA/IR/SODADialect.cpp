@@ -350,6 +350,94 @@ static void printLaunchFuncOperands(OpAsmPrinter &printer, Operation *,
   printer << ")";
 }
 
+
+//===----------------------------------------------------------------------===//
+// LaunchCGRAOp
+//===----------------------------------------------------------------------===//
+
+void LaunchCGRAOp::build(OpBuilder &builder, OperationState &result,
+                         SODAFuncOp kernelFunc, ValueRange kernelOperands) {
+  // This is a good area to add static operands.
+
+  // Add the data operands.
+  result.addOperands(kernelOperands);
+  auto kernelModule = kernelFunc->getParentOfType<SODAModuleOp>();
+  auto kernelSymbol =
+      SymbolRefAttr::get(kernelModule.getNameAttr(),
+                         {SymbolRefAttr::get(kernelFunc.getNameAttr())});
+  result.addAttribute(getKernelAttrName(), kernelSymbol);
+  SmallVector<int32_t, 2> segmentSizes(2, 1);
+  segmentSizes.front() = 0; // Initially no async dependencies.
+  segmentSizes.back() = static_cast<int32_t>(kernelOperands.size());
+  result.addAttribute(getOperandSegmentSizeAttr(),
+                      builder.getI32VectorAttr(segmentSizes));
+}
+
+unsigned LaunchCGRAOp::getNumKernelOperands() {
+  return getNumOperands() - asyncDependencies().size() - kNumConfigOperands;
+}
+
+StringAttr LaunchCGRAOp::getKernelModuleName() {
+  return kernel().getRootReference();
+}
+
+StringAttr LaunchCGRAOp::getKernelName() { return kernel().getLeafReference(); }
+
+Value LaunchCGRAOp::getKernelOperand(unsigned i) {
+  return getOperand(asyncDependencies().size() + kNumConfigOperands + i);
+}
+
+LogicalResult LaunchCGRAOp::verify() {
+  auto module = (*this)->getParentOfType<ModuleOp>();
+  if (!module)
+    return emitOpError("expected to belong to a module");
+
+  if (!module->getAttrOfType<UnitAttr>(
+          SODADialect::getContainerModuleAttrName()))
+    return emitOpError("expected the closest surrounding module to have the '" +
+                       SODADialect::getContainerModuleAttrName() +
+                       "'attribute");
+
+  auto kernelAttr = (*this)->getAttrOfType<SymbolRefAttr>(getKernelAttrName());
+  if (!kernelAttr)
+    return emitOpError("symbol reference attribute '" + getKernelAttrName() +
+                       "' must be specified");
+
+  return success();
+}
+
+static ParseResult parseLaunchCGRAOperands(
+    OpAsmParser &parser,
+    SmallVectorImpl<OpAsmParser::UnresolvedOperand> &argNames,
+    SmallVectorImpl<Type> &argTypes) {
+  if (parser.parseOptionalKeyword("args"))
+    return success();
+
+  SmallVector<OpAsmParser::Argument> args;
+  if (parser.parseArgumentList(args, OpAsmParser::Delimiter::Paren,
+                               /*allowType=*/true))
+    return failure();
+  for (auto &arg : args) {
+    argNames.push_back(arg.ssaName);
+    argTypes.push_back(arg.type);
+  }
+  return success();
+}
+
+static void printLaunchCGRAOperands(OpAsmPrinter &printer, Operation *,
+                                    OperandRange operands, TypeRange types) {
+  if (operands.empty())
+    return;
+  printer << "args(";
+  llvm::interleaveComma(llvm::zip(operands, types), printer,
+                        [&](const auto &pair) {
+                          printer.printOperand(std::get<0>(pair));
+                          printer << " : ";
+                          printer.printType(std::get<1>(pair));
+                        });
+  printer << ")";
+}
+
 //===----------------------------------------------------------------------===//
 // SODAFuncOp
 //===----------------------------------------------------------------------===//

@@ -17,6 +17,11 @@ def SodaKernelOutlining : Pass<"soda-outline-bambu-code", "mlir::ModuleOp"> {
   let constructor = "mlir::soda::createSodaKernelOutliningPass()";
 }
 
+def CGRAKernelOutlining : Pass<"outline-cgra-code", "mlir::ModuleOp"> {
+  let summary = "Outline soda.launch bodies into CGRA kernel functions";
+  let constructor = "mlir::soda::createCGRAKernelOutliningPass()";
+}
+
 def SodaKernelGeneration : Pass<"soda-generate-bambu-accelcode", "mlir::ModuleOp"> {
   let summary = "Extract bambu kernels into simple mlir modules";
   let constructor = "mlir::soda::createSodaKernelGenerationPass()";
