@@ -10,5 +10,8 @@ clang++-12 gemmreluadd.linalg.tiled.o main.cpp
 ../../build/bin/soda-opt --outline-cgra-code gemmreluadd.cgra.mlir > gemmreluadd.cgra.outlined.mlir
 ../../build/bin/soda-opt -outline-cgra-code -generate-cgra-hostcode gemmreluadd.cgra.mlir > gemmreluadd.cgra.outlined.host.mlir
 
-# Lower to llvm.mlir:
+# Lower to llvm:
 ../../build/bin/soda-opt -lower-all-to-llvm gemmreluadd.cgra.outlined.host.mlir > gemmreluadd.cgra.llvm.mlir
+mlir-translate --mlir-to-llvmir gemmreluadd.cgra.llvm.mlir > gemmreluadd.cgra.ll
+llc -filetype=obj gemmreluadd.cgra.ll
+clang++-12 gemmreluadd.cgra.o cgra.cpp main.cpp -o cgra.out
