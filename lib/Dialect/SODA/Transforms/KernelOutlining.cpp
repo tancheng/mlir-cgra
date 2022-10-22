@@ -28,6 +28,9 @@
 #include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Dialect/SODA/Utils.h"
 
+#include <iostream>
+using namespace std;
+
 using namespace mlir;
 
 /// Identifies operations that are beneficial to sink into kernels. These
@@ -228,9 +231,9 @@ public:
       Block::iterator insertPt(func.getOperation()->getNextNode());
       auto funcWalkResult = func.walk([&](soda::LaunchOp op) {
         llvm::SetVector<Value> operands;
-        std::string kernelFnName = "see";
-            // Twine(op->getParentOfType<func::FuncOp>().getName(), "_kernel")
-            //     .str();
+        std::string kernelFnName =
+            Twine(op->getParentOfType<func::FuncOp>().getName(), "_kernel")
+                .str();
 
         // func.emitWarning()<< kernelFnName;
         // auto newName =
@@ -338,20 +341,14 @@ public:
       Block::iterator insertPt(func.getOperation()->getNextNode());
       auto funcWalkResult = func.walk([&](soda::LaunchOp op) {
         llvm::SetVector<Value> operands;
-        std::string kernelFnName = "cgra";
-
-        //     Twine(op->getParentOfType<func::FuncOp>().getName(), "_kernel")
-        //         .str();
-
-        // func.emitWarning()<< kernelFnName;
-        // auto newName =
-        //     (Twine(op.getKernelModuleName(), "_" +
-        //     Twine(kernelFnName)).str();
-
-        // // auto func = getOperation().lookupSymbol<func::FuncOp>(newName);
-        // if(getOperation().lookupSymbol<func::FuncOp>(newName)){
-        //   kernelFnName = kernelFnName+"_kernel";
-        // }
+        std::string kernelFnName;
+        if (op.body().front().op_begin<soda::FusionOp>() != op.body().front().op_end<soda::FusionOp>()) {
+          kernelFnName = "fusion";
+        } else if (op.body().front().op_begin<soda::MatmulOp>() != op.body().front().op_end<soda::MatmulOp>()) {
+          kernelFnName = "matmul";
+        } else {
+          kernelFnName = "generic";
+        }
 
         // Pull in instructions that can be sunk
         if (failed(sinkOperationsIntoLaunchOp(op)))

@@ -68,7 +68,7 @@ struct LinalgMatmulMapper
         if (failed(convertLinalgMatmulToCGRALaunch(matmulOp)))
           signalPassFailure();
       } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
-	runOnInnerOp(forOp);
+	      runOnInnerOp(forOp);
       }
     }
   }
