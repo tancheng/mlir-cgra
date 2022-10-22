@@ -137,11 +137,12 @@ int main(int argc, char **argv) {
   mlir::soda::registerConvertLinalgConvToSODAPass();
   mlir::soda::registerConvertLinalgGenericToSODAPass();
 
-  // CGRA outlining passes
+  // CGRA passes
   mlir::soda::registerConvertPatternToCGRAPass();
   mlir::soda::registerConvertLinalgMatmulToCGRAPass();
   mlir::soda::registerConvertLinalgConvToCGRAPass();
   mlir::soda::registerCGRAKernelOutliningPass();
+  mlir::soda::registerCGRAHostGenerationPass();
 
   // Optimization passes
   mlir::soda::registerPassManagerMiscPass();

@@ -41,6 +41,26 @@ public:
 } // namespace
 
 namespace {
+
+class CGRAHostGenerationPass
+    : public CGRAHostGenerationBase<CGRAHostGenerationPass> {
+public:
+  void runOnOperation() override {
+
+    RewritePatternSet patterns(&getContext());
+    soda::populateCGRAHostGenerationConversionPatterns(patterns);
+    ConversionTarget target(getContext());
+    target.addLegalDialect<func::FuncDialect, BuiltinDialect>();
+    if (failed(applyPartialConversion(getOperation(), target,
+                                      std::move(patterns)))) {
+      signalPassFailure();
+    }
+  }
+};
+
+} // namespace
+
+namespace {
 class SODALaunchFuncLowering : public OpRewritePattern<soda::LaunchFuncOp> {
 public:
   using OpRewritePattern<soda::LaunchFuncOp>::OpRewritePattern;
@@ -54,6 +74,46 @@ public:
     auto newName =
         (Twine(op.getKernelModuleName()) + "_" + Twine(op.getKernelName()))
             .str();
+
+    auto func = module.lookupSymbol<func::FuncOp>(newName);
+    if (!func) {
+
+      // Get callee
+      Operation *kernelFunc = module.lookupSymbol(op.kernelAttr());
+      auto kernelSODAFunction = dyn_cast_or_null<soda::SODAFuncOp>(kernelFunc);
+
+      // Add a private function with same prototype on the top of parent module
+      OpBuilder::InsertionGuard guard(rewriter);
+      rewriter.setInsertionPointToStart(module.getBody());
+      FunctionType funcTy = kernelSODAFunction.getFunctionType();
+      func::FuncOp func = rewriter.create<func::FuncOp>(
+          rewriter.getUnknownLoc(), newName, funcTy);
+      func.setPrivate();
+
+      rewriter.setInsertionPoint(op);
+    }
+
+    assert(
+        isa<FunctionOpInterface>(SymbolTable::lookupSymbolIn(module, newName)));
+
+    rewriter.replaceOpWithNewOp<func::CallOp>(op, TypeRange{}, newName,
+                                              op.getOperands());
+
+    return success();
+  }
+};
+
+class SODALaunchCGRALowering : public OpRewritePattern<soda::LaunchCGRAOp> {
+public:
+  using OpRewritePattern<soda::LaunchCGRAOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(soda::LaunchCGRAOp op,
+                                PatternRewriter &rewriter) const override {
+
+    ModuleOp module = op->getParentOfType<ModuleOp>();
+
+    // Build final function name
+    auto newName = "cgra_" + Twine(op.getKernelModuleName()).str();
 
     auto func = module.lookupSymbol<func::FuncOp>(newName);
     if (!func) {
@@ -106,6 +166,20 @@ void soda::populateHostGenerationConversionPatterns(
   // clang-format on
 }
 
+void soda::populateCGRAHostGenerationConversionPatterns(
+    RewritePatternSet &patterns) {
+  // clang-format off
+  patterns.add<
+      SODALaunchCGRALowering,
+      SODAModuleDeletion
+      >(patterns.getContext());
+  // clang-format on
+}
+
 std::unique_ptr<Pass> mlir::soda::createSodaHostGenerationPass() {
   return std::make_unique<SodaHostGenerationPass>();
+}
+
+std::unique_ptr<Pass> mlir::soda::createCGRAHostGenerationPass() {
+  return std::make_unique<CGRAHostGenerationPass>();
 }

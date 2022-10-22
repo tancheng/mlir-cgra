@@ -8,5 +8,7 @@ clang++-12 gemmreluadd.linalg.tiled.o main.cpp
 
 # CGRA outlining:
 ../../build/bin/soda-opt --outline-cgra-code gemmreluadd.cgra.mlir > gemmreluadd.cgra.outlined.mlir
+../../build/bin/soda-opt -outline-cgra-code -generate-cgra-hostcode gemmreluadd.cgra.mlir > gemmreluadd.cgra.outlined.host.mlir
 
-../../build/bin/soda-opt -soda-outline-bambu-code -soda-generate-bambu-hostcode -lower-all-to-llvm gemmreluadd.cgra.mlir
+# Lower to llvm.mlir:
+../../build/bin/soda-opt -lower-all-to-llvm gemmreluadd.cgra.outlined.host.mlir > gemmreluadd.cgra.llvm.mlir

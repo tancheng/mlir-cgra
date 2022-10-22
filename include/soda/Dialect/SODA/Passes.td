@@ -37,6 +37,11 @@ def SodaHostGeneration : Pass<"soda-generate-bambu-hostcode"> {
   let constructor = "mlir::soda::createSodaHostGenerationPass()";
 }
 
+def CGRAHostGeneration : Pass<"generate-cgra-hostcode"> {
+  let summary = "Generate host code to call CGRA api";
+  let constructor = "mlir::soda::createCGRAHostGenerationPass()";
+}
+
 def SodaAsyncRegionPass : Pass<"soda-async-region", "func::FuncOp"> {
   let summary = "Make SODA ops async.";
   let constructor = "mlir::soda::createSodaAsyncRegionPass()";
