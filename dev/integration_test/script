@@ -14,4 +14,4 @@ clang++-12 gemmreluadd.linalg.tiled.o main.cpp
 ../../build/bin/soda-opt -lower-all-to-llvm gemmreluadd.cgra.outlined.host.mlir > gemmreluadd.cgra.llvm.mlir
 mlir-translate --mlir-to-llvmir gemmreluadd.cgra.llvm.mlir > gemmreluadd.cgra.ll
 llc -filetype=obj gemmreluadd.cgra.ll
-clang++-12 gemmreluadd.cgra.o cgra.cpp main.cpp -o cgra.out
+clang++-12 gemmreluadd.cgra.o runtime.cpp main.cpp -o test.out
