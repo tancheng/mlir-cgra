@@ -6,7 +6,7 @@ declare ptr @malloc(i64)
 
 declare void @free(ptr)
 
-declare void @cgra_fusion(ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64)
+declare void @cgra_fusion_add_max_add(ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64)
 
 declare void @cgra_matmul(ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64, ptr, ptr, i64, i64, i64, i64, i64)
 
@@ -279,7 +279,7 @@ define void @main_graph(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, 
   %261 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %260, i64 1, 4, 1, !dbg !229
   %262 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %261, i64 4, 3, 0, !dbg !230
   %263 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %262, i64 16, 4, 0, !dbg !231
-  call void @cgra_fusion(ptr %121, ptr %126, i64 %215, i64 4, i64 8, i64 16, i64 1, ptr %221, ptr %223, i64 %231, i64 4, i64 8, i64 16, i64 1, ptr %237, ptr %239, i64 %247, i64 4, i64 8, i64 16, i64 1, ptr %190, ptr %195, i64 %258, i64 4, i64 8, i64 16, i64 1), !dbg !232
+  call void @cgra_fusion_add_max_add(ptr %121, ptr %126, i64 %215, i64 4, i64 8, i64 16, i64 1, ptr %221, ptr %223, i64 %231, i64 4, i64 8, i64 16, i64 1, ptr %237, ptr %239, i64 %247, i64 4, i64 8, i64 16, i64 1, ptr %190, ptr %195, i64 %258, i64 4, i64 8, i64 16, i64 1), !dbg !232
   %264 = add i64 %207, 8, !dbg !233
   br label %206, !dbg !234
 

@@ -36,7 +36,7 @@ module attributes {llvm.data_layout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i6
         %5 = memref.subview %arg3[%arg5, %arg6] [4, 8] [1, 1] : memref<16x16xf32> to memref<4x8xf32, #map0>
         %6 = memref.subview %2[%arg5, %arg6] [4, 8] [1, 1] : memref<16x16xf32> to memref<4x8xf32, #map0>
         soda.launch {
-          soda.cgra.fusion {pattern = "arith.addf-arith.maxf-arith.addf-linalg.yield"} %3, %4, %5, %6 : memref<4x8xf32, #map0>, memref<4x8xf32, #map0>, memref<4x8xf32, #map0>, memref<4x8xf32, #map0>
+          soda.cgra.fusion {pattern = "add_max_add"} %3, %4, %5, %6 : memref<4x8xf32, #map0>, memref<4x8xf32, #map0>, memref<4x8xf32, #map0>, memref<4x8xf32, #map0>
           soda.terminator
         }
       }

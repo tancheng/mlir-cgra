@@ -29,7 +29,7 @@ extern "C" void cgra_matmul(float* a_allocated, float* a_aligned, int64_t a_offs
 
 // This fusion is an example for add+max+add. A robust fusion call should
 // be able to figure out what type of operation chain is targeted.
-extern "C" void cgra_fusion(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_stride0, int64_t a_stride1,
+extern "C" void cgra_fusion_add_max_add(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_stride0, int64_t a_stride1,
                  float* b_allocated, float* b_aligned, int64_t b_offset, int64_t b_size0, int64_t b_size1, int64_t b_stride0, int64_t b_stride1,
                  float* c_allocated, float* c_aligned, int64_t c_offset, int64_t c_size0, int64_t c_size1, int64_t c_stride0, int64_t c_stride1,
                  float* d_allocated, float* d_aligned, int64_t d_offset, int64_t d_size0, int64_t d_size1, int64_t d_stride0, int64_t d_stride1) {
@@ -43,7 +43,6 @@ extern "C" void cgra_fusion(float* a_allocated, float* a_aligned, int64_t a_offs
 
 // TODO: generic cgra_call. Some operations are also offloaded to CGRA without
 // user pre-defined mapping, which requires lowering to LLVMIR.
-
 
 // TODO: need to enable multi-threading for a data-communication overhead and
 // synchronization awared simulation.

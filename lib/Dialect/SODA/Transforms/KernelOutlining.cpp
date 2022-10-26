@@ -140,6 +140,7 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
   auto outlinedFunc = builder.create<soda::SODAFuncOp>(loc, kernelFnName, type);
   outlinedFunc->setAttr(soda::SODADialect::getKernelFuncAttrName(),
                         builder.getUnitAttr());
+
   BlockAndValueMapping map;
 
   // Map the arguments corresponding to the launch parameter like blockIdx,
@@ -343,7 +344,8 @@ public:
         llvm::SetVector<Value> operands;
         std::string kernelFnName;
         if (op.body().front().op_begin<soda::FusionOp>() != op.body().front().op_end<soda::FusionOp>()) {
-          kernelFnName = "fusion";
+          kernelFnName = "fusion_";
+          kernelFnName += (*op.body().front().op_begin<soda::FusionOp>())->getAttr("pattern").cast<StringAttr>().str();
         } else if (op.body().front().op_begin<soda::MatmulOp>() != op.body().front().op_end<soda::MatmulOp>()) {
           kernelFnName = "matmul";
         } else {

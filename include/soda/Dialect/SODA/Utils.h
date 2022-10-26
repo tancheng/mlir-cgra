@@ -36,7 +36,7 @@ class MatmulOp;
 ///   `launchOp` and defined above it. These captured values are appended to the
 ///   `operands` list.
 soda::SODAFuncOp outlineKernelFunc(soda::LaunchOp launchOp, StringRef kernelFnName,
-                                 SmallVectorImpl<Value> &operands);
+                                   SmallVectorImpl<Value> &operands);
 
 /// Sink operations into the `launchOp` to reduce the number of values that are
 /// used within the region of the operation, but defined outside of the

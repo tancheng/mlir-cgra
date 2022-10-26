@@ -1,7 +1,7 @@
 module attributes {llvm.data_layout = "", llvm.target_triple = "x86_64-unknown-linux-gnu", soda.container_module} {
   llvm.func @free(!llvm.ptr<i8>)
   llvm.func @malloc(i64) -> !llvm.ptr<i8>
-  llvm.func @cgra_fusion(!llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64) attributes {sym_visibility = "private"}
+  llvm.func @cgra_fusion_add_max_add(!llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64) attributes {sym_visibility = "private"}
   llvm.func @cgra_matmul(!llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64) attributes {sym_visibility = "private"}
   llvm.func @main_graph(%arg0: !llvm.ptr<f32>, %arg1: !llvm.ptr<f32>, %arg2: i64, %arg3: i64, %arg4: i64, %arg5: i64, %arg6: i64, %arg7: !llvm.ptr<f32>, %arg8: !llvm.ptr<f32>, %arg9: i64, %arg10: i64, %arg11: i64, %arg12: i64, %arg13: i64, %arg14: !llvm.ptr<f32>, %arg15: !llvm.ptr<f32>, %arg16: i64, %arg17: i64, %arg18: i64, %arg19: i64, %arg20: i64, %arg21: !llvm.ptr<f32>, %arg22: !llvm.ptr<f32>, %arg23: i64, %arg24: i64, %arg25: i64, %arg26: i64, %arg27: i64, %arg28: !llvm.ptr<f32>, %arg29: !llvm.ptr<f32>, %arg30: i64, %arg31: i64, %arg32: i64, %arg33: i64, %arg34: i64) attributes {input_names = ["X0", "X1", "X2", "X3"], output_names = ["Z0"]} {
     %0 = llvm.mlir.undef : !llvm.struct<(ptr<f32>, ptr<f32>, i64, array<2 x i64>, array<2 x i64>)>
@@ -352,7 +352,7 @@ module attributes {llvm.data_layout = "", llvm.target_triple = "x86_64-unknown-l
     %313 = llvm.mlir.constant(16 : i64) : i64
     %314 = llvm.insertvalue %312, %311[3, 0] : !llvm.struct<(ptr<f32>, ptr<f32>, i64, array<2 x i64>, array<2 x i64>)>
     %315 = llvm.insertvalue %313, %314[4, 0] : !llvm.struct<(ptr<f32>, ptr<f32>, i64, array<2 x i64>, array<2 x i64>)>
-    llvm.call @cgra_fusion(%116, %123, %248, %254, %250, %255, %251, %259, %261, %269, %275, %271, %276, %272, %280, %282, %290, %296, %292, %297, %293, %221, %228, %306, %312, %308, %313, %309) : (!llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64) -> ()
+    llvm.call @cgra_fusion_add_max_add(%116, %123, %248, %254, %250, %255, %251, %259, %261, %269, %275, %271, %276, %272, %280, %282, %290, %296, %292, %297, %293, %221, %228, %306, %312, %308, %313, %309) : (!llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64, !llvm.ptr<f32>, !llvm.ptr<f32>, i64, i64, i64, i64, i64) -> ()
     %316 = llvm.add %240, %42  : i64
     llvm.br ^bb17(%316 : i64)
   ^bb19:  // pred: ^bb17
