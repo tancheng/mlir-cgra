@@ -12,7 +12,7 @@ struct LogicalResult;
 class Operation;
 
 /// Convert Operations that match opName into soda.
-LogicalResult convertPatternToCGRALaunch(Operation *op, std::string patterns);
+LogicalResult convertPatternToCGRALaunch(Operation *op, ArrayRef<std::string> patterns);
 
 } // namespace mlir
 

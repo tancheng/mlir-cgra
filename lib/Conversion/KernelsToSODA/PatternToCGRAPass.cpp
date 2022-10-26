@@ -18,6 +18,7 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/Support/CommandLine.h"
 
+using namespace std;
 using namespace mlir;
 
 namespace {
@@ -31,8 +32,8 @@ namespace {
 struct OperationMapper : public ConvertPatternToCGRABase<OperationMapper> {
   OperationMapper() = default;
 
-  OperationMapper(StringRef opName) {
-    this->targetPatterns.setValue(opName.str());
+  OperationMapper(ArrayRef<string> patterns) {
+    this->targetPatterns = patterns;
   }
 
   void runOnInnerOp(scf::ForOp& forOp) {

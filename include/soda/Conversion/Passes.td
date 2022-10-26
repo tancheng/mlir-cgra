@@ -98,8 +98,8 @@ def ConvertPatternToCGRA: Pass<"convert-pattern-to-cgra", "func::FuncOp"> {
   let constructor = "mlir::createPatternToCGRAPass()";
   let dependentDialects = ["soda::SODADialect"];
   let options = [
-    Option<"targetPatterns", "target-patterns", "std::string", /*default=*/"",
-      "The patterns need to be fused for CGRA acceleration.">,
+    ListOption<"targetPatterns", "target-patterns", "std::string",
+            "List of target patterns need to be fused for CGRA acceleration.">,
   ];
 }
 

@@ -15,7 +15,7 @@
 #include "mlir/IR/Location.h"
 
 #include <iostream>
-#include <list>
+#include <vector>
 
 #define DEBUG_TYPE "pattern-to-cgra"
 
@@ -26,8 +26,8 @@ namespace {
 // Helper structure that holds common state of the loop to CGRA kernel
 // conversion.
 struct PatternToCGRAConverter {
-  void createLaunch(Operation *op, string patterns);
-  string getMatchedPattern(list<string> &arithOptNameList, string patterns);
+  void createLaunch(Operation *op, ArrayRef<string> patterns);
+  string getMatchedPattern(std::vector<string> &arithOptNames, string pattern);
 };
 
 } // namespace
@@ -36,41 +36,39 @@ struct PatternToCGRAConverter {
 // PatternToCGRA
 //===----------------------------------------------------------------------===//
 
-string PatternToCGRAConverter::getMatchedPattern(list<string> &arithOptNameList, string patterns) {
+string PatternToCGRAConverter::getMatchedPattern(std::vector<string> &arithOptNames, string pattern) {
 
   // One pattern (i.e., operation chain) includes multiple ops that are connected
   // by `-` as delimiter.
-  string delim = "-";
-  string targetOpts;
-  for(const auto &s : arithOptNameList) {
-    if(!targetOpts.empty())
-      targetOpts += delim;
-    targetOpts += s;
-  }
-
-  // Multiple patterns are separated by `,`.
-  string separator = ",";
+  std::vector<string> patternOpts;
+  string separator = "-";
   auto start = 0;
-  auto end = patterns.find(separator);
+  auto end = pattern.find(separator);
   while (end != string::npos) {
-
-    if (patterns.substr(start, end - start) == targetOpts) {
-      return targetOpts;
-    }
-
+    patternOpts.push_back(pattern.substr(start, end - start));
     start = end + separator.length();
-    end = patterns.find(separator, start);
+    end = pattern.find(separator, start);
   }
+  patternOpts.push_back(pattern.substr(start, end - start));
 
-  if (patterns.substr(start, end) == targetOpts)
-    return targetOpts;
+  if (arithOptNames.size() != patternOpts.size())
+    return "";
 
-  return "";
+  string matchedPattern = "";
+  for (auto i=0; i<(int)arithOptNames.size(); ++i) {
+    if (arithOptNames[i].find(patternOpts[i]) == string::npos) {
+      return "";
+    }
+    if (i != 0)
+      matchedPattern += "_";
+    matchedPattern += patternOpts[i];
+  }
+  return matchedPattern;
 }
 
 // Add a SODA launch operation around the generic op if the inner ops match
 // the pattern.
-void PatternToCGRAConverter::createLaunch(Operation *op, string patterns) {
+void PatternToCGRAConverter::createLaunch(Operation *op, ArrayRef<string> patterns) {
 
   OpBuilder builder(op);
   auto genericOp = dyn_cast<linalg::GenericOp>(op);
@@ -84,17 +82,32 @@ void PatternToCGRAConverter::createLaunch(Operation *op, string patterns) {
 
   Operation* newOp = NULL;
 
-  list<string> arithOptList;
+  std::vector<string> arithOptNames;
   for (Operation &arithOp : llvm::make_early_inc_range(genericOp.getRegion().front().getOperations())) {
-    arithOptList.push_back(string(arithOp.getName().getStringRef()));
+    string arithOptName = string(arithOp.getName().getStringRef());
+    // ignore linalg.yield as it is not a computation
+    if (arithOptName != "linalg.yield")
+      arithOptNames.push_back(arithOptName);
   }
 
+  for (auto pattern: patterns) {
+    string matchedPattern = getMatchedPattern(arithOptNames, pattern);
+    if (matchedPattern != "") {
+      auto ctx  = builder.getContext();
+      newOp = builder.create<soda::FusionOp>(loc, genericOp->getOperands());
+      newOp->setAttr("pattern", StringAttr::get(ctx, matchedPattern));
+      break;
+    }
+  }
+
+  /*
   auto matchedPattern = getMatchedPattern(arithOptList, patterns);
   if (matchedPattern != "") {
     auto ctx  = builder.getContext();
     newOp = builder.create<soda::FusionOp>(loc, genericOp->getOperands());
     newOp->setAttr("pattern", StringAttr::get(ctx, matchedPattern));
   }
+  */
 
 /*
   for (Operation &arithOp : llvm::make_early_inc_range(genericOp.getRegion().front().getOperations())) {
@@ -125,12 +138,12 @@ void PatternToCGRAConverter::createLaunch(Operation *op, string patterns) {
   op->erase();
 }
 
-static LogicalResult convertPatternToCGRALaunch(Operation *op, string patterns) {
+static LogicalResult convertPatternToCGRALaunch(Operation *op, ArrayRef<string> patterns) {
   PatternToCGRAConverter converter;
   converter.createLaunch(op, patterns);
   return success();
 }
 
-LogicalResult mlir::convertPatternToCGRALaunch(Operation *op, string patterns) {
+LogicalResult mlir::convertPatternToCGRALaunch(Operation *op, ArrayRef<string> patterns) {
   return ::convertPatternToCGRALaunch(op, patterns);
 }
