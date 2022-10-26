@@ -31,14 +31,19 @@ std::unique_ptr<OperationPass<ModuleOp>> createCGRAKernelOutliningPass();
 
 /// Extract code called by `soda.launch_func` into isolated mlir module/file,
 /// with no host code information. This file can be later lowered and consumed
-/// by bambu
+/// by bambu.
 std::unique_ptr<OperationPass<ModuleOp>> createSodaKernelGenerationPass();
+
+/// Extract code called by `soda.launch_cgra` into isolated mlir module/file,
+/// with no host code information. This file can be later lowered to affine
+/// (with loop flattening) and LLVMIR for traditional CGRA mapping.
+std::unique_ptr<OperationPass<ModuleOp>> createCGRAKernelGenerationPass();
 
 /// Transform `soda.launch_func` into calls to the bambu accelerator API
 void populateHostGenerationConversionPatterns(RewritePatternSet &patterns);
 std::unique_ptr<Pass> createSodaHostGenerationPass();
 
-/// Transform `soda.launch_cgra` into calls to the CGRA API
+/// Transform `soda.launch_cgra` into calls to the CGRA API.
 void populateCGRAHostGenerationConversionPatterns(RewritePatternSet &patterns);
 std::unique_ptr<Pass> createCGRAHostGenerationPass();
 

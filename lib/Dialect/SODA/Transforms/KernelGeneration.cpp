@@ -42,7 +42,101 @@ public:
 
 } // namespace
 
+namespace {
+
+class CGRAKernelGenerationPass
+    : public CGRAKernelGenerationBase<CGRAKernelGenerationPass> {
+public:
+  void runOnOperation() override;
+};
+
+} // namespace
+
 void SodaKernelGenerationPass::runOnOperation() {
+
+  // Steps:
+  // 1 Transfer SODAModuleOp region to its parent mlir::ModuleOp
+  // 2 Delete any code unrelated to the kernel
+  // 3 Walk through the module and change soda.module terminator
+  // 4 Walk through the module and change soda.func to regular func
+  // 5 Walk through the module and change soda.return
+  // 6 Set attribute marking that we modified this mlir:ModuleOp for Bambu
+  // target
+
+  Operation *op = getOperation();
+
+  if (!isa<ModuleOp>(op)) {
+    return signalPassFailure();
+  }
+
+  ModuleOp mop = dyn_cast<ModuleOp>(op);
+  if (!mop) {
+    return signalPassFailure();
+  }
+
+  // Will be set to true if the current module has a SODAModuleOp
+  bool modified = false;
+  mop.walk([this, &modified, &mop](soda::SODAModuleOp sodaOp) {
+    if (modified) {
+      sodaOp.emitError("should only contain one 'soda::SODAModuleOp' op");
+      return signalPassFailure();
+    }
+
+    BlockAndValueMapping map;
+    sodaOp.body().cloneInto(&(mop.getRegion()), map);
+    sodaOp.erase();
+
+    modified = true;
+  });
+
+  // This module does not have a SODAModuleOp
+  if (!modified) {
+    return signalPassFailure();
+  }
+
+  // We inserted a new block into a ModuleOp, ModuleOp should have only one
+  // block, thus delete the old (first) block. This also takes care of deleting
+  // the nested SODAModuleOp or other unrelated code.
+  Block *oldBlock = &mop->getRegions().front().getBlocks().front();
+  oldBlock->erase();
+
+  mop.walk([](soda::ModuleEndOp endOp) { endOp.erase(); });
+
+  mop.walk([this](soda::SODAFuncOp funcOp) {
+    OpBuilder replacer(funcOp);
+
+    func::FuncOp dstFunc = replacer.create<func::FuncOp>(
+        funcOp.getLoc(), funcOp.getName(), funcOp.getFunctionType());
+
+    dstFunc.getRegion().takeBody(funcOp.body());
+    funcOp.erase();
+
+    // Set all memref arguments to noalias
+    // TODO (NICO): Create analysis on the outliner, only carry decisions here
+
+    if (!(this->noAliasAnalysis)) {
+      int index = 0;
+      for (BlockArgument argument : dstFunc.getArguments()) {
+        if (argument.getType().isa<MemRefType>()) {
+          dstFunc.setArgAttr(index, LLVMDialect::getNoAliasAttrName(),
+                             UnitAttr::get(dstFunc.getContext()));
+        }
+        index++;
+      }
+    }
+  });
+
+  mop.walk([](soda::ReturnOp returnOp) {
+    OpBuilder replacer(returnOp);
+    replacer.create<mlir::func::ReturnOp>(returnOp.getLoc());
+    returnOp.erase();
+  });
+
+  if (modified)
+    mop->setAttr("soda.bambu.container_module", UnitAttr::get(&getContext()));
+}
+
+void CGRAKernelGenerationPass::runOnOperation() {
 
   // Steps:
   // 1 Transfer SODAModuleOp region to its parent mlir::ModuleOp
@@ -129,4 +223,9 @@ void SodaKernelGenerationPass::runOnOperation() {
 std::unique_ptr<OperationPass<ModuleOp>>
 mlir::soda::createSodaKernelGenerationPass() {
   return std::make_unique<SodaKernelGenerationPass>();
+}
+
+std::unique_ptr<OperationPass<ModuleOp>>
+mlir::soda::createCGRAKernelGenerationPass() {
+  return std::make_unique<CGRAKernelGenerationPass>();
 }

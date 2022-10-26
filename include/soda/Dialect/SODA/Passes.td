@@ -32,6 +32,16 @@ def SodaKernelGeneration : Pass<"soda-generate-bambu-accelcode", "mlir::ModuleOp
   ];
 }
 
+def CGRAKernelGeneration : Pass<"generate-cgra-accelcode", "mlir::ModuleOp"> {
+  let summary = "Extract CGRA kernels into simple mlir modules to lower to LLVMIR for traditional mapping";
+  let constructor = "mlir::soda::createCGRAKernelGenerationPass()";
+  
+  let options = [
+    Option<"noAliasAnalysis", "no-aa", "bool", /*default=*/"false",
+           "If set, kernel arguments will not be marked with no-alias (default: false)">,
+  ];
+}
+
 def SodaHostGeneration : Pass<"soda-generate-bambu-hostcode"> {
   let summary = "Generate host code to call bambu accelerator api";
   let constructor = "mlir::soda::createSodaHostGenerationPass()";
