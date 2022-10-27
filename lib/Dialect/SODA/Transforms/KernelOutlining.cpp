@@ -343,13 +343,18 @@ public:
       auto funcWalkResult = func.walk([&](soda::LaunchOp op) {
         llvm::SetVector<Value> operands;
         std::string kernelFnName;
+        bool isGenericFunc = false;
+        static int genericFuncCount = 0;
         if (op.body().front().op_begin<soda::FusionOp>() != op.body().front().op_end<soda::FusionOp>()) {
           kernelFnName = "fusion_";
           kernelFnName += (*op.body().front().op_begin<soda::FusionOp>())->getAttr("pattern").cast<StringAttr>().str();
         } else if (op.body().front().op_begin<soda::MatmulOp>() != op.body().front().op_end<soda::MatmulOp>()) {
           kernelFnName = "matmul";
         } else {
-          kernelFnName = "generic";
+          kernelFnName = "generic_" + to_string(genericFuncCount);
+          cout<<"check genericCount: "<<genericFuncCount<<endl;
+          isGenericFunc = true;
+          ++genericFuncCount;
         }
 
         // Pull in instructions that can be sunk
@@ -361,11 +366,26 @@ public:
         // Create nested module and insert outlinedFunc. The module will
         // originally get the same name as the function, but may be renamed on
         // insertion into the parent module.
-        auto kernelModule = createCGRAKernelModule(outlinedFunc, symbolTable);
-        symbolTable.insert(kernelModule, insertPt);
-
+        cout<<"start"<<endl;
+        if (isGenericFunc) {
+          cout<<"ready??"<<endl;
+          auto kernelModule = dyn_cast<soda::SODAModuleOp>(symbolTable.lookup("generic"));
+          cout<<"done!!"<<endl;
+          if (kernelModule == NULL) {
+            kernelModule = createCGRAKernelModule(outlinedFunc, "generic", symbolTable);
+            symbolTable.insert(kernelModule, insertPt);
+          } else {
+            SymbolTable moduleSymbolTable(kernelModule);
+            moduleSymbolTable.insert(outlinedFunc);
+          }
+        } else {
+          auto kernelModule = createCGRAKernelModule(outlinedFunc, kernelFnName, symbolTable);
+          symbolTable.insert(kernelModule, insertPt);
+        }
+        cout<<"ready to convert?"<<endl;
         convertToLaunchCGRAOp(op, outlinedFunc, operands.getArrayRef());
         modified = true;
+        cout<<"done this walk"<<endl;
         return WalkResult::advance();
       });
       if (funcWalkResult.wasInterrupted())
@@ -382,7 +402,8 @@ public:
 private:
   /// Returns a soda.module containing kernelFunc and all callees (recursive).
   soda::SODAModuleOp createCGRAKernelModule(soda::SODAFuncOp kernelFunc,
-                                        const SymbolTable &parentSymbolTable) {
+                                            string newModuleName,
+                                            const SymbolTable &parentSymbolTable) {
     // TODO: This code cannot use an OpBuilder because it must be inserted into
     // a SymbolTable by the caller. SymbolTable needs to be refactored to
     // prevent manual building of Ops with symbols in code using SymbolTables
@@ -390,6 +411,7 @@ private:
 
     // Prevent module and kernel name combination aliasing to an existing
     // function name in the symbol table
+    /*
     std::string newModuleName = kernelFunc.getName().str();
     std::string possibleConflict =
         (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();
@@ -398,6 +420,7 @@ private:
       possibleConflict =
           (Twine(newModuleName) + "_" + Twine(kernelFunc.getName())).str();
     }
+    */
 
     auto context = getOperation().getContext();
     OpBuilder builder(context);

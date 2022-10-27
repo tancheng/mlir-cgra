@@ -32,6 +32,8 @@ using namespace mlir::soda;
 
 #include "soda/Dialect/SODA/SODAOpsDialect.cpp.inc"
 
+#include <iostream>
+
 //===----------------------------------------------------------------------===//
 // SODADialect
 //===----------------------------------------------------------------------===//
@@ -362,6 +364,8 @@ void LaunchCGRAOp::build(OpBuilder &builder, OperationState &result,
   // Add the data operands.
   result.addOperands(kernelOperands);
   auto kernelModule = kernelFunc->getParentOfType<SODAModuleOp>();
+  if (kernelModule == NULL)
+    std::cout<<"kernelModule is NULL"<<std::endl;
   auto kernelSymbol =
       SymbolRefAttr::get(kernelModule.getNameAttr(),
                          {SymbolRefAttr::get(kernelFunc.getNameAttr())});
