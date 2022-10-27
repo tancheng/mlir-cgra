@@ -115,7 +115,7 @@ public:
     ModuleOp module = op->getParentOfType<ModuleOp>();
 
     // Build final function name
-    auto newName = "cgra_" + Twine(op.getKernelModuleName()).str();
+    auto newName = "cgra_" + Twine(op.getKernelName()).str();
     auto func = module.lookupSymbol<func::FuncOp>(newName);
 
     if (!func) {

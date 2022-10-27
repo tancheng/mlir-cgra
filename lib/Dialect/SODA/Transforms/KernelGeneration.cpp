@@ -29,6 +29,8 @@
 #include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Dialect/SODA/Utils.h"
 
+#include <string>
+
 using namespace mlir;
 using namespace mlir::LLVM;
 
@@ -191,8 +193,9 @@ void CGRAKernelGenerationPass::runOnOperation() {
   mop.walk([this](soda::SODAFuncOp funcOp) {
     OpBuilder replacer(funcOp);
 
+    std::string newName = "cgra_" + Twine(funcOp.getName()).str();
     func::FuncOp dstFunc = replacer.create<func::FuncOp>(
-        funcOp.getLoc(), funcOp.getName(), funcOp.getFunctionType());
+        funcOp.getLoc(), newName, funcOp.getFunctionType());
 
     dstFunc.getRegion().takeBody(funcOp.body());
     funcOp.erase();
