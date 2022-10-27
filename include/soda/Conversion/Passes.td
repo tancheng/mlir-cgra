@@ -103,4 +103,10 @@ def ConvertPatternToCGRA: Pass<"convert-pattern-to-cgra", "func::FuncOp"> {
   ];
 }
 
+def ConvertLinalgGenericToCGRA : Pass<"convert-linalg-generic-to-cgra", "func::FuncOp"> {
+  let summary = "Offload (nested) linalg::generic Ops for CGRA acceleration (w/o fusion)";
+  let constructor = "mlir::createLinalgGenericToCGRAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
 #endif // SODA_CONVERSION_PASSES

@@ -19,7 +19,7 @@ class Pass;
 // std::unique_ptr<OperationPass<func::FuncOp>> createLinalgDotToSODAPass();
 std::unique_ptr<OperationPass<func::FuncOp>> createLinalgMatmulToCGRAPass();
 std::unique_ptr<OperationPass<func::FuncOp>> createLinalgConvToCGRAPass();
-// std::unique_ptr<OperationPass<func::FuncOp>> createLinalgGenericToSODAPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createLinalgGenericToCGRAPass();
 
 } // namespace mlir
 

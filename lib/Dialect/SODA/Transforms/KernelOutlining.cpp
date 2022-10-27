@@ -364,20 +364,20 @@ public:
             outlineKernelFuncImpl(op, kernelFnName, operands);
 
         // Create nested module and insert outlinedFunc. The module will
-        // originally get the same name as the function, but may be renamed on
-        // insertion into the parent module.
+        // originally get the same name as the function, while the generic
+        // ones will be combined into single "generic" module.
         cout<<"start"<<endl;
         if (isGenericFunc) {
           cout<<"ready??"<<endl;
-          auto kernelModule = dyn_cast<soda::SODAModuleOp>(symbolTable.lookup("generic"));
-          cout<<"done!!"<<endl;
-          if (kernelModule == NULL) {
-            kernelModule = createCGRAKernelModule(outlinedFunc, "generic", symbolTable);
+          if (!symbolTable.lookup("generic")) {
+            auto kernelModule = createCGRAKernelModule(outlinedFunc, "generic", symbolTable);
             symbolTable.insert(kernelModule, insertPt);
           } else {
+            auto kernelModule = dyn_cast<soda::SODAModuleOp>(symbolTable.lookup("generic"));
             SymbolTable moduleSymbolTable(kernelModule);
             moduleSymbolTable.insert(outlinedFunc);
           }
+          cout<<"done!!"<<endl;
         } else {
           auto kernelModule = createCGRAKernelModule(outlinedFunc, kernelFnName, symbolTable);
           symbolTable.insert(kernelModule, insertPt);

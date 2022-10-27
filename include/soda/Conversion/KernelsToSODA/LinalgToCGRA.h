@@ -12,7 +12,7 @@ namespace linalg {
 // class DotOp;
 class MatmulOp;
 class Conv2DOp;
-// class GenericOp;
+class GenericOp;
 // TODO: add more ops
 } // namespace linalg
 
@@ -26,7 +26,7 @@ LogicalResult convertLinalgMatmulToCGRALaunch(linalg::MatmulOp matmulOp);
 LogicalResult convertLinalgConvToCGRALaunch(linalg::Conv2DOp convOp);
 
 /// Convert linalg Generic op into CGRA.
-// LogicalResult convertLinalgGenericToSODALaunch(linalg::GenericOp genericOp);
+LogicalResult convertLinalgGenericToCGRALaunch(linalg::GenericOp genericOp);
 
 } // namespace mlir
 
