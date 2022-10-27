@@ -161,16 +161,18 @@ void CGRAKernelGenerationPass::runOnOperation() {
   // Will be set to true if the current module has a SODAModuleOp
   bool modified = false;
   mop.walk([this, &modified, &mop](soda::SODAModuleOp sodaOp) {
-    if (modified) {
-      sodaOp.emitError("should only contain one 'soda::SODAModuleOp' op");
-      return signalPassFailure();
+    if (sodaOp.getName() == "generic") {
+      if (modified) {
+        sodaOp.emitError("should only contain one 'soda::SODAModuleOp' op");
+        return signalPassFailure();
+      }
+
+      BlockAndValueMapping map;
+      sodaOp.body().cloneInto(&(mop.getRegion()), map);
+      sodaOp.erase();
+
+      modified = true;
     }
-
-    BlockAndValueMapping map;
-    sodaOp.body().cloneInto(&(mop.getRegion()), map);
-    sodaOp.erase();
-
-    modified = true;
   });
 
   // This module does not have a SODAModuleOp

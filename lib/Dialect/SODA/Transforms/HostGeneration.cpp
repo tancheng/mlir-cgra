@@ -18,6 +18,8 @@
 #include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Dialect/SODA/Utils.h"
 
+#include <iostream>
+
 using namespace mlir;
 
 namespace {
@@ -125,6 +127,8 @@ public:
       // Add a private function with same prototype on the top of parent module
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
+      if (kernelSODAFunction == NULL)
+        std::cout<<"kernelSODAFunction is NULL"<<std::endl;
       FunctionType funcTy = kernelSODAFunction.getFunctionType();
       func::FuncOp func = rewriter.create<func::FuncOp>(
           rewriter.getUnknownLoc(), newName, funcTy);

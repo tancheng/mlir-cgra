@@ -352,7 +352,6 @@ public:
           kernelFnName = "matmul";
         } else {
           kernelFnName = "generic_" + to_string(genericFuncCount);
-          cout<<"check genericCount: "<<genericFuncCount<<endl;
           isGenericFunc = true;
           ++genericFuncCount;
         }
@@ -366,9 +365,7 @@ public:
         // Create nested module and insert outlinedFunc. The module will
         // originally get the same name as the function, while the generic
         // ones will be combined into single "generic" module.
-        cout<<"start"<<endl;
         if (isGenericFunc) {
-          cout<<"ready??"<<endl;
           if (!symbolTable.lookup("generic")) {
             auto kernelModule = createCGRAKernelModule(outlinedFunc, "generic", symbolTable);
             symbolTable.insert(kernelModule, insertPt);
@@ -377,15 +374,12 @@ public:
             SymbolTable moduleSymbolTable(kernelModule);
             moduleSymbolTable.insert(outlinedFunc);
           }
-          cout<<"done!!"<<endl;
         } else {
           auto kernelModule = createCGRAKernelModule(outlinedFunc, kernelFnName, symbolTable);
           symbolTable.insert(kernelModule, insertPt);
         }
-        cout<<"ready to convert?"<<endl;
         convertToLaunchCGRAOp(op, outlinedFunc, operands.getArrayRef());
         modified = true;
-        cout<<"done this walk"<<endl;
         return WalkResult::advance();
       });
       if (funcWalkResult.wasInterrupted())
