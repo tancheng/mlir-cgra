@@ -40,6 +40,7 @@ add_mlir_python_common_capi_library(SODAPythonCAPI
   RELATIVE_INSTALL_ROOT "../../../.."
   DECLARED_SOURCES
     SODAPythonSources
+    MLIRPythonExtension.RegisterEverything
     MLIRPythonSources.Core
 )
 

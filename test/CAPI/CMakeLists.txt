@@ -6,7 +6,7 @@ add_mlir_aggregate(SODACAPITestLib
   SHARED
   EMBED_LIBS
   MLIRCAPIIR
-  MLIRCAPIRegistration
+  MLIRCAPIRegisterEverything
   SODACAPI
 )
 

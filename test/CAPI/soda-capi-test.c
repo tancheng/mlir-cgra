@@ -6,12 +6,20 @@
 
 #include "mlir-c/IR.h"
 #include "soda-c/Dialect/SODA.h"
+#include "mlir-c/RegisterEverything.h"
+
+static void registerAllUpstreamDialects(MlirContext ctx) {
+  MlirDialectRegistry registry = mlirDialectRegistryCreate();
+  mlirRegisterAllDialects(registry);
+  mlirContextAppendDialectRegistry(ctx, registry);
+  mlirDialectRegistryDestroy(registry);
+}
 
 int main(int argc, char **argv) {
   MlirContext ctx = mlirContextCreate();
   // TODO: Create the dialect handles for the builtin dialects and avoid this.
   // This adds dozens of MB of binary size over just the standalone dialect.
-  mlirRegisterAllDialects(ctx);
+  registerAllUpstreamDialects(ctx);
   mlirDialectHandleRegisterDialect(mlirGetDialectHandle__soda__(), ctx);
 
   MlirModule module = mlirModuleCreateParse(
