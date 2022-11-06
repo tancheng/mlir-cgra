@@ -9,7 +9,7 @@ void matmul(DataReq& input, DataReq& output) {
   for (int i=0; i<out.sizes[0]; ++i) {
     for (int j=0; j<out.sizes[1]; ++j) {
       for (int k=0; k<inB.sizes[0]; ++k) {
-        out.aligned[out.offset+i*out.strides[0]+j] += inA.aligned[inA.offset+i*inA.strides[0]+k] * inB.aligned[inB.offset+k*inB.strides[0]+j];
+        out.aligned[out.offset+i*out.strides[0]+j] += inA.aligned[inA.offset*inA.sizes[1]+i*inA.strides[0]+k] * inB.aligned[inB.offset+k*inB.strides[0]+j];
       }
     }
   }
