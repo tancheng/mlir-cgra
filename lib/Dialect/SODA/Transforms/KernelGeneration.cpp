@@ -193,7 +193,7 @@ void CGRAKernelGenerationPass::runOnOperation() {
   mop.walk([this](soda::SODAFuncOp funcOp) {
     OpBuilder replacer(funcOp);
 
-    std::string newName = "cgra_" + Twine(funcOp.getName()).str();
+    std::string newName = Twine(funcOp.getName()).str();
     func::FuncOp dstFunc = replacer.create<func::FuncOp>(
         funcOp.getLoc(), newName, funcOp.getFunctionType());
 
@@ -202,7 +202,7 @@ void CGRAKernelGenerationPass::runOnOperation() {
 
     // Set all memref arguments to noalias
     // TODO (NICO): Create analysis on the outliner, only carry decisions here
-
+    /*
     if (!(this->noAliasAnalysis)) {
       int index = 0;
       for (BlockArgument argument : dstFunc.getArguments()) {
@@ -213,6 +213,7 @@ void CGRAKernelGenerationPass::runOnOperation() {
         index++;
       }
     }
+    */
   });
 
   mop.walk([](soda::ReturnOp returnOp) {

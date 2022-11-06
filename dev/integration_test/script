@@ -10,15 +10,22 @@ clang++-12 gemmreluadd.linalg.tiled.o main.cpp
 ../../build/bin/soda-opt --outline-cgra-code gemmreluadd.cgra.mlir > gemmreluadd.cgra.outlined.mlir
 ../../build/bin/soda-opt -outline-cgra-code -generate-cgra-hostcode gemmreluadd.cgra.mlir > gemmreluadd.cgra.host.mlir
 
-# Lower the operations that cannot be fused to generic kernel
-../../build/bin/soda-opt -outline-cgra-code -generate-cgra-accelcode gemmreluadd.cgra.mlir > gemmreluadd.cgra.generic.mlir
-
-# Lower to affine and then flatten it
-../../../llvm-project/build/bin/mlir-opt --convert-linalg-to-affine-loops -canonicalize --affine-loop-coalescing -lower-affine gemmreluadd.cgra.generic.mlir
-
-
 # Lower to llvm:
 ../../build/bin/soda-opt -lower-all-to-llvm gemmreluadd.cgra.host.mlir > gemmreluadd.cgra.llvm.mlir
 mlir-translate --mlir-to-llvmir gemmreluadd.cgra.llvm.mlir > gemmreluadd.cgra.ll
 llc -filetype=obj gemmreluadd.cgra.ll
-clang++-12 gemmreluadd.cgra.o runtime.cpp main.cpp -o test.out
+clang++-12 gemmreluadd.cgra.o Runtime.cpp main.cpp Simulator.cpp -o test.out
+
+# Lower the operations that cannot be fused to generic kernel
+../../build/bin/soda-opt -outline-cgra-code -generate-cgra-accelcode gemmreluadd.cgra.mlir > gemmreluadd.cgra.generic.mlir
+
+# Lower to affine and then flatten it
+../../../llvm-project/build/bin/mlir-opt --convert-linalg-to-affine-loops -canonicalize --affine-loop-coalescing -lower-affine gemmreluadd.cgra.generic.mlir > gemmreluadd.cgra.generic.affine.mlir
+
+# Lower to llvm:
+../../build/bin/soda-opt -lower-all-to-llvm gemmreluadd.cgra.generic.affine.mlir > gemmreluadd.cgra.generic.llvm.mlir
+mlir-translate --mlir-to-llvmir gemmreluadd.cgra.generic.llvm.mlir > gemmreluadd.cgra.generic.ll # need to remove noalias...
+llc -filetype=obj gemmreluadd.cgra.generic.ll
+clang++-12 gemmreluadd.cgra.o Runtime.cpp main.cpp Simulator.cpp -o test.out
+
+

@@ -1,3 +1,6 @@
+
+#include "Common.h"
+
 #include <iostream>
 
 template <typename T, size_t N> struct MemRefDescriptor {
@@ -16,6 +19,9 @@ extern "C" {
                    float* d_allocated, float* d_aligned, int64_t d_offset, int64_t d_size0, int64_t d_size1, int64_t d_stride0, int64_t d_stride1,
                    float* e_allocated, float* e_aligned, int64_t e_offset, int64_t e_size0, int64_t e_size1, int64_t e_stride0, int64_t e_stride1);
 }
+
+
+Simulator* cgra;
 
 int main(int argc, char *argv[]) {
   float *a = new float[512];
@@ -46,6 +52,8 @@ int main(int argc, char *argv[]) {
     {16, 32}, // sizes[N]
     {1, 1},  // strides[N]
   };
+
+  cgra = new Simulator(false);
 
   // main_graph(memref0, memref1, memref2, memref3, memref4);
   main_graph(a, a, 0, 16, 32, 1, 1, b, b, 0, 32, 16, 1, 1, c, c, 0, 16, 16, 1, 1, d, d, 0, 16, 16, 1, 1, e, e, 0, 16, 16, 1, 1);
