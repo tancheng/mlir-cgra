@@ -30,3 +30,7 @@ llc -filetype=obj 12-accel.ll
 
 # compile for simulation
 clang++-12 main.cpp 11-model.o 12-accel.o -I../../../sim/ ../../../sim/*.cpp CustomizedRuntime.cpp -o simulate
+
+# run CGRA-Mapper to get the execution cycles for each generic kernel, and register in the simulator
+llvm-as 12-accel.ll
+opt -load ../build/src/libmapperPass.so -mapperPass 12-accel.bc
