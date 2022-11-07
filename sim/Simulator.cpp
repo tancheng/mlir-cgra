@@ -8,10 +8,23 @@ Simulator::Simulator(bool enableDoubleBuffer) {
   // DMA speed in GB/s @1GHz => bytes/cycle
   DMASpeed = 1;
   this->enableDoubleBuffer = enableDoubleBuffer;
+  registerPredefinedMappings();
+}
+
+void Simulator::registerPredefinedMappings() {
   exCycleMap.insert({"matmul", 20});
   exCycleMap.insert({"fusion_add_max_add", 20});
   exFuncMap["matmul"] = matmul;
   exFuncMap["fusion_add_max_add"] = fusion_add_max_add;
+}
+
+void Simulator::registerTraditionalMapping(string operation, int64_t cycles) {
+
+  if (exCycleMap.find(operation) != exCycleMap.end()) {
+    exCycleMap[operation] = cycles;
+  } else {
+    exCycleMap.insert({operation, cycles});
+  }
 }
 
 void Simulator::issueRD(DataReq& input) {

@@ -46,6 +46,8 @@ public:
   void issueEX(string);
   void issueWR(DataReq&, bool);
   int64_t getTotalCycles();
+  void registerPredefinedMappings();
+  void registerTraditionalMapping(string, int64_t);
 
 private:
   bool enableDoubleBuffer;

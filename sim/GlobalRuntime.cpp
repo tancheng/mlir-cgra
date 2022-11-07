@@ -88,7 +88,7 @@ extern "C" void cgra_fusion_add_max_add(float* a_allocated, float* a_aligned, in
   // issue READ/EXECUTE/WRITE requests for simulation
   cgra->issueRD(input);
   cgra->issueEX("fusion_add_max_add");
-  cgra->issueWR(output, true);
+  cgra->issueWR(output, true); // true indicates there is a predefined mapping in the CGRAFunc.h
 
   cout<<"calculated output for cgra_fusion() d_size0: "<<d_size0<<"; d_size1: "<<d_size1<<"; d_stride0: "<<d_stride0<<"; d_stride1: "<<d_stride1<<endl;
 }
