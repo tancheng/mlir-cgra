@@ -158,24 +158,28 @@ void soda::addAsyncDependency(Operation *op, Value token) {
     return;
   auto attrName =
       OpTrait::AttrSizedOperandSegments<void>::getOperandSegmentSizeAttr();
-  auto sizeAttr = op->template getAttrOfType<DenseIntElementsAttr>(attrName);
+  auto sizeAttr = op->template getAttrOfType<DenseI32ArrayAttr>(attrName);
 
   // Async dependencies is the only variadic operand.
   if (!sizeAttr)
     return;
 
-  SmallVector<int32_t, 8> sizes(sizeAttr.getValues<int32_t>());
+  SmallVector<int32_t, 8> sizes(sizeAttr.asArrayRef());
   ++sizes.front();
-  op->setAttr(attrName, Builder(op->getContext()).getI32VectorAttr(sizes));
+  op->setAttr(attrName, Builder(op->getContext()).getDenseI32ArrayAttr(sizes));
 }
 
 //===----------------------------------------------------------------------===//
 // LaunchOp
 //===----------------------------------------------------------------------===//
 
-void LaunchOp::build(OpBuilder &builder, OperationState &result
+void LaunchOp::build(OpBuilder &builder, OperationState &result,
+                     Type asyncTokenType, ValueRange asyncDependencies) {
 
-) {
+
+  result.addOperands(asyncDependencies);
+  if (asyncTokenType)
+    result.types.push_back(builder.getType<AsyncTokenType>());
 
   // Add the data operands.
 
@@ -266,8 +270,15 @@ ParseResult LaunchOp::parse(OpAsmParser &parser, OperationState &result) {
 //===----------------------------------------------------------------------===//
 
 void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
-                         SODAFuncOp kernelFunc, ValueRange kernelOperands) {
+                         SODAFuncOp kernelFunc, ValueRange kernelOperands,
+                         Type asyncTokenType,
+                         ValueRange asyncDependencies) {
   // This is a good area to add static operands.
+
+  // Async dependencies.
+  result.addOperands(asyncDependencies);
+  if (asyncTokenType)
+    result.types.push_back(builder.getType<AsyncTokenType>());
 
   // Add the data operands.
   result.addOperands(kernelOperands);
@@ -277,15 +288,13 @@ void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
                          {SymbolRefAttr::get(kernelFunc.getNameAttr())});
   result.addAttribute(getKernelAttrName(), kernelSymbol);
   SmallVector<int32_t, 2> segmentSizes(2, 1);
-  segmentSizes.front() = 0; // Initially no async dependencies.
+  segmentSizes.front() = asyncDependencies.size();
   segmentSizes.back() = static_cast<int32_t>(kernelOperands.size());
   result.addAttribute(getOperandSegmentSizeAttr(),
-                      builder.getI32VectorAttr(segmentSizes));
+                      builder.getDenseI32ArrayAttr(segmentSizes));
 }
 
-unsigned LaunchFuncOp::getNumKernelOperands() {
-  return getNumOperands() - asyncDependencies().size() - kNumConfigOperands;
-}
+unsigned LaunchFuncOp::getNumKernelOperands() { return operands().size(); }
 
 StringAttr LaunchFuncOp::getKernelModuleName() {
   return kernel().getRootReference();
@@ -595,9 +604,7 @@ LogicalResult soda::ReturnOp::verify() {
 
   for (const auto &pair : llvm::enumerate(
            llvm::zip(function.getFunctionType().getResults(), operands()))) {
-    Type type;
-    Value operand;
-    std::tie(type, operand) = pair.value();
+    auto [type, operand] = pair.value();
     if (type != operand.getType())
       return emitOpError() << "unexpected type `" << operand.getType()
                            << "' for operand #" << pair.index();
@@ -646,6 +653,10 @@ void SODAModuleOp::print(OpAsmPrinter &p) {
                 /*printBlockTerminators=*/false);
 }
 
+/// Parses an optional list of async operands with an optional leading keyword.
+/// (`async`)? (`[` ssa-id-list `]`)?
+///
+/// This method is used by the tablegen assembly format for async ops as well.
 static ParseResult parseAsyncDependencies(
     OpAsmParser &parser, Type &asyncTokenType,
     SmallVectorImpl<OpAsmParser::UnresolvedOperand> &asyncDependencies) {

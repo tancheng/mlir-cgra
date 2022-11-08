@@ -280,7 +280,9 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands)>
+    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands,
+      CArg<"Type", "nullptr">:$asyncTokenType,
+      CArg<"ValueRange", "{}">:$asyncDependencies)>
   ];
 
   let extraClassDeclaration = [{
@@ -319,9 +321,9 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
   let hasVerifier = 1;
 }
 
-def SODA_LaunchOp : SODA_Op<"launch">,
-    Arguments<(ins)>,
-    Results<(outs)> {
+def SODA_LaunchOp : SODA_Op<"launch", [SODA_AsyncOpInterface]>,
+    Arguments<(ins Variadic<SODA_AsyncToken>:$asyncDependencies)>,
+    Results<(outs Optional<SODA_AsyncToken>:$asyncToken)> {
   let summary = "SODA kernel launch operation";
 
   let description = [{
@@ -354,7 +356,8 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilder<(ins)>
+    OpBuilder<(ins CArg<"Type", "nullptr">:$asyncTokenType,
+      CArg<"ValueRange", "{}">:$asyncDependencies)>
   ];
   
   let extraClassDeclaration = [{
