@@ -203,21 +203,21 @@ class ArrayMaxCt<int n> : AttrConstraint<
     CPred<"$_self.cast<::mlir::ArrayAttr>().size() <= " # n>,
     "with at least " # n # " elements">;
 
-def SNN_Fp32ArrayAttr2 : Confined<F32ArrayAttr, [ArrayCount<2>]>;
-def SNN_Fp32ArrayAttr3 : Confined<F32ArrayAttr, [ArrayCount<3>]>;
-def SNN_Fp32ArrayAttr4 : Confined<F32ArrayAttr, [ArrayCount<4>]>;
-def SNN_Fp32ArrayAttr5 : Confined<F32ArrayAttr, [ArrayCount<5>]>;
-def SNN_Fp32ArrayAttr6 : Confined<F32ArrayAttr, [ArrayCount<6>]>;
+def SNN_Fp32ArrayAttr2 : ConfinedAttr<F32ArrayAttr, [ArrayCount<2>]>;
+def SNN_Fp32ArrayAttr3 : ConfinedAttr<F32ArrayAttr, [ArrayCount<3>]>;
+def SNN_Fp32ArrayAttr4 : ConfinedAttr<F32ArrayAttr, [ArrayCount<4>]>;
+def SNN_Fp32ArrayAttr5 : ConfinedAttr<F32ArrayAttr, [ArrayCount<5>]>;
+def SNN_Fp32ArrayAttr6 : ConfinedAttr<F32ArrayAttr, [ArrayCount<6>]>;
 
-def SNN_IntArrayAttr2 : Confined<I64ArrayAttr, [ArrayCount<2>]>;
-def SNN_IntArrayAttr3 : Confined<I64ArrayAttr, [ArrayCount<3>]>;
-def SNN_IntArrayAttr4 : Confined<I64ArrayAttr, [ArrayCount<4>]>;
-def SNN_IntArrayAttr5 : Confined<I64ArrayAttr, [ArrayCount<5>]>;
-def SNN_IntArrayAttr6 : Confined<I64ArrayAttr, [ArrayCount<6>]>;
+def SNN_IntArrayAttr2 : ConfinedAttr<I64ArrayAttr, [ArrayCount<2>]>;
+def SNN_IntArrayAttr3 : ConfinedAttr<I64ArrayAttr, [ArrayCount<3>]>;
+def SNN_IntArrayAttr4 : ConfinedAttr<I64ArrayAttr, [ArrayCount<4>]>;
+def SNN_IntArrayAttr5 : ConfinedAttr<I64ArrayAttr, [ArrayCount<5>]>;
+def SNN_IntArrayAttr6 : ConfinedAttr<I64ArrayAttr, [ArrayCount<6>]>;
 
-def SNN_IntArrayAttrUpto2 : Confined<I64ArrayAttr, [ArrayMaxCt<2>]>;
-def SNN_IntArrayAttrUpto4 : Confined<I64ArrayAttr, [ArrayMaxCt<4>]>;
-def SNN_IntArrayAttrUpto5 : Confined<I64ArrayAttr, [ArrayMaxCt<5>]>;
+def SNN_IntArrayAttrUpto2 : ConfinedAttr<I64ArrayAttr, [ArrayMaxCt<2>]>;
+def SNN_IntArrayAttrUpto4 : ConfinedAttr<I64ArrayAttr, [ArrayMaxCt<4>]>;
+def SNN_IntArrayAttrUpto5 : ConfinedAttr<I64ArrayAttr, [ArrayMaxCt<5>]>;
 
 //===----------------------------------------------------------------------===//
 // Iterable attributes.

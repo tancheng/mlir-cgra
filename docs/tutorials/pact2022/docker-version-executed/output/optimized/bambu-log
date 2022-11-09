@@ -1,0 +1,504 @@
+ ==  Bambu executed with: bambu -v3 --print-dot -lm --soft-float --compiler=I386_CLANG12 --device=nangate45 --clock-period=5 --no-iob --experimental-setup=BAMBU-BALANCED-MP --channels-number=2 --memory-allocation-policy=ALL_BRAM --disable-function-proxy --generate-tb=main_kernel_test.xml --simulate --simulator=VERILATOR --top-fname=main_kernel input.ll 
+
+
+********************************************************************************
+                    ____                  _
+                   | __ )  __ _ _ __ ___ | |_   _   _
+                   |  _ \ / _` | '_ ` _ \| '_ \| | | |
+                   | |_) | (_| | | | | | | |_) | |_| |
+                   |____/ \__,_|_| |_| |_|_.__/ \__,_|
+
+********************************************************************************
+                         High-Level Synthesis Tool
+
+                         Politecnico di Milano - DEIB
+                          System Architectures Group
+********************************************************************************
+                Copyright (C) 2004-2022 Politecnico di Milano
+    Version: PandA 0.9.8 - Revision 891ec3caed502474cab0813cc4a9fc678deabaa5
+
+Parameters parsed in 0.12 seconds
+
+Target technology = FPGA
+Library Name     : STD_FU
+  Total cells    : 3
+  - combinational: 0
+  - others: 3
+
+Library Name     : STD_FU
+  Total cells    : 10
+  - combinational: 0
+  - others: 10
+
+Library Name     : STD_FU
+  Total cells    : 33
+  - combinational: 0
+  - others: 33
+
+Library Name     : STD_FU
+  Total cells    : 8
+  - combinational: 0
+  - others: 8
+
+Library Name     : STD_FU
+  Total cells    : 56
+  - combinational: 0
+  - others: 56
+
+Library Name     : STD_FU
+  Total cells    : 1
+  - combinational: 0
+  - others: 1
+
+Library Name     : CS_COMPONENT
+  Total cells    : 16
+  - combinational: 0
+  - others: 16
+
+Library Name     : STD_FU
+  Total cells    : 2
+  - combinational: 0
+  - others: 2
+
+Library Name     : STD_FU
+  Total cells    : 0
+  - combinational: 0
+  - others: 0
+
+Library Name     : STD_FU
+  Total cells    : 3
+  - combinational: 0
+  - others: 3
+
+Library Name     : STD_FU
+  Total cells    : 17
+  - combinational: 0
+  - others: 17
+
+Library Name     : STD
+  Total cells    : 14
+  - combinational: 0
+  - others: 14
+
+Library Name     : STD_COMMON
+  Total cells    : 57
+  - combinational: 0
+  - others: 57
+
+Library Name     : STD_FU
+  Total cells    : 8
+  - combinational: 0
+  - others: 8
+
+Library Name     : STD_PC
+  Total cells    : 16
+  - combinational: 0
+  - others: 16
+
+Library Name     : STD_SOFT_FLOAT
+  Total cells    : 2
+  - combinational: 0
+  - others: 2
+
+Library Name     : STD
+  Total cells    : 72
+  - combinational: 0
+  - others: 72
+
+Library Name     : STD_FU
+  Total cells    : 2
+  - combinational: 0
+  - others: 2
+
+Library Name     : STD_FU
+  Total cells    : 9
+  - combinational: 0
+  - others: 9
+
+Library Name     : WBWrapper
+  Total cells    : 12
+  - combinational: 0
+  - others: 12
+
+Available devices:
+ - 5CSEMA5F31C6
+ - 5SGXEA7N2F45C1
+ - EP2C70F896C6
+ - EP2C70F896C6-R
+ - EP4SGX530KH40C2
+ - LFE335EA8FN484C
+ - LFE5U85F8BG756C
+ - LFE5UM85F8BG756C
+ - asap7-BC
+ - asap7-TC
+ - asap7-WC
+ - nangate45
+ - nx1h140tsp
+ - nx1h35S
+ - nx2h540tsc
+ - xc4vlx100-10ff1513
+ - xc5vlx110t-1ff1136
+ - xc5vlx330t-2ff1738
+ - xc5vlx50-3ff1153
+ - xc6vlx240t-1ff1156
+ - xc7a100t-1csg324-VVD
+ - xc7vx330t-1ffg1157
+ - xc7vx485t-2ffg1761-VVD
+ - xc7vx690t-3ffg1930-VVD
+ - xc7z020-1clg484
+ - xc7z020-1clg484-VVD
+ - xc7z020-1clg484-YOSYS-VVD
+ - xc7z045-2ffg900-VVD
+Library Name     : STD_FU
+  Total cells    : 4335
+  - combinational: 0
+  - others: 4335
+
+warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
+1 warning generated.
+warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
+1 warning generated.
+ (in-process)  /usr/local/include  /usr/lib/llvm-12/lib/clang/12.0.0/include  /usr/include/x86_64-linux-gnu  /usr/include  
+warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
+1 warning generated.
+warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
+1 warning generated.
+  Bit Value Opt: cond_expr optimized, nbits = 1
+  Bit Value Opt: plus_expr optimized, nbits = 1
+  Bit Value Opt: cond_expr optimized, nbits = 2
+  Bit Value Opt: cond_expr optimized, nbits = 2
+  Bit Value Opt: cond_expr optimized, nbits = 3
+  Bit Value Opt: cond_expr optimized, nbits = 2
+  Bit Value Opt: cond_expr optimized, nbits = 3
+  Bit Value Opt: cond_expr optimized, nbits = 4
+  Bit Value Opt: cond_expr optimized, nbits = 5
+  Bit Value Opt: bit_xor_expr optimized, nbits = 2
+  Bit Value Opt: bit_and_expr optimized, nbits = 2
+  Bit Value Opt: ne_expr optimized, nbits = 2
+  Bit Value Opt: plus_expr optimized, nbits = 2
+  Bit Value Opt: bit_and_expr optimized, nbits = 11
+  Bit Value Opt: eq_expr optimized, nbits = 11
+  Bit Value Opt: bit_and_expr optimized, nbits = 19
+  Bit Value Opt: eq_expr optimized, nbits = 19
+  Bit Value Opt: bit_and_expr optimized, nbits = 23
+  Bit Value Opt: eq_expr optimized, nbits = 23
+  Bit Value Opt: bit_and_expr optimized, nbits = 25
+  Bit Value Opt: eq_expr optimized, nbits = 25
+  Bit Value Opt: bit_and_expr optimized, nbits = 26
+  Bit Value Opt: eq_expr optimized, nbits = 26
+  Bit Value Opt: bit_and_expr optimized, nbits = 26
+  Bit Value Opt: ne_expr optimized, nbits = 26
+  Bit Value Opt: cond_expr optimized, nbits = 1
+  Bit Value Opt: cond_expr optimized, nbits = 1
+  Bit Value Opt: cond_expr optimized, nbits = 1
+  Bit Value Opt: cond_expr optimized, nbits = 1
+  Bit Value Opt: cond_expr optimized, nbits = 1
+  Bit Value Opt: bit_xor_expr optimized, nbits = 1
+  Bit Value Opt: bit_and_expr optimized, nbits = 1
+  Bit Value Opt: ne_expr optimized, nbits = 1
+  Bit Value Opt: cond_expr optimized, nbits = 1
+  Bit Value Opt: bit_and_expr optimized, nbits = 22
+  Bit Value Opt: ne_expr optimized, nbits = 22
+  Bit Value Opt: bit_and_expr optimized, nbits = 47
+  Bit Value Opt: ne_expr optimized, nbits = 47
+  Bit Value Opt: bit_and_expr optimized, nbits = 9
+  Bit Value Opt: ne_expr optimized, nbits = 9
+  Bit Value Opt: bit_and_expr optimized, nbits = 24
+  Bit Value Opt: ne_expr optimized, nbits = 24
+
+  Memory allocation information:
+Warning: This function uses unknown addresses: main_kernel
+    BRAM bitsize: 16
+    Spec may not exploit DATA bus width
+    Spec accesses data having an address unknown at compile time
+    Internal data is not externally accessible
+    DATA bus bitsize: 32
+    ADDRESS bus bitsize: 32
+    SIZE bus bitsize: 6
+    Internally allocated memory (no private memories): 0
+    Internally allocated memory: 0
+  Time to perform memory allocation: 0.00 seconds
+
+
+  Module allocation information for function __float_adde8m23b_127nih:
+    Number of complex operations: 0
+    Number of complex operations: 0
+  Time to perform module allocation: 0.05 seconds
+
+
+  Module allocation information for function __float_mule8m23b_127nih:
+    Number of complex operations: 0
+    Number of complex operations: 0
+  Time to perform module allocation: 0.06 seconds
+
+
+  Scheduling Information of function __float_adde8m23b_127nih:
+    Number of control steps: 5
+    Minimum slack: 1.2453454070818424
+    Estimated max frequency (MHz): 266.33608372023093
+  Time to perform scheduling: 0.03 seconds
+
+  Number of function call sites = 128
+
+  State Transition Graph Information of function __float_adde8m23b_127nih:
+    Number of operations: 248
+    Number of basic blocks: 3
+    Number of states: 4
+    Minimum number of cycles: 4
+    Maximum number of cycles 4
+    Parameters are registered
+    Done port is registered
+  Time to perform creation of STG: 0.02 seconds
+
+
+  Scheduling Information of function __float_mule8m23b_127nih:
+    Number of control steps: 4
+    Minimum slack: 0.089668775531421829
+    Estimated max frequency (MHz): 203.65224957064382
+  Time to perform scheduling: 0.02 seconds
+
+  Number of function call sites = 128
+
+  State Transition Graph Information of function __float_mule8m23b_127nih:
+    Number of operations: 203
+    Number of basic blocks: 3
+    Number of states: 3
+    Minimum number of cycles: 3
+    Maximum number of cycles 3
+    Parameters are registered
+    Done port is registered
+  Time to perform creation of STG: 0.02 seconds
+
+
+  Easy binding information for function __float_adde8m23b_127nih:
+    Bound operations:113/248
+  Time to perform easy binding: 0.00 seconds
+
+
+  Easy binding information for function __float_mule8m23b_127nih:
+    Bound operations:96/203
+  Time to perform easy binding: 0.00 seconds
+
+
+  Storage Value Information of function __float_adde8m23b_127nih:
+    Number of storage values inserted: 16
+  Time to compute storage value information: 0.00 seconds
+
+
+  Storage Value Information of function __float_mule8m23b_127nih:
+    Number of storage values inserted: 4
+  Time to compute storage value information: 0.00 seconds
+
+  Slack computed in 0.01 seconds
+  Weight computation completed in 0.00 seconds
+  False-loop computation completed in 0.00 seconds
+  Iteration 0 completed in 0.00 seconds
+
+  Register binding information for function __float_adde8m23b_127nih:
+    Register allocation algorithm obtains a sub-optimal result: 16 registers(LB:12)
+  Time to perform register binding: 0.00 seconds
+
+  Iteration 1 completed in 0.00 seconds
+  Clique covering computation completed in 0.00 seconds
+
+  Module binding information for function __float_adde8m23b_127nih:
+    Number of modules instantiated: 248
+    Number of performance conflicts: 108
+    Estimated resources area (no Muxes and address logic): 143674
+    Estimated area of MUX21: 0
+    Total estimated area: 143674
+    Estimated number of DSPs: 0
+  Time to perform module binding: 0.01 seconds
+
+
+  Register binding information for function __float_adde8m23b_127nih:
+    Register allocation algorithm obtains a sub-optimal result: 16 registers(LB:12)
+  Time to perform register binding: 0.00 seconds
+
+  Total number of flip-flops in function __float_adde8m23b_127nih: 139
+  Slack computed in 0.01 seconds
+  Weight computation completed in 0.00 seconds
+  False-loop computation completed in 0.00 seconds
+  Iteration 0 completed in 0.00 seconds
+
+  Register binding information for function __float_mule8m23b_127nih:
+    Register allocation algorithm obtains an optimal result: 4 registers
+  Time to perform register binding: 0.00 seconds
+
+  Iteration 1 completed in 0.00 seconds
+  Clique covering computation completed in 0.00 seconds
+
+  Module binding information for function __float_mule8m23b_127nih:
+    Number of modules instantiated: 203
+    Number of performance conflicts: 2
+    Estimated resources area (no Muxes and address logic): 113692
+    Estimated area of MUX21: 0
+    Total estimated area: 113692
+    Estimated number of DSPs: 0
+  Time to perform module binding: 0.01 seconds
+
+
+  Register binding information for function __float_mule8m23b_127nih:
+    Register allocation algorithm obtains an optimal result: 4 registers
+  Time to perform register binding: 0.00 seconds
+
+  Total number of flip-flops in function __float_mule8m23b_127nih: 98
+  All registers are without enable: function pipelining may come for free
+  Resources are not shared in function __float_mule8m23b_127nih: function pipelining may come for free
+
+  Module allocation information for function main_kernel:
+    Number of complex operations: 352
+    Number of complex operations: 352
+  Time to perform module allocation: 0.03 seconds
+
+
+  Scheduling Information of function main_kernel:
+    Number of control steps: 58
+    Minimum slack: 0.089668773531400348
+    Estimated max frequency (MHz): 203.65224948769446
+  Time to perform scheduling: 0.38 seconds
+
+  Number of function call sites = 0
+
+  State Transition Graph Information of function main_kernel:
+    Number of operations: 1203
+    Number of basic blocks: 3
+    Number of states: 56
+    Minimum number of cycles: 56
+    Maximum number of cycles 56
+    Done port is registered
+  Time to perform creation of STG: 0.42 seconds
+
+
+  Easy binding information for function main_kernel:
+    Bound operations:774/1203
+  Time to perform easy binding: 0.01 seconds
+
+
+  Storage Value Information of function main_kernel:
+    Number of storage values inserted: 607
+  Time to compute storage value information: 0.00 seconds
+
+  Slack computed in 0.01 seconds
+  Weight computation completed in 0.08 seconds
+  False-loop computation completed in 0.00 seconds
+  cdfc mux estimation 93 -- Number of cliques covering the graph: 2 main_kernel_BMEMORY_CTRLN_774 with 96 vertices
+  cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_adde8m23b_127nih_806 with 128 vertices
+  cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_mule8m23b_127nih_807 with 128 vertices
+  Iteration 0 completed in 1.10 seconds
+
+  Register binding information for function main_kernel:
+    Register allocation algorithm obtains a sub-optimal result: 607 registers(LB:124)
+  Time to perform register binding: 0.27 seconds
+
+  cdfc mux estimation 93 -- Number of cliques covering the graph: 2 main_kernel_BMEMORY_CTRLN_774 with 96 vertices
+  cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_adde8m23b_127nih_806 with 128 vertices
+  cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_mule8m23b_127nih_807 with 128 vertices
+  Iteration 1 completed in 1.10 seconds
+  Clique covering computation completed in 2.47 seconds
+
+  Module binding information for function main_kernel:
+    Number of modules instantiated: 885
+    Number of performance conflicts: 0
+    Estimated resources area (no Muxes and address logic): 193979
+    Estimated area of MUX21: 314110.59999999998
+    Total estimated area: 508089.59999999998
+    Estimated number of DSPs: 0
+  Time to perform module binding: 2.58 seconds
+
+
+  Register binding information for function main_kernel:
+    Register allocation algorithm obtains a sub-optimal result: 607 registers(LB:124)
+  Time to perform register binding: 0.27 seconds
+
+
+  Connection Binding Information for function main_kernel:
+    Number of allocated multiplexers (2-to-1 equivalent): 541
+    Total number of bit-level multiplexers: 17312
+  Time to perform interconnection binding: 0.03 seconds
+
+  Total number of flip-flops in function main_kernel: 19424
+ .:: Creating Generic Bash Backend Flow ::.
+  Parameter P0 (494937) (testvector 0) allocated at 1073741824 : reserved_mem_size = 128
+  Parameter P1 (494938) (testvector 0) allocated at 1073741952 : reserved_mem_size = 128
+  Parameter P2 (494939) (testvector 0) allocated at 1073742080 : reserved_mem_size = 64
+  C-based testbench generation for function main_kernel: /working_dir/HLS_output//simulation/values.c
+  Prepared testbench
+clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
+clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
+warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
+1 warning generated.
+clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
+clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
+warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
+1 warning generated.
+
+  Summary of resources:
+     - ASSIGN_UNSIGNED_FU: 16
+     - ASSIGN_VECTOR_BOOL_FU: 16
+     - BMEMORY_CTRLN: 1
+     - IIdata_converter_FU: 32
+     - IUdata_converter_FU: 32
+     - MUX_GATE: 541
+     - OR_GATE: 32
+     - UIdata_converter_FU: 32
+     - UUdata_converter_FU: 2596
+     - bus_merger: 5
+     - constant_value: 769
+     - flipflop_AR: 32
+     - join_signal: 5
+     - lshift_expr_FU: 32
+     - register_SE: 635
+     - register_STD: 356
+     - rshift_expr_FU: 32
+     - split_signal: 5
+     - truth_and_expr_FU: 816
+     - truth_or_expr_FU: 176
+     - truth_xor_expr_FU: 48
+     - ui_bit_and_expr_FU: 1184
+     - ui_bit_ior_concat_expr_FU: 16
+     - ui_bit_ior_expr_FU: 656
+     - ui_bit_xor_expr_FU: 208
+     - ui_cond_expr_FU: 224
+     - ui_eq_expr_FU: 416
+     - ui_extract_bit_expr_FU: 112
+     - ui_lshift_expr_FU: 672
+     - ui_lt_expr_FU: 32
+     - ui_minus_expr_FU: 16
+     - ui_mult_expr_FU: 16
+     - ui_ne_expr_FU: 272
+     - ui_plus_expr_FU: 80
+     - ui_pointer_plus_expr_FU: 77
+     - ui_rshift_expr_FU: 784
+     - ui_ternary_plus_expr_FU: 16
+     - ui_ternary_pm_expr_FU: 16
+make: Entering directory '/working_dir/HLS_output/verilator_beh/verilator_obj'
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow  -fstrict-aliasing     -c -o testbench_main_kernel_main.o /working_dir/HLS_output//simulation/testbench_main_kernel_main.cpp
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow  -fstrict-aliasing     -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow  -fstrict-aliasing     -c -o Vmain_kernel_tb.o Vmain_kernel_tb.cpp
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow  -fstrict-aliasing     -c -o Vmain_kernel_tb__Syms.o Vmain_kernel_tb__Syms.cpp
+ar -cr Vmain_kernel_tb__ALL.a Vmain_kernel_tb.o Vmain_kernel_tb__Syms.o
+ranlib Vmain_kernel_tb__ALL.a
+g++    testbench_main_kernel_main.o verilated.o Vmain_kernel_tb__ALL.a   -static  -o Vmain_kernel_tb -lm -lstdc++ 
+make: Leaving directory '/working_dir/HLS_output/verilator_beh/verilator_obj'
+Start reading vector           1's values from input file.
+
+Reading of vector values from input file completed. Simulation started.
+Simulation ended after                   56 cycles.
+
+Simulation completed with success
+
+- /working_dir/HLS_output//simulation/testbench_main_kernel_tb.v:685: Verilog $finish
+Start reading vector           1's values from input file.
+
+Reading of vector values from input file completed. Simulation started.
+Simulation ended after                   56 cycles.
+
+Simulation completed with success
+
+- /working_dir/HLS_output//simulation/testbench_main_kernel_tb.v:685: Verilog $finish
+File "/working_dir/results.txt" opened
+1. Simulation completed with SUCCESS; Execution time 56 cycles;
+  Total cycles             : 56 cycles
+  Number of executions     : 1
+  Average execution        : 56 cycles

@@ -37,9 +37,12 @@ int registerTestLinalgCodegenStrategy();
 // Register important linalg passes
 inline void registerLinalgPassesForSoda() {
 
-  mlir::registerLinalgPromotionPass();
+  // TODO: MLIR removed the promotion pass. Expose it to the command line.
+  // mlir::registerLinalgPromotionPass();
   // Test passes
-  mlir::test::registerTestLinalgCodegenStrategy();
+  // mlir::test::registerTestLinalgCodegenStrategy();
+
+  mlir::registerLinalgPasses();
 }
 
 // Register important affine passes

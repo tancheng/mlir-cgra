@@ -30,7 +30,7 @@ struct EraseMemrefDeallocPattern : public RewritePattern {
 
 struct EraseMemrefDeallocPass
     : public mlir::soda::EraseMemrefDeallocBase<EraseMemrefDeallocPass> {
-  void runOnOperation() {
+  void runOnOperation() override {
     RewritePatternSet patterns(&getContext());
     populateEraseMemrefDeallocPattern(patterns);
     if (failed(applyPatternsAndFoldGreedily(getOperation()->getRegions(),

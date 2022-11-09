@@ -1,7 +1,7 @@
 #ifndef SODA_C_DIALECT_SODA_H
 #define SODA_C_DIALECT_SODA_H
 
-#include "mlir-c/Registration.h"
+#include "mlir-c/IR.h"
 
 #ifdef __cplusplus
 extern "C" {

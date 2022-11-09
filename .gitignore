@@ -5,6 +5,9 @@ cmake-build-release/
 # Nested build directory
 /build*
 
+/dev*
+/docs*
+
 # Nested install directory
 /install*
 

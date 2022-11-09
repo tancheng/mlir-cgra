@@ -40,6 +40,7 @@ add_mlir_python_common_capi_library(SODAPythonCAPI
   RELATIVE_INSTALL_ROOT "../../../.."
   DECLARED_SOURCES
     SODAPythonSources
+    MLIRPythonExtension.RegisterEverything
     MLIRPythonSources.Core
 )
 
@@ -52,6 +53,7 @@ add_mlir_python_modules(SODAPythonModules
   INSTALL_PREFIX "python_packages/soda/mlir_soda"
   DECLARED_SOURCES
     SODAPythonSources
+    MLIRPythonExtension.RegisterEverything
     MLIRPythonSources
   COMMON_CAPI_LINK_LIBS
     SODAPythonCAPI
