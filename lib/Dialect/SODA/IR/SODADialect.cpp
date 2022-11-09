@@ -367,8 +367,15 @@ static void printLaunchFuncOperands(OpAsmPrinter &printer, Operation *,
 //===----------------------------------------------------------------------===//
 
 void LaunchCGRAOp::build(OpBuilder &builder, OperationState &result,
-                         SODAFuncOp kernelFunc, ValueRange kernelOperands) {
+                         SODAFuncOp kernelFunc, ValueRange kernelOperands,
+                         Type asyncTokenType,
+                         ValueRange asyncDependencies) {
   // This is a good area to add static operands.
+
+  // Async dependencies.
+  result.addOperands(asyncDependencies);
+  if (asyncTokenType)
+    result.types.push_back(builder.getType<AsyncTokenType>());
 
   // Add the data operands.
   result.addOperands(kernelOperands);
@@ -380,14 +387,14 @@ void LaunchCGRAOp::build(OpBuilder &builder, OperationState &result,
                          {SymbolRefAttr::get(kernelFunc.getNameAttr())});
   result.addAttribute(getKernelAttrName(), kernelSymbol);
   SmallVector<int32_t, 2> segmentSizes(2, 1);
-  segmentSizes.front() = 0; // Initially no async dependencies.
+  segmentSizes.front() = asyncDependencies.size();
   segmentSizes.back() = static_cast<int32_t>(kernelOperands.size());
   result.addAttribute(getOperandSegmentSizeAttr(),
-                      builder.getI32VectorAttr(segmentSizes));
+                      builder.getDenseI32ArrayAttr(segmentSizes));
 }
 
 unsigned LaunchCGRAOp::getNumKernelOperands() {
-  return getNumOperands() - asyncDependencies().size() - kNumConfigOperands;
+  return operands().size();
 }
 
 StringAttr LaunchCGRAOp::getKernelModuleName() {

@@ -338,7 +338,9 @@ def SODA_LaunchCGRAOp : SODA_Op<"launch_cgra", [SODA_AsyncOpInterface,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands)>
+    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands,
+      CArg<"Type", "nullptr">:$asyncTokenType,
+      CArg<"ValueRange", "{}">:$asyncDependencies)>
   ];
 
   let extraClassDeclaration = [{
