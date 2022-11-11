@@ -56,7 +56,7 @@ linalg_on_tensors_mlir = torch_mlir.compile(
 file_path = 'bert.txt'
 new_path = 'bert.mlir'
 with open(file_path, 'wt') as f:
-    print(linalg_on_tensors_mlir.operation.get_asm(large_elements_limit=10), file=f)
+    print(linalg_on_tensors_mlir.operation.get_asm(), file=f)
 os.rename(file_path,new_path)
 
 result = model.forward(example_input)
