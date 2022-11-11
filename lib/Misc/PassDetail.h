@@ -13,9 +13,22 @@ namespace mlir {
 template <typename ConcreteDialect>
 void registerDialect(DialectRegistry &registry);
 
+namespace func {
+class FuncOp;
+} // end namespace func
+
 namespace arith {
 class ArithmeticDialect;
 } // namespace arith
+
+namespace soda {
+class SODADialect;
+class SODAModuleOp;
+} // end namespace soda
+
+namespace scf {
+class SCFDialect;
+} // end namespace scf
 
 namespace memref {
 class MemRefDialect;

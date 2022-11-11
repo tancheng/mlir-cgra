@@ -148,6 +148,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerCGRAKernelOutliningPass();
   mlir::soda::registerCGRAKernelGenerationPass();
   mlir::soda::registerCGRAHostGenerationPass();
+  mlir::soda::registerLinalgTilingForCGRAPass();
 
   // Optimization passes
   mlir::soda::registerPassManagerMiscPass();

@@ -90,6 +90,16 @@ def ForwardMemrefCopy : Pass<"forward-memref-copy", "func::FuncOp"> {
   let constructor = "mlir::soda::createForwardMemrefCopyPass()";
 }
 
+def LinalgTilingForCGRA: Pass<"linalg-tiling-for-cgra", "func::FuncOp"> {
+  let summary = "Convert selected elementwise operation chain into single CGRA call";
+  let constructor = "mlir::soda::createLinalgTilingForCGRAPass()";
+  let dependentDialects = ["soda::SODADialect", "scf::SCFDialect"];
+  let options = [
+    ListOption<"CGRAConfigs", "cgra-configs", "uint64_t",
+               "CGRA dim x, dim y, sram input0, sram input1, sram input2, sram output">,
+  ];
+}
+
 //===----------------------------------------------------------------------===//
 // Pattern-Match and Rewrite with Constraints
 //===----------------------------------------------------------------------===//

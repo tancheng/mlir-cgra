@@ -14,11 +14,15 @@
 #define SODA_MISC_PASSES_H
 
 #include "mlir/Dialect/Func/IR/FuncOps.h"
+#include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassRegistry.h"
+#include "soda/Dialect/SODA/SODADialect.h"
 #include <memory>
 
 namespace mlir {
+template <typename T>
+class OperationPass;
 class Pass;
 } // namespace mlir
 
@@ -32,6 +36,12 @@ class CopyOp;
 } // namespace memref
 namespace linalg {
 class FillOp;
+}
+namespace scf {
+class ForOp;
+}
+namespace func {
+class FuncOp;
 }
 } // namespace mlir
 
@@ -48,6 +58,9 @@ std::unique_ptr<mlir::Pass> createEraseMemrefDeallocPass();
 std::unique_ptr<mlir::Pass> createForwardMemrefAllocPass();
 std::unique_ptr<mlir::Pass> createForwardLinalgFillPass();
 std::unique_ptr<mlir::Pass> createForwardMemrefCopyPass();
+
+std::unique_ptr<OperationPass<func::FuncOp>> createLinalgTilingForCGRAPass();
+
 void populateEraseMemrefDeallocPattern(RewritePatternSet &patterns);
 
 //===----------------------------------------------------------------------===//

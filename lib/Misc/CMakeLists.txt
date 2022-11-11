@@ -6,6 +6,7 @@ add_mlir_dialect_library(SODAMisc
     MemrefEraseDealloc.cpp
     ForwardMemrefAlloc.cpp
     ForwardLinalgOps.cpp
+    LinalgTilingForCGRA.cpp
     FuncToLLVM.cpp
 
     ADDITIONAL_HEADER_DIRS
