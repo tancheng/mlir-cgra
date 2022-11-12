@@ -297,10 +297,10 @@ define void @main_graph(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, 
   ret void, !dbg !243
 }
 
-; Function Attrs: argmemonly nofree nounwind willreturn
+; Function Attrs: argmemonly nocallback nofree nounwind willreturn
 declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #0
 
-attributes #0 = { argmemonly nofree nounwind willreturn }
+attributes #0 = { argmemonly nocallback nofree nounwind willreturn }
 
 !llvm.dbg.cu = !{!0}
 !llvm.module.flags = !{!2}

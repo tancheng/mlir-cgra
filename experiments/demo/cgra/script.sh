@@ -4,8 +4,8 @@ mlir-opt --linalg-fuse-elementwise-ops 02-linalg.mlir > 03-fused.mlir
 # perform finalization
 mlir-opt --canonicalize -convert-tensor-to-linalg -linalg-init-tensor-to-alloc-tensor -eliminate-alloc-tensors   -linalg-bufferize -arith-bufferize   -tensor-bufferize -func-bufferize   -finalizing-bufferize -buffer-deallocation   --buffer-results-to-out-params   --canonicalize -cse 03-fused.mlir > 04-finalized.mlir
 
-# perform tiling (same rule across all the operations)
-mlir-opt --linalg-tile=tile-sizes=4,4 04-finalized.mlir > 05-tiled.mlir
+# perform tiling
+soda-opt --linalg-tiling-for-cgra=cgra-configs=4,4,1024,1024,1024,1024 04-finalized.mlir > 05-tiled.mlir
 
 # locating target operations that will be offloaded onto CGRA
 soda-opt --convert-linalg-matmul-to-cgra --convert-pattern-to-cgra=target-patterns="add-max-add" 05-tiled.mlir > 06-locating.mlir
