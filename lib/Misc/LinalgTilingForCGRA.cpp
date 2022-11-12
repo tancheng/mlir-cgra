@@ -70,6 +70,7 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
         MatmulOpTileSizes.push_back(dimY);
         MatmulOpTileSizes.push_back(matmulReducedTile);
 
+        BatchMatmulOpTileSizes.push_back(1);
         BatchMatmulOpTileSizes.push_back(dimX);
         BatchMatmulOpTileSizes.push_back(dimY);
         BatchMatmulOpTileSizes.push_back(matmulReducedTile);
