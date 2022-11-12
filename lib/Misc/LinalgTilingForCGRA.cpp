@@ -67,12 +67,12 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
 
     if (matmulReducedTile > 1) {
         MatmulOpTileSizes.push_back(dimX);
-        MatmulOpTileSizes.push_back(matmulReducedTile);
         MatmulOpTileSizes.push_back(dimY);
+        MatmulOpTileSizes.push_back(matmulReducedTile);
 
         BatchMatmulOpTileSizes.push_back(dimX);
-        BatchMatmulOpTileSizes.push_back(matmulReducedTile);
         BatchMatmulOpTileSizes.push_back(dimY);
+        BatchMatmulOpTileSizes.push_back(matmulReducedTile);
     } else {
         MatmulOpTileSizes.push_back(dimX);
         MatmulOpTileSizes.push_back(dimY);

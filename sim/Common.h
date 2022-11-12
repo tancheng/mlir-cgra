@@ -37,7 +37,9 @@ public:
   vector<MemRef> memRefs;
 };
 
-using pfunc = void (*)(DataReq&, DataReq&);
+class Simulator;
+
+using pfunc = void (*)(DataReq&, DataReq&, Simulator&);
 
 class Simulator {
 public:
@@ -48,6 +50,7 @@ public:
   int64_t getTotalCycles();
   void registerPredefinedMappings();
   void registerTraditionalMapping(string, int64_t);
+  map<string, int> matmulLocCount;
 
 private:
   bool enableDoubleBuffer;

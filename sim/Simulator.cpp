@@ -82,7 +82,7 @@ void Simulator::issueWR(DataReq& output, bool computeHere) {
   // perform computation
   if (computeHere) {
     pfunc f = exFuncMap[operation];
-    (*f)(input, output);
+    (*f)(input, output, *this);
   }
 
   // calculate data communication (CGRA->host) cycles

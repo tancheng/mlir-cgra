@@ -48,8 +48,12 @@ extern "C" void cgra_matmul(float* a_allocated, float* a_aligned, int64_t a_offs
   cgra->issueEX("matmul");
   cgra->issueWR(output, true);
 
-  cout<<"calculated output for cgra_matmul() c_size0: "<<c_size0<<"; c_size1: "<<c_size1<<"; c_stride0: "<<c_stride0<<"; c_stride1: "<<c_stride1<<endl;
+  /*
+  cout<<"calculated output for cgra_matmul() a_alloc: "<<a_allocated<<"; a_aligned: "<<a_aligned<<"; a_offset: "<<a_offset<<"; a_size0: "<<a_size0<<"; a_size1: "<<a_size1<<"; a_stride0: "<<a_stride0<<"; a_stride1: "<<a_stride1<<endl;
+  cout<<"calculated output for cgra_matmul() b_alloc: "<<b_allocated<<"; b_aligned: "<<b_aligned<<"; b_offset: "<<b_offset<<"; b_size0: "<<b_size0<<"; b_size1: "<<b_size1<<"; b_stride0: "<<b_stride0<<"; b_stride1: "<<b_stride1<<endl;
+  cout<<"calculated output for cgra_matmul() c_alloc: "<<c_allocated<<"; c_aligned: "<<c_aligned<<"; c_offset: "<<c_offset<<"; c_size0: "<<c_size0<<"; c_size1: "<<c_size1<<"; c_stride0: "<<c_stride0<<"; c_stride1: "<<c_stride1<<endl;
   cout<<"check total cycles: "<<cgra->getTotalCycles()<<endl;
+  */
 }
 
 // This fusion is an example for add+max+add. A robust fusion call should
