@@ -143,6 +143,7 @@ int main(int argc, char **argv) {
   // CGRA passes
   mlir::soda::registerConvertPatternToCGRAPass();
   mlir::soda::registerConvertLinalgMatmulToCGRAPass();
+  mlir::soda::registerConvertLinalgBatchMatmulToCGRAPass();
   mlir::soda::registerConvertLinalgGenericToCGRAPass();
   mlir::soda::registerConvertLinalgConvToCGRAPass();
   mlir::soda::registerCGRAKernelOutliningPass();

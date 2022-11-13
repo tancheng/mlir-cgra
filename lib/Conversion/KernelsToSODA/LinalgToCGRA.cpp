@@ -28,6 +28,8 @@ struct LinalgToCGRAConverter {
   template <class T>
   void createMatmulLaunch(T rootOp);
   template <class T>
+  void createBatchMatmulLaunch(T rootOp);
+  template <class T>
   void createGenericLaunch(T rootOp);
 };
 
@@ -77,6 +79,29 @@ void LinalgToCGRAConverter::createMatmulLaunch(T rootLinalgOp) {
     builder.setInsertionPointToStart(&launchOp.body().front());
   
     Operation* newOp = builder.create<soda::MatmulOp>(loc, rootLinalgOp->getOperands());
+
+    auto results = newOp->getResults();
+    rootLinalgOp->replaceAllUsesWith(results);
+    rootLinalgOp->erase();
+  }
+}
+
+
+/// Add a CGRA launch operation around the "linalg.batch_matmul" op.
+template <class T>
+void LinalgToCGRAConverter::createBatchMatmulLaunch(T rootLinalgOp) {
+  OpBuilder builder(rootLinalgOp.getOperation());
+
+  if (dyn_cast<linalg::BatchMatmulOp>(&rootLinalgOp) != nullptr) {
+
+    // Create a launch op and move target op into the region
+    Location loc = rootLinalgOp.getLoc();
+    auto launchOp = builder.create<soda::LaunchOp>(loc);
+    builder.setInsertionPointToEnd(&launchOp.body().front());
+    builder.create<soda::TerminatorOp>(loc);
+    builder.setInsertionPointToStart(&launchOp.body().front());
+
+    Operation* newOp = builder.create<soda::BatchMatmulOp>(loc, rootLinalgOp->getOperands());
 
     auto results = newOp->getResults();
     rootLinalgOp->replaceAllUsesWith(results);
@@ -148,6 +173,18 @@ static LogicalResult convertLinalgMatmulToCGRALaunch(linalg::MatmulOp op) {
 
 LogicalResult mlir::convertLinalgMatmulToCGRALaunch(linalg::MatmulOp op) {
   return ::convertLinalgMatmulToCGRALaunch(op);
+}
+
+static LogicalResult convertLinalgBatchMatmulToCGRALaunch(linalg::BatchMatmulOp op) {
+
+  LinalgToCGRAConverter converter;
+  converter.createBatchMatmulLaunch(op);
+
+  return success();
+}
+
+LogicalResult mlir::convertLinalgBatchMatmulToCGRALaunch(linalg::BatchMatmulOp op) {
+  return ::convertLinalgBatchMatmulToCGRALaunch(op);
 }
 
 static LogicalResult convertLinalgConvToCGRALaunch(linalg::Conv2DOp op) {

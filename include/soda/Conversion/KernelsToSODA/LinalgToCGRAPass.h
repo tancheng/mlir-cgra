@@ -18,6 +18,7 @@ class Pass;
 /// Create a pass that converts linalg ops into soda launch ops.
 // std::unique_ptr<OperationPass<func::FuncOp>> createLinalgDotToSODAPass();
 std::unique_ptr<OperationPass<func::FuncOp>> createLinalgMatmulToCGRAPass();
+std::unique_ptr<OperationPass<func::FuncOp>> createLinalgBatchMatmulToCGRAPass();
 std::unique_ptr<OperationPass<func::FuncOp>> createLinalgConvToCGRAPass();
 std::unique_ptr<OperationPass<func::FuncOp>> createLinalgGenericToCGRAPass();
 

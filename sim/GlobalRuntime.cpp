@@ -56,6 +56,82 @@ extern "C" void cgra_matmul(float* a_allocated, float* a_aligned, int64_t a_offs
   */
 }
 
+extern "C" void cgra_matmul_(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_stride0, int64_t a_stride1,
+                 float* b_allocated, float* b_aligned, int64_t b_offset, int64_t b_size0, int64_t b_size1, int64_t b_stride0, int64_t b_stride1,
+                 float* c_allocated, float* c_aligned, int64_t c_offset, int64_t c_size0, int64_t c_size1, int64_t c_stride0, int64_t c_stride1) {
+  cgra_matmul(a_allocated, a_aligned, a_offset, a_size0, a_size1, a_stride0, a_stride1,
+              b_allocated, b_aligned, b_offset, b_size0, b_size1, b_stride0, b_stride1,
+              c_allocated, c_aligned, c_offset, c_size0, c_size1, c_stride0, c_stride1);
+
+}
+
+extern "C" void cgra_batch_matmul(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_size2, int64_t a_stride0, int64_t a_stride1, int64_t a_stride2,
+                            float* b_allocated, float* b_aligned, int64_t b_offset, int64_t b_size0, int64_t b_size1, int64_t b_size2, int64_t b_stride0, int64_t b_stride1, int64_t b_stride2,
+                            float* c_allocated, float* c_aligned, int64_t c_offset, int64_t c_size0, int64_t c_size1, int64_t c_size2, int64_t c_stride0, int64_t c_stride1, int64_t c_stride2) {
+
+  // prepare inputs
+  vector<int64_t> a_sizes = {a_size0, a_size1, a_size2};
+  vector<int64_t> a_strides = {a_stride0, a_stride1, a_stride2};
+  MemRef memRef0(a_allocated, a_aligned, a_offset, a_sizes, a_strides, 3);
+
+  vector<int64_t> b_sizes = {b_size0, b_size1, b_size2};
+  vector<int64_t> b_strides = {b_stride0, b_stride1, b_stride2};
+  MemRef memRef1(b_allocated, b_aligned, b_offset, b_sizes, b_strides, 3);
+
+  DataReq input;
+  input.assembleReq(memRef0);
+  input.assembleReq(memRef1);
+
+  // prepare outputs
+  vector<int64_t> c_sizes = {c_size0, c_size1, c_size2};
+  vector<int64_t> c_strides = {c_stride0, c_stride1, c_stride2};
+  MemRef memRef2(c_allocated, c_aligned, c_offset, c_sizes, c_strides, 3);
+
+  DataReq output;
+  output.assembleReq(memRef2);
+
+  // issue READ/EXECUTE/WRITE requests for simulation
+  cgra->issueRD(input);
+  cgra->issueEX("batch_matmul");
+  cgra->issueWR(output, true);
+}
+
+extern "C" void cgra_batch_matmul_(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_size2, int64_t a_stride0, int64_t a_stride1, int64_t a_stride2,
+                            float* b_allocated, float* b_aligned, int64_t b_offset, int64_t b_size0, int64_t b_size1, int64_t b_size2, int64_t b_stride0, int64_t b_stride1, int64_t b_stride2,
+                            float* c_allocated, float* c_aligned, int64_t c_offset, int64_t c_size0, int64_t c_size1, int64_t c_size2, int64_t c_stride0, int64_t c_stride1, int64_t c_stride2) {
+
+  // prepare inputs
+  vector<int64_t> a_sizes = {a_size0, a_size1, a_size2};
+  vector<int64_t> a_strides = {a_stride0, a_stride1, a_stride2};
+  MemRef memRef0(a_allocated, a_aligned, a_offset, a_sizes, a_strides, 3);
+
+  vector<int64_t> b_sizes = {b_size0, b_size1, b_size2};
+  vector<int64_t> b_strides = {b_stride0, b_stride1, b_stride2};
+  MemRef memRef1(b_allocated, b_aligned, b_offset, b_sizes, b_strides, 3);
+
+  DataReq input;
+  input.assembleReq(memRef0);
+  input.assembleReq(memRef1);
+
+  // prepare outputs
+  vector<int64_t> c_sizes = {c_size0, c_size1, c_size2};
+  vector<int64_t> c_strides = {c_stride0, c_stride1, c_stride2};
+  MemRef memRef2(c_allocated, c_aligned, c_offset, c_sizes, c_strides, 3);
+
+  DataReq output;
+  output.assembleReq(memRef2);
+
+  // issue READ/EXECUTE/WRITE requests for simulation
+  cgra->issueRD(input);
+  cgra->issueEX("batch_matmul");
+  cgra->issueWR(output, true);
+
+  cout<<"calculated output for cgra_batch_matmul() a_alloc: "<<a_allocated<<"; a_aligned: "<<a_aligned<<"; a_offset: "<<a_offset<<"; a_size0: "<<a_size0<<"; a_size1: "<<a_size1<<"; a_size2: "<<a_size2<<"; a_stride0: "<<a_stride0<<"; a_stride1: "<<a_stride1<<"; a_stride2: "<<a_stride2<<endl;
+  cout<<"calculated output for cgra_batch_matmul() b_alloc: "<<b_allocated<<"; b_aligned: "<<b_aligned<<"; b_offset: "<<b_offset<<"; b_size0: "<<b_size0<<"; b_size1: "<<b_size1<<"; b_size2: "<<b_size2<<"; b_stride0: "<<b_stride0<<"; b_stride1: "<<b_stride1<<"; b_stride2: "<<b_stride2<<endl;
+  cout<<"calculated output for cgra_batch_matmul() c_alloc: "<<c_allocated<<"; c_aligned: "<<c_aligned<<"; c_offset: "<<c_offset<<"; c_size0: "<<c_size0<<"; c_size1: "<<c_size1<<"; c_size2: "<<c_size2<<"; c_stride0: "<<c_stride0<<"; c_stride1: "<<c_stride1<<"; c_stride2: "<<c_stride2<<endl;
+  cout<<"check total cycles: "<<cgra->getTotalCycles()<<endl;
+}
+
 // This fusion is an example for add+max+add. A robust fusion call should
 // be able to figure out what type of operation chain is targeted.
 extern "C" void cgra_fusion_add_max_add(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_stride0, int64_t a_stride1,

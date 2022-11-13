@@ -453,6 +453,24 @@ def SODA_MatmulOp : SODA_Op<"cgra.matmul", [NoSideEffect]>,
   // let hasVerifier = 1;
 }
 
+def SODA_BatchMatmulOp : SODA_Op<"cgra.batch_matmul", [NoSideEffect]>,
+    Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
+  let summary = "CGRA BatchMatmul operation.";
+  let description = [{
+    An soda operation `cgra.batch_matmul` to replace `linalg.batch_matmul`. The operands and
+    output are the same.
+  }];
+
+  let builders = [OpBuilder<(ins), [{ // empty}]>];
+
+  let arguments = (ins Variadic<AnyType>:$operands);
+  // let arguments = (ins AnyType:$operandA, AnyType:$operandB, AnyType:$operandC);
+
+  let assemblyFormat = "attr-dict ($operands^ `:` type($operands))?";
+
+  // let hasVerifier = 1;
+}
+
 def SODA_FusionOp : SODA_Op<"cgra.fusion", [NoSideEffect]>,
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
   let summary = "CGRA fused operation.";

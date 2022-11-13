@@ -13,8 +13,10 @@ Simulator::Simulator(bool enableDoubleBuffer) {
 
 void Simulator::registerPredefinedMappings() {
   exCycleMap.insert({"matmul", 20});
+  exCycleMap.insert({"batch_matmul", 20});
   exCycleMap.insert({"fusion_add_max_add", 20});
   exFuncMap["matmul"] = matmul;
+  exFuncMap["batch_matmul"] = batch_matmul;
   exFuncMap["fusion_add_max_add"] = fusion_add_max_add;
 }
 

@@ -350,6 +350,8 @@ public:
           kernelFnName += (*op.body().front().op_begin<soda::FusionOp>())->getAttr("pattern").cast<StringAttr>().str();
         } else if (op.body().front().op_begin<soda::MatmulOp>() != op.body().front().op_end<soda::MatmulOp>()) {
           kernelFnName = "matmul";
+        }  else if (op.body().front().op_begin<soda::BatchMatmulOp>() != op.body().front().op_end<soda::BatchMatmulOp>()) {
+          kernelFnName = "batch_matmul";
         } else {
           kernelFnName = "generic_" + to_string(genericFuncCount);
           isGenericFunc = true;

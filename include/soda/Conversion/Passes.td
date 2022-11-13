@@ -87,6 +87,12 @@ def ConvertLinalgMatmulToCGRA : Pass<"convert-linalg-matmul-to-cgra", "func::Fun
   let dependentDialects = ["soda::SODADialect"];
 }
 
+def ConvertLinalgBatchMatmulToCGRA : Pass<"convert-linalg-batch_matmul-to-cgra", "func::FuncOp"> {
+  let summary = "Offload (nested) linalg::batch_matmul Ops for CGRA acceleration";
+  let constructor = "mlir::createLinalgBatchMatmulToCGRAPass()";
+  let dependentDialects = ["soda::SODADialect"];
+}
+
 def ConvertLinalgConvToCGRA : Pass<"convert-linalg-conv-to-cgra", "func::FuncOp"> {
   let summary = "Offload (nested) linalg::conv Ops for CGRA acceleration";
   let constructor = "mlir::createLinalgConvToCGRAPass()";

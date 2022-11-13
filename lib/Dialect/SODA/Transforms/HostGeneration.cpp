@@ -19,7 +19,10 @@
 #include "soda/Dialect/SODA/Utils.h"
 
 #include <iostream>
+#include <map>
+#include <string>
 
+using namespace std;
 using namespace mlir;
 
 namespace {
@@ -78,6 +81,7 @@ public:
             .str();
 
     auto func = module.lookupSymbol<func::FuncOp>(newName);
+
     if (!func) {
 
       // Get callee
@@ -118,7 +122,11 @@ public:
     auto newName = "cgra_" + Twine(op.getKernelName()).str();
     auto func = module.lookupSymbol<func::FuncOp>(newName);
 
-    if (!func) {
+    // std::cout<<"found func... "<<newName<<std::endl;
+    while (func) {
+      newName += "_";
+      func = module.lookupSymbol<func::FuncOp>(newName);
+    }
 
       // Get callee
       Operation *kernelFunc = module.lookupSymbol(op.kernelAttr());
@@ -130,12 +138,12 @@ public:
       if (kernelSODAFunction == NULL)
         std::cout<<"kernelSODAFunction is NULL"<<std::endl;
       FunctionType funcTy = kernelSODAFunction.getFunctionType();
-      func::FuncOp func = rewriter.create<func::FuncOp>(
+      func::FuncOp updatedFunc = rewriter.create<func::FuncOp>(
           rewriter.getUnknownLoc(), newName, funcTy);
-      func.setPrivate();
+      updatedFunc.setPrivate();
 
       rewriter.setInsertionPoint(op);
-    }
+    // }
 
     assert(
         isa<FunctionOpInterface>(SymbolTable::lookupSymbolIn(module, newName)));
