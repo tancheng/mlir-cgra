@@ -73,12 +73,8 @@ void PatternToCGRAConverter::createLaunch(Operation *op, ArrayRef<string> patter
   OpBuilder builder(op);
   auto genericOp = dyn_cast<linalg::GenericOp>(op);
 
-  // Create a launch op and move target op into the region
+  // potentially create a launch op and move target op into the region
   Location loc = genericOp->getLoc();
-  auto launchOp = builder.create<soda::LaunchOp>(loc);
-  builder.setInsertionPointToEnd(&launchOp.body().front());
-  builder.create<soda::TerminatorOp>(loc);
-  builder.setInsertionPointToStart(&launchOp.body().front());
 
   Operation* newOp = NULL;
 
@@ -100,42 +96,24 @@ void PatternToCGRAConverter::createLaunch(Operation *op, ArrayRef<string> patter
     }
   }
 
-  /*
-  auto matchedPattern = getMatchedPattern(arithOptList, patterns);
-  if (matchedPattern != "") {
-    auto ctx  = builder.getContext();
-    newOp = builder.create<soda::FusionOp>(loc, genericOp->getOperands());
-    newOp->setAttr("pattern", StringAttr::get(ctx, matchedPattern));
-  }
-  */
-
-/*
-  for (Operation &arithOp : llvm::make_early_inc_range(genericOp.getRegion().front().getOperations())) {
-    if (auto maxOp = dyn_cast<arith::MaxFOp>(&arithOp)) {
-      matchTargetArithOp(maxOp, patterns);
-      mlir::Value maxInput = maxOp.getOperand(0);
-      auto maxInputOp = maxInput.getDefiningOp<arith::MaxFOp>();
-      if (maxInputOp) {
-        newOp = builder.create<soda::AddMaxOp>(loc, genericOp->getOperands());
-      }
-    }
-  }
-*/
-
   // Clone the op.
-  if (newOp == NULL) {
+  if (newOp != NULL) {
+    auto launchOp = builder.create<soda::LaunchOp>(loc);
+    builder.setInsertionPointToEnd(&launchOp.body().front());
+    builder.create<soda::TerminatorOp>(loc);
+    builder.setInsertionPointToStart(&launchOp.body().front());
     newOp = Operation::create(
         op->getLoc(), op->getName(), op->getResultTypes(),
         op->getOperands(), op->getAttrDictionary(),
         op->getSuccessors(), op->getRegions());
 
     builder.insert(newOp);
-  }
 
-  // Insert the clone into the soda launch.
-  auto results = newOp->getResults();
-  op->replaceAllUsesWith(results);
-  op->erase();
+    // Insert the clone into the soda launch.
+    auto results = newOp->getResults();
+    op->replaceAllUsesWith(results);
+    op->erase();
+  }
 }
 
 static LogicalResult convertPatternToCGRALaunch(Operation *op, ArrayRef<string> patterns) {

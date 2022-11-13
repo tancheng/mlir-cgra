@@ -137,10 +137,17 @@ struct LinalgGenericMapper: public ConvertLinalgGenericToCGRABase<LinalgGenericM
 
   void runOnOperation() override {
     for (Operation &op : llvm::make_early_inc_range(getOperation().getOps())) {
+      /*
       if (auto genericOp = dyn_cast<linalg::GenericOp>(&op)) {
         if (failed(convertLinalgGenericToCGRALaunch(genericOp)))
           signalPassFailure();
       } else if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
+	      runOnInnerOp(forOp);
+      }
+      */
+      // TODO: in current prototype, we only target the tiled generic op to be offloaded
+      // onto CGRA for simplicity.
+      if (auto forOp = dyn_cast<scf::ForOp>(&op)) {
 	      runOnInnerOp(forOp);
       }
     }
