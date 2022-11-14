@@ -36,11 +36,11 @@ int main(int argc, char *argv[]) {
   a[10] = 1012;
   a[11] = 102;
 
-  cgra = new Simulator(false);
+  cgra = new Simulator(4, 4); // provide the x/y sizes of the CGRA
 
   forward(a, a, 0, 1, 12, 1, 1, b, b, 0, 1, 2, 1, 1);
 
-  std::cout<<"check result: "<<std::endl;
+  std::cout<<"Check result: "<<std::endl;
   for (int i=0; i<2; ++i) {
     std::cout<<b[i]<<"\t";
   }

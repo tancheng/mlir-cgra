@@ -54,12 +54,12 @@ int main(int argc, char *argv[]) {
     {1, 1},  // strides[N]
   };
 
-  cgra = new Simulator(false);
+  cgra = new Simulator(4, 4);
 
   // main_graph(memref0, memref1, memref2, memref3, memref4);
   main_graph(a, a, 0, 16, 32, 1, 1, b, b, 0, 32, 16, 1, 1, c, c, 0, 16, 16, 1, 1, d, d, 0, 16, 16, 1, 1, e, e, 0, 16, 16, 1, 1);
 
-  std::cout<<"check result: "<<std::endl;
+  std::cout<<"Check result: "<<std::endl;
   for (int i=0; i<256; ++i) {
     std::cout<<e[i]<<"\t";
     if (i % 16 == 15) {
