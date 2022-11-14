@@ -60,14 +60,12 @@ extern "C" void cgra_generic_0(float* a_allocated, float* a_aligned, int64_t a_o
 
   // issue READ/EXECUTE/WRITE requests for simulation
   cgra->issueRD(input);
-  cgra->issueEX("generic_0");
+  cgra->issueEX("generic_0", a_size0 * a_size1);
   cgra->issueWR(output, false); // false indicates there is no related predefined operation, so need to run the lowered llvm ir code
 
   generic_0(a_allocated, a_aligned, a_offset, a_size0, a_size1, a_stride0, a_stride1,
             b_allocated, b_aligned, b_offset, b_size0, b_size1, b_stride0, b_stride1,
             c_allocated, c_aligned, c_offset, c_size0, c_size1, c_stride0, c_stride1,
             d_allocated, d_aligned, d_offset, d_size0, d_size1, d_stride0, d_stride1);
-
-  cout<<"calculated output for cgra_fusion() d_size0: "<<d_size0<<"; d_size1: "<<d_size1<<"; d_stride0: "<<d_stride0<<"; d_stride1: "<<d_stride1<<endl;
 }
 

@@ -54,7 +54,9 @@ int main(int argc, char *argv[]) {
     {1, 1},  // strides[N]
   };
 
-  cgra = new Simulator(false); // true or false indicates whether double buffer is enabled
+  cgra = new Simulator(4, 4); // true or false indicates whether double buffer is enabled
+  cgra->enableDoubleBuffer();
+  cgra->runAsBaseline();
   
   // register the operations into runtime, these operations are offloaded and runing on CGRA.
   // However, they are mapped in the conventional way (i.e., through mlir->llvm->mapping), in
@@ -62,18 +64,20 @@ int main(int argc, char *argv[]) {
   // have longer execution cycles than the pre-defined ones. Note that for baseline (i.e., 
   // conventional CGRA), all the operations are conventionally mapped, so we need to register
   // all of them one by one. 
-  cgra->registerTraditionalMapping("matmul", 40);
-  cgra->registerTraditionalMapping("generic_0", 40);
+  // cgra->registerTraditionalMapping("matmul", 40);
+  // cgra->registerTraditionalMapping("generic_0", 40);
 
   // main_graph(memref0, memref1, memref2, memref3, memref4);
   main_graph(a, a, 0, 16, 32, 1, 1, b, b, 0, 32, 16, 1, 1, c, c, 0, 16, 16, 1, 1, d, d, 0, 16, 16, 1, 1, e, e, 0, 16, 16, 1, 1);
 
-  std::cout<<"check result: "<<std::endl;
+  std::cout<<"Check result: "<<std::endl;
   for (int i=0; i<256; ++i) {
     std::cout<<e[i]<<"\t";
     if (i % 16 == 15) {
       std::cout<<std::endl;
     }
   }
+
+  std::cout<<"Total cycles: "<<cgra->getTotalCycles()<<std::endl;
   return 0;
 }
