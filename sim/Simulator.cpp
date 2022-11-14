@@ -4,33 +4,39 @@
 
 #include <iostream>
 
-Simulator::Simulator() {
+Simulator::Simulator(int dimX, int dimY) {
   // DMA speed in GB/s @1GHz => bytes/cycle
-  DMASpeed = 1;
   this->doubleBufferEnabled = false;
-  registerPredefinedMappings();
+  this->dimX = dimX;
+  this->dimY = dimY;
+  traditionalII = 4;
+  isBaselineMode = false;
+  registerPredefinedMappingKernels();
 }
 
 void Simulator::enableDoubleBuffer() {
   this->doubleBufferEnabled = true;
 }
 
-void Simulator::registerPredefinedMappings() {
-  exCycleMap.insert({"matmul", 20});
-  exCycleMap.insert({"batch_matmul", 20});
-  exCycleMap.insert({"fusion_add_max_add", 20});
+// For baseline, all the kernels are mapped in the
+// traditional way.
+void Simulator::runAsBaseline() {
+  isBaselineMode = true;
+}
+
+void Simulator::registerPredefinedMappingKernels() {
+  predefinedMappingKernels.insert("matmul");
+  predefinedMappingKernels.insert("batch_matmul");
+  predefinedMappingKernels.insert("fusion_add_max_add");
+
   exFuncMap["matmul"] = matmul;
   exFuncMap["batch_matmul"] = batch_matmul;
   exFuncMap["fusion_add_max_add"] = fusion_add_max_add;
 }
 
-void Simulator::registerTraditionalMapping(string operation, int64_t cycles) {
 
-  if (exCycleMap.find(operation) != exCycleMap.end()) {
-    exCycleMap[operation] = cycles;
-  } else {
-    exCycleMap.insert({operation, cycles});
-  }
+void Simulator::registerPredefinedMappingKernel(string kernel) {
+  predefinedMappingKernels.insert(kernel);
 }
 
 void Simulator::issueRD(DataReq& input) {
@@ -48,7 +54,7 @@ void Simulator::issueRD(DataReq& input) {
     }
     totalSize += tensorSize;
   }
-  rdCycles = totalSize / DMASpeed;
+  rdCycles = totalSize * 4 / DMASpeed * 2; // assume 400MHz DMA (32b/cycle), the CGRA is 800MHz.
   int64_t rdStartCycle = lastEXCompleteCycle[rdIndex];
   if (doubleBufferEnabled)
     rdStartCycle = max(lastRDCompleteCycle[rdIndex ^ 1], lastEXCompleteCycle[rdIndex]);
@@ -61,11 +67,32 @@ void Simulator::issueRD(DataReq& input) {
 
 }
 
-void Simulator::issueEX(string operationType) {
+void Simulator::issueEX(string operationType, int64_t loopBounds) {
 
   // calculate execution cycles (the computation is done during issueWR())
   currentOperation[exIndex] = operationType;
-  int64_t exCycles = exCycleMap[operationType];
+  int64_t exCycles = 0;
+
+  if (operationType == "matmul" || operationType == "batch_matmul") {
+    if (isBaselineMode || predefinedMappingKernels.find(operationType) == predefinedMappingKernels.end()) {
+      exCycles = loopBounds * traditionalII;
+    } else {
+      exCycles = loopBounds + this->dimX - 1;
+    }
+  } else {
+    if (isBaselineMode || predefinedMappingKernels.find(operationType) == predefinedMappingKernels.end()) {
+
+      // assume unrolling factor is the same as the dimX
+      exCycles = loopBounds / this->dimX * traditionalII;
+    } else {
+
+      // for generic op
+      // in this prototype, we only target 3-opt chain
+      exCycles = loopBounds / this->dimX + 2 * (this->dimX -1);
+    }
+  }
+
+  // int64_t exCycles = exCycleMap[operationType];
   int64_t exStartCycle = lastRDCompleteCycle[exIndex];
   if (doubleBufferEnabled)
     exStartCycle = max(lastRDCompleteCycle[exIndex], lastEXCompleteCycle[exIndex ^ 1]);
@@ -101,7 +128,7 @@ void Simulator::issueWR(DataReq& output, bool computeHere) {
     }
     totalSize += tensorSize;
   }
-  wrCycles = totalSize / DMASpeed;
+  wrCycles = totalSize * 4 / DMASpeed * 2;
 
   int64_t wrStartCycle = lastEXCompleteCycle[wrIndex];
   if (doubleBufferEnabled)

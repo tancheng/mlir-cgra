@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 #include <iostream>
 
 using namespace std;
@@ -43,15 +44,20 @@ using pfunc = void (*)(DataReq&, DataReq&, Simulator&);
 
 class Simulator {
 public:
-  Simulator();
+  Simulator(int, int);
   void enableDoubleBuffer();
   void issueRD(DataReq&);
-  void issueEX(string);
+  void issueEX(string, int64_t);
   void issueWR(DataReq&, bool);
   int64_t getTotalCycles();
-  void registerPredefinedMappings();
-  void registerTraditionalMapping(string, int64_t);
+  void registerPredefinedMappingKernels();
+  void registerPredefinedMappingKernel(string);
   map<string, int> matmulLocCount;
+  int dimX;
+  int dimY;
+  bool isBaselineMode;
+  void runAsBaseline();
+  int traditionalII;
 
 private:
   bool doubleBufferEnabled;
@@ -66,9 +72,9 @@ private:
   int rdIndex = 0;
   int exIndex = 0;
   int wrIndex = 0;
-  // DMA speed in GB/s @1GHz => bytes/cycle
-  float DMASpeed = 1;
-  map<string, int64_t> exCycleMap;
+  // A typical DMA @ 400MHz (32b/cycle)
+  float DMASpeed = 32;
+  set<string> predefinedMappingKernels;
   map<string, pfunc> exFuncMap;
 };
 

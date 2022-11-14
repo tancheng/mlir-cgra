@@ -45,7 +45,7 @@ extern "C" void cgra_matmul(float* a_allocated, float* a_aligned, int64_t a_offs
 
   // issue READ/EXECUTE/WRITE requests for simulation
   cgra->issueRD(input);
-  cgra->issueEX("matmul");
+  cgra->issueEX("matmul", a_size1);
   cgra->issueWR(output, true);
 }
 
@@ -76,7 +76,7 @@ extern "C" void cgra_batch_matmul(float* a_allocated, float* a_aligned, int64_t 
 
   // issue READ/EXECUTE/WRITE requests for simulation
   cgra->issueRD(input);
-  cgra->issueEX("batch_matmul");
+  cgra->issueEX("batch_matmul", a_size2);
   cgra->issueWR(output, true);
 
   /*
@@ -122,7 +122,7 @@ extern "C" void cgra_fusion_add_max_add(float* a_allocated, float* a_aligned, in
 
   // issue READ/EXECUTE/WRITE requests for simulation
   cgra->issueRD(input);
-  cgra->issueEX("fusion_add_max_add");
+  cgra->issueEX("fusion_add_max_add", d_size0);
   cgra->issueWR(output, true); // true indicates there is a predefined mapping in the CGRAFunc.h
 
   // cout<<"calculated output for cgra_fusion() d_size0: "<<d_size0<<"; d_size1: "<<d_size1<<"; d_stride0: "<<d_stride0<<"; d_stride1: "<<d_stride1<<endl;

@@ -91,7 +91,12 @@ class Define:
 
 
         lines.append("\tcgra->issueRD(input);")
-        lines.append("\tcgra->issueEX(\"generic_" + str(self.ID) + "\");")
+        accum = "int accum = 1"
+        for j in range(self.tensorDims[0]):
+            accum += " * i0_size" + str(j)
+        accum += ";"
+        lines.append("\t" + accum)
+        lines.append("\tcgra->issueEX(\"generic_" + str(self.ID) + "\", accum);")
         lines.append("\tcgra->issueWR(output, false);")
 
         call = "generic_" + str(self.ID) + "("
