@@ -4,11 +4,15 @@
 
 #include <iostream>
 
-Simulator::Simulator(bool enableDoubleBuffer) {
+Simulator::Simulator() {
   // DMA speed in GB/s @1GHz => bytes/cycle
   DMASpeed = 1;
-  this->enableDoubleBuffer = enableDoubleBuffer;
+  this->doubleBufferEnabled = false;
   registerPredefinedMappings();
+}
+
+void Simulator::enableDoubleBuffer() {
+  this->doubleBufferEnabled = true;
 }
 
 void Simulator::registerPredefinedMappings() {
@@ -46,13 +50,13 @@ void Simulator::issueRD(DataReq& input) {
   }
   rdCycles = totalSize / DMASpeed;
   int64_t rdStartCycle = lastEXCompleteCycle[rdIndex];
-  if (enableDoubleBuffer)
+  if (doubleBufferEnabled)
     rdStartCycle = max(lastRDCompleteCycle[rdIndex ^ 1], lastEXCompleteCycle[rdIndex]);
   lastRDCompleteCycle[rdIndex] = rdStartCycle + rdCycles;
 
-  cout<<"issueRD: lastRDCompleteCycle["<<rdIndex<<"]: "<<lastRDCompleteCycle[rdIndex]<<"; totalSize: "<<totalSize<<endl;
+  // cout<<"issueRD: lastRDCompleteCycle["<<rdIndex<<"]: "<<lastRDCompleteCycle[rdIndex]<<"; totalSize: "<<totalSize<<endl;
 
-  if (enableDoubleBuffer)
+  if (doubleBufferEnabled)
     rdIndex = rdIndex ^ 1;
 
 }
@@ -63,13 +67,13 @@ void Simulator::issueEX(string operationType) {
   currentOperation[exIndex] = operationType;
   int64_t exCycles = exCycleMap[operationType];
   int64_t exStartCycle = lastRDCompleteCycle[exIndex];
-  if (enableDoubleBuffer)
+  if (doubleBufferEnabled)
     exStartCycle = max(lastRDCompleteCycle[exIndex], lastEXCompleteCycle[exIndex ^ 1]);
   lastEXCompleteCycle[exIndex] = exStartCycle + exCycles;
 
-  cout<<"issueEX: lastEXCompleteCycle["<<exIndex<<"]: "<<lastEXCompleteCycle[exIndex]<<endl;
+  // cout<<"issueEX: lastEXCompleteCycle["<<exIndex<<"]: "<<lastEXCompleteCycle[exIndex]<<endl;
 
-  if (enableDoubleBuffer)
+  if (doubleBufferEnabled)
     exIndex = exIndex ^ 1;
 
 
@@ -100,13 +104,13 @@ void Simulator::issueWR(DataReq& output, bool computeHere) {
   wrCycles = totalSize / DMASpeed;
 
   int64_t wrStartCycle = lastEXCompleteCycle[wrIndex];
-  if (enableDoubleBuffer)
+  if (doubleBufferEnabled)
     wrStartCycle = max(lastWRCompleteCycle[wrIndex ^ 1], lastEXCompleteCycle[wrIndex]);
   lastWRCompleteCycle[wrIndex] = wrStartCycle + wrCycles;
 
-  cout<<"issueWR: lastWRCompleteCycle["<<wrIndex<<"]: "<<lastWRCompleteCycle[wrIndex]<<"; totalSize: "<<totalSize<<endl;
+  // cout<<"issueWR: lastWRCompleteCycle["<<wrIndex<<"]: "<<lastWRCompleteCycle[wrIndex]<<"; totalSize: "<<totalSize<<endl;
 
-  if (enableDoubleBuffer)
+  if (doubleBufferEnabled)
     wrIndex = wrIndex ^ 1;
 
 }

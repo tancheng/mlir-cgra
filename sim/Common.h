@@ -43,7 +43,8 @@ using pfunc = void (*)(DataReq&, DataReq&, Simulator&);
 
 class Simulator {
 public:
-  Simulator(bool);
+  Simulator();
+  void enableDoubleBuffer();
   void issueRD(DataReq&);
   void issueEX(string);
   void issueWR(DataReq&, bool);
@@ -53,7 +54,7 @@ public:
   map<string, int> matmulLocCount;
 
 private:
-  bool enableDoubleBuffer;
+  bool doubleBufferEnabled;
   // These data struct could be replaced by queue if
   // we are targeting multi-threading
   DataReq currentInput[2];
