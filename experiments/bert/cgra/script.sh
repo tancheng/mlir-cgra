@@ -13,6 +13,9 @@ soda-opt --convert-linalg-matmul-to-cgra --convert-linalg-batch_matmul-to-cgra -
 # offload operations onto CGRA
 soda-opt -outline-cgra-code -generate-cgra-hostcode 06-locating.mlir > 07-host.mlir
 
+# generate CGRA accelerated code (for both conventional mapped kernels and user predefined kernels)
+soda-opt -outline-cgra-code -generate-cgra-accelcode 06-locating.mlir > 08-accel.mlir
+
 # lower to llvm mlir
 soda-opt -lower-all-to-llvm 07-host.mlir > 09-host-llvm.mlir
 soda-opt -lower-all-to-llvm 08-accel.mlir > 10-accel-llvm.mlir

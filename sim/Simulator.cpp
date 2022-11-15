@@ -9,7 +9,10 @@ Simulator::Simulator(int dimX, int dimY) {
   this->doubleBufferEnabled = false;
   this->dimX = dimX;
   this->dimY = dimY;
-  traditionalII = 4;
+  // Usually, the II increases along with the size of the CGRA
+  // as larger CGRA lowers vectorized kernels. And vectorization
+  // leads to longer critical path (i.e., recII).
+  traditionalII = dimX;
   isBaselineMode = false;
   registerPredefinedMappingKernels();
 }

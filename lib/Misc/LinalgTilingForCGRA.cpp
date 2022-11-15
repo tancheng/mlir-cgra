@@ -89,11 +89,10 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
     auto matmulOpOptions = linalg::LinalgTilingOptions().setTileSizes(MatmulOpTileSizes);
     auto batchMatmulOpOptions = linalg::LinalgTilingOptions().setTileSizes(BatchMatmulOpTileSizes);
 
-    // in this prototype, we only target the genericOp that contains only parallel
-    // computes/maps (a reduction can exist at last?), has less than 4 inputs and
-    // 1 output, and has 3 `valid` operations (excluding `yield`), for simplicity.
+    // In this prototype, we only target the genericOp that contains more than 1 opt for simplicity,
+    // i.e., avoid the ones only contain single `yield`.
     getOperation().walk([&](linalg::GenericOp op) {
-      if (op.getRegion().front().getOperations().size() == 3 &&
+      if (op.getRegion().front().getOperations().size() > 1 &&
           !op->getAttr(kLinalgTransformMarker)) {
         op->setAttr(kLinalgTransformMarker,
                     StringAttr::get(&getContext(), "GenericOpTilable"));
