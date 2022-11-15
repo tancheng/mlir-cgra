@@ -29,8 +29,9 @@
 #include "soda/Dialect/SODA/Utils.h"
 
 #include <iostream>
-using namespace std;
+#include <map>
 
+using namespace std;
 using namespace mlir;
 
 /// Identifies operations that are beneficial to sink into kernels. These
@@ -334,6 +335,9 @@ private:
 class CGRAKernelOutliningPass
     : public CGRAKernelOutliningBase<CGRAKernelOutliningPass> {
 public:
+
+  map<string, int> offloadedKernelID;
+
   void runOnOperation() override {
     SymbolTable symbolTable(getOperation());
     bool modified = false;
@@ -353,9 +357,18 @@ public:
         }  else if (op.body().front().op_begin<soda::BatchMatmulOp>() != op.body().front().op_end<soda::BatchMatmulOp>()) {
           kernelFnName = "batch_matmul";
         } else {
-          kernelFnName = "generic_" + to_string(genericFuncCount);
+          if (op->getAttr("pattern")) {
+            auto name = op->getAttr("pattern").cast<StringAttr>().str();
+            if (offloadedKernelID.find(name) == offloadedKernelID.end()) {
+              offloadedKernelID.insert({name, 0});
+            }
+            kernelFnName = name + "_" + to_string(offloadedKernelID[name]);
+            offloadedKernelID[name] += 1;
+          } else {
+            kernelFnName = "generic_" + to_string(genericFuncCount);
+            ++genericFuncCount;
+          }
           isGenericFunc = true;
-          ++genericFuncCount;
         }
 
         // Pull in instructions that can be sunk

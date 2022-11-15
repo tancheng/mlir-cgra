@@ -9,7 +9,6 @@
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/Linalg/Transforms/Transforms.h"
 #include "mlir/Dialect/Linalg/Transforms/CodegenStrategy.h"
-#include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
 
@@ -115,9 +114,9 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
       }
     });
 
-    linalg::LinalgTransformationFilter genericOpF(StringAttr::get(ctx, "GenericOpTilable"), StringAttr::get(ctx, "tiled"));
-    linalg::LinalgTransformationFilter matmulOpF(StringAttr::get(ctx, "MatmulOpTilable"), StringAttr::get(ctx, "tiled"));
-    linalg::LinalgTransformationFilter batchMatmulOpF(StringAttr::get(ctx, "BatchMatmulTilable"), StringAttr::get(ctx, "tiled"));
+    linalg::LinalgTransformationFilter genericOpF(StringAttr::get(ctx, "GenericOpTilable"), StringAttr::get(ctx, "offloadedOnCGRA"));
+    linalg::LinalgTransformationFilter matmulOpF(StringAttr::get(ctx, "MatmulOpTilable"), StringAttr::get(ctx, "offloadedOnCGRA"));
+    linalg::LinalgTransformationFilter batchMatmulOpF(StringAttr::get(ctx, "BatchMatmulTilable"), StringAttr::get(ctx, "offloadedOnCGRA"));
     
     pm.addNestedPass<func::FuncOp>(
       mlir::createLinalgStrategyTilePass("linalg.generic", genericOpOptions, genericOpF));

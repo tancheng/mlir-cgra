@@ -3,13 +3,13 @@
 import sys
 
 class Declare:
-    def __init__(self, ID, numOfTensors, tensorDims):
-        self.ID = ID
+    def __init__(self, funcName, numOfTensors, tensorDims):
+        self.funcName = funcName
         self.numOfTensors = numOfTensors
         self.tensorDims = tensorDims
 
     def toCString(self):
-        line = "void *generic_" + str(self.ID) + "("
+        line = "void *" + self.funcName + "("
         for i in range(self.numOfTensors):
             addrType = "float*"
             paramsPerTensor = addrType + ", " + addrType + ", int64_t, "
@@ -20,8 +20,8 @@ class Declare:
         return line
 
 class Define:
-    def __init__(self, ID, numOfTensors, tensorDims):
-        self.ID = ID
+    def __init__(self, funcName, numOfTensors, tensorDims):
+        self.funcName = funcName
         self.numOfTensors = numOfTensors
         self.tensorDims = tensorDims
 
@@ -52,7 +52,7 @@ class Define:
 
     def toCString(self):
         lines = []
-        head = "extern \"C\" void cgra_generic_" + str(self.ID) + "("
+        head = "extern \"C\" void cgra_" + self.funcName + "("
 
         for i in range(self.numOfTensors - 1):
             head += "float* i" + str(i) + "_allocated, float* i" + str(i) + "_aligned, int64_t i" + str(i) + "_offset, "
@@ -96,10 +96,10 @@ class Define:
             accum += " * i0_size" + str(j)
         accum += ";"
         lines.append("\t" + accum)
-        lines.append("\tcgra->issueEX(\"generic_" + str(self.ID) + "\", accum);")
+        lines.append("\tcgra->issueEX(\"" + self.funcName + "\", accum);")
         lines.append("\tcgra->issueWR(output, false);")
 
-        call = "generic_" + str(self.ID) + "("
+        call = self.funcName + "("
         for i in range(self.numOfTensors - 1):
             call += "i" + str(i) + "_allocated, i" + str(i) + "_aligned, i" + str(i) + "_offset, "
             for j in range(self.tensorDims[i]):
@@ -174,21 +174,20 @@ else:
         defines = []
 
         lines = sourceFile.readlines()
-        ID = 0
         for line in lines:
 
-            if "func.func @generic_" in line:
+            if "func.func " in line:
+                funcName = line.split("@")[1].split("(")[0]
                 numOfTensors = line.count("memref")
                 phrases = line.split("memref")
                 tensorDims = []
                 for phrase in phrases[1:]:
                     dim = phrase.split("<")[1].split(">")[0].count("x")
                     tensorDims.append(dim)
-                dec = Declare(ID, numOfTensors, tensorDims)
-                define = Define(ID, numOfTensors, tensorDims)
+                dec = Declare(funcName, numOfTensors, tensorDims)
+                define = Define(funcName, numOfTensors, tensorDims)
                 declares.append(dec)
                 defines.append(define)
-                ID += 1
 
         codeGenGenericDeclares(declares)
         codeGenGenericDefines(defines)

@@ -15,6 +15,7 @@
 #include "mlir/IR/Location.h"
 
 #include <iostream>
+#include <string>
 #include <vector>
 
 #define DEBUG_TYPE "pattern-to-cgra"
@@ -76,8 +77,6 @@ void PatternToCGRAConverter::createLaunch(Operation *op, ArrayRef<string> patter
   // potentially create a launch op and move target op into the region
   Location loc = genericOp->getLoc();
 
-  Operation* newOp = NULL;
-
   std::vector<string> arithOptNames;
   for (Operation &arithOp : llvm::make_early_inc_range(genericOp.getRegion().front().getOperations())) {
     string arithOptName = string(arithOp.getName().getStringRef());
@@ -89,30 +88,28 @@ void PatternToCGRAConverter::createLaunch(Operation *op, ArrayRef<string> patter
   for (auto pattern: patterns) {
     string matchedPattern = getMatchedPattern(arithOptNames, pattern);
     if (matchedPattern != "") {
-      auto ctx  = builder.getContext();
-      newOp = builder.create<soda::FusionOp>(loc, genericOp->getOperands());
-      newOp->setAttr("pattern", StringAttr::get(ctx, matchedPattern));
+      auto launchOp = builder.create<soda::LaunchOp>(loc);
+      builder.setInsertionPointToEnd(&launchOp.body().front());
+      builder.create<soda::TerminatorOp>(loc);
+      builder.setInsertionPointToStart(&launchOp.body().front());
+
+      auto *newOp = Operation::create(
+        genericOp->getLoc(), genericOp->getName(),
+        genericOp->getResultTypes(), genericOp->getOperands(),
+        genericOp->getAttrDictionary(), genericOp->getSuccessors(),
+        genericOp->getRegions());
+
+      launchOp->setAttr("pattern",
+                  StringAttr::get(builder.getContext(), "fusion_" + matchedPattern));
+
+      // Insert the clone into the soda launch.
+      auto results = newOp->getResults();
+      builder.insert(newOp);
+      genericOp->replaceAllUsesWith(results);
+      genericOp->erase();
       break;
+
     }
-  }
-
-  // Clone the op.
-  if (newOp != NULL) {
-    auto launchOp = builder.create<soda::LaunchOp>(loc);
-    builder.setInsertionPointToEnd(&launchOp.body().front());
-    builder.create<soda::TerminatorOp>(loc);
-    builder.setInsertionPointToStart(&launchOp.body().front());
-    newOp = Operation::create(
-        op->getLoc(), op->getName(), op->getResultTypes(),
-        op->getOperands(), op->getAttrDictionary(),
-        op->getSuccessors(), op->getRegions());
-
-    builder.insert(newOp);
-
-    // Insert the clone into the soda launch.
-    auto results = newOp->getResults();
-    op->replaceAllUsesWith(results);
-    op->erase();
   }
 }
 
