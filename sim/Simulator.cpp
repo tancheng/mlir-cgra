@@ -14,7 +14,9 @@ Simulator::Simulator(int dimX, int dimY) {
   // leads to longer critical path (i.e., recII).
   traditionalII = dimX;
   isBaselineMode = false;
-  registerPredefinedMappingKernels();
+ 
+  exFuncMap["matmul"] = matmul;
+  exFuncMap["batch_matmul"] = batch_matmul;
 }
 
 void Simulator::enableDoubleBuffer() {
@@ -25,21 +27,6 @@ void Simulator::enableDoubleBuffer() {
 // traditional way.
 void Simulator::runAsBaseline() {
   isBaselineMode = true;
-}
-
-void Simulator::registerPredefinedMappingKernels() {
-  predefinedMappingKernels.insert("matmul");
-  predefinedMappingKernels.insert("batch_matmul");
-  predefinedMappingKernels.insert("fusion_add_max_add");
-
-  exFuncMap["matmul"] = matmul;
-  exFuncMap["batch_matmul"] = batch_matmul;
-  exFuncMap["fusion_add_max_add"] = fusion_add_max_add;
-}
-
-
-void Simulator::registerPredefinedMappingKernel(string kernel) {
-  predefinedMappingKernels.insert(kernel);
 }
 
 void Simulator::issueRD(DataReq& input) {
@@ -58,7 +45,7 @@ void Simulator::issueRD(DataReq& input) {
     totalSize += tensorSize;
   }
   rdCycles = totalSize * 4 / DMASpeed * 2; // assume 400MHz DMA (32b/cycle), the CGRA is 800MHz.
-  int64_t rdStartCycle = lastEXCompleteCycle[rdIndex];
+  int64_t rdStartCycle = max(lastRDCompleteCycle[0], lastEXCompleteCycle[0]);
   if (doubleBufferEnabled)
     rdStartCycle = max(lastRDCompleteCycle[rdIndex ^ 1], lastEXCompleteCycle[rdIndex]);
   lastRDCompleteCycle[rdIndex] = rdStartCycle + rdCycles;
@@ -77,18 +64,16 @@ void Simulator::issueEX(string operationType, int64_t loopBounds) {
   int64_t exCycles = 0;
 
   if (operationType == "matmul" || operationType == "batch_matmul") {
-    if (isBaselineMode || predefinedMappingKernels.find(operationType) == predefinedMappingKernels.end()) {
+    if (isBaselineMode) {
       exCycles = loopBounds * traditionalII;
     } else {
       exCycles = loopBounds + this->dimX - 1;
     }
   } else {
-    if (isBaselineMode || predefinedMappingKernels.find(operationType) == predefinedMappingKernels.end()) {
-
+    if (isBaselineMode || operationType.substr(0, 7) == "generic") {
       // assume unrolling factor is the same as the dimX
-      exCycles = loopBounds / this->dimX * traditionalII;
+      exCycles = loopBounds * traditionalII;
     } else {
-
       // for generic op
       // in this prototype, we only target 3-opt chain
       exCycles = loopBounds / this->dimX + 2 * (this->dimX -1);
@@ -96,7 +81,7 @@ void Simulator::issueEX(string operationType, int64_t loopBounds) {
   }
 
   // int64_t exCycles = exCycleMap[operationType];
-  int64_t exStartCycle = lastRDCompleteCycle[exIndex];
+  int64_t exStartCycle = max(lastRDCompleteCycle[0], lastEXCompleteCycle[0]);
   if (doubleBufferEnabled)
     exStartCycle = max(lastRDCompleteCycle[exIndex], lastEXCompleteCycle[exIndex ^ 1]);
   lastEXCompleteCycle[exIndex] = exStartCycle + exCycles;

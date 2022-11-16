@@ -50,8 +50,6 @@ public:
   void issueEX(string, int64_t);
   void issueWR(DataReq&, bool);
   int64_t getTotalCycles();
-  void registerPredefinedMappingKernels();
-  void registerPredefinedMappingKernel(string);
   map<string, int> matmulLocCount;
   int dimX;
   int dimY;
@@ -74,7 +72,6 @@ private:
   int wrIndex = 0;
   // A typical DMA @ 400MHz (32b/cycle)
   float DMASpeed = 32;
-  set<string> predefinedMappingKernels;
   map<string, pfunc> exFuncMap;
 };
 
