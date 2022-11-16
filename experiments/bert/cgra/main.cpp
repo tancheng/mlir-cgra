@@ -4,14 +4,6 @@
 
 using namespace std;
 
-template <typename T, size_t N> struct MemRefDescriptor {
-  T *allocated;
-  T *aligned;
-  intptr_t offset;
-  intptr_t sizes[N];
-  intptr_t strides[N];
-};
-
 extern "C" {
   void *forward(int64_t* a_allocated, int64_t* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_stride0, int64_t a_stride1,
                 float* b_allocated, float* b_aligned, int64_t b_offset, int64_t b_size0, int64_t b_size1, int64_t b_stride0, int64_t b_stride1);
@@ -23,7 +15,7 @@ Simulator* cgra;
 int main(int argc, char *argv[]) {
 
   if (argc < 4) {
-    cout<<"Please provide `CGRA dim`, isDoubleBuffered`, `common mapping II`, and `runAsBaseline`..."<<endl;
+    cout<<"Please provide `CGRA dim`, isDoubleBuffered`, and `runAsBaseline`..."<<endl;
     return 0;
   }
 

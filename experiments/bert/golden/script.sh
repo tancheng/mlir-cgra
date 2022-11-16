@@ -11,3 +11,5 @@ llc -filetype=obj 05-model.ll
 # also need to append llvm-project/build/lib/ on LD_LIBRARY_PATH:
 # export LD_LIBRARY_PATH=../../../../llvm-project/build/lib/
 clang++-12 main.cpp 05-model.o ../../../../llvm-project/build/lib/libmlir_c_runner_utils.so -I../../../sim/ ../../../sim/*.cpp -o simulate
+
+./simulate 4 false true
