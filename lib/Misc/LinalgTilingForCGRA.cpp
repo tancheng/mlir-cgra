@@ -60,7 +60,7 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
     int matmulReducedTile = buffInput0 / 4 / (dimX * dimY);
     int genericOpTile = buffInput0 / 4;
 
-    SmallVector<int64_t> GenericOpTileSizes{ genericOpTile };
+    SmallVector<int64_t> GenericOpTileSizes;
     SmallVector<int64_t> MatmulOpTileSizes;
     SmallVector<int64_t> BatchMatmulOpTileSizes;
 
@@ -85,7 +85,6 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
     auto ctx = module.getContext();
     PassManager pm(module.getContext());
     
-    auto genericOpOptions = linalg::LinalgTilingOptions().setTileSizes(GenericOpTileSizes);
     auto matmulOpOptions = linalg::LinalgTilingOptions().setTileSizes(MatmulOpTileSizes);
     auto batchMatmulOpOptions = linalg::LinalgTilingOptions().setTileSizes(BatchMatmulOpTileSizes);
 
@@ -94,8 +93,67 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
     getOperation().walk([&](linalg::GenericOp op) {
       if (op.getRegion().front().getOperations().size() > 1 &&
           !op->getAttr(kLinalgTransformMarker)) {
-        op->setAttr(kLinalgTransformMarker,
-                    StringAttr::get(&getContext(), "GenericOpTilable"));
+
+        bool isTarget = true;
+        for (uint64_t i=0; i<op->getOperands().size(); ++i) {
+          if (op->getOperand(i).getType().dyn_cast<MemRefType>().getShape().size() < 1) {
+            isTarget = false;
+            break;
+          }
+        }
+
+        if (isTarget) {
+          auto shape0 = op->getOperand(0).getType().dyn_cast<MemRefType>().getShape();
+          for (uint64_t i=1; i<op->getOperands().size(); ++i) {
+            auto curShape = op->getOperand(i).getType().dyn_cast<MemRefType>().getShape();
+            if (shape0.size() != curShape.size()) {
+              isTarget = false;
+              break;
+            }
+            for (uint64_t j=0; j<shape0.size(); ++j) {
+              if (shape0[j] != curShape[j]) {
+                isTarget = false;
+                break;
+              }
+            }
+            if (!isTarget)
+              break;
+          }
+        }
+
+        if (isTarget) {
+          auto memrefType = op->getOperand(0).getType().dyn_cast<MemRefType>();
+          auto shapes = memrefType.getShape();
+          int curAccum = 1;
+          int lastAccum = 1;
+          SmallVector<int64_t> reversedGenericOpTileSizes;
+          for (int i=shapes.size()-1; i>=0; i--) {
+            curAccum *= shapes[i];
+            if (curAccum <= genericOpTile) {
+              reversedGenericOpTileSizes.push_back(shapes[i]);
+            } else {
+              reversedGenericOpTileSizes.push_back(genericOpTile / lastAccum);
+              i--;
+              while (i >= 0) {
+                reversedGenericOpTileSizes.push_back(1);
+                i--;
+              }
+              break;
+            }
+            lastAccum = curAccum;
+          }
+
+          GenericOpTileSizes.clear();
+          // cout<<"tiling: ";
+          while (reversedGenericOpTileSizes.size() != 0) {
+            GenericOpTileSizes.push_back(reversedGenericOpTileSizes.back());
+            // cout<<"  "<<reversedGenericOpTileSizes.back();
+            reversedGenericOpTileSizes.pop_back();
+          }
+          // cout<<"   tiling done"<<endl;
+          op->setAttr(kLinalgTransformMarker,
+                      StringAttr::get(&getContext(), "GenericOpTilable"));
+        }
       }
     });
 
@@ -112,6 +170,8 @@ struct LinalgTilingForCGRA : public LinalgTilingForCGRABase<LinalgTilingForCGRA>
                     StringAttr::get(&getContext(), "BatchMatmulTilable"));
       }
     });
+
+    auto genericOpOptions = linalg::LinalgTilingOptions().setTileSizes(GenericOpTileSizes);
 
     linalg::LinalgTransformationFilter genericOpF(StringAttr::get(ctx, "GenericOpTilable"), StringAttr::get(ctx, "offloadedOnCGRA"));
     linalg::LinalgTransformationFilter matmulOpF(StringAttr::get(ctx, "MatmulOpTilable"), StringAttr::get(ctx, "offloadedOnCGRA"));

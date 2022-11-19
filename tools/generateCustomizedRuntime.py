@@ -28,17 +28,24 @@ class Define:
     def assembleTensor(self, index, numOfDims, isInput = True):
         lines = []
         var = "i" if isInput else "o"
-        sizes = "\tvector<int64_t> " + var + str(index) + "_sizes = {"
-        for i in range(numOfDims):
-            sizes += var + str(index) + "_size" + str(i) + ", "
-        sizes = sizes[:-2] + "};"
-        lines.append(sizes)
 
-        strides = "\tvector<int64_t> " + var + str(index) + "_strides = {"
-        for i in range(numOfDims):
-            strides += var + str(index) + "_stride" + str(i) + ", "
-        strides = strides[:-2] + "};"
-        lines.append(strides)
+        if numOfDims == 0:
+            sizes = "\tvector<int64_t> " + var + str(index) + "_sizes = {};"
+            lines.append(sizes)
+            strides = "\tvector<int64_t> " + var + str(index) + "_strides = {};"
+            lines.append(strides)
+        else:
+          sizes = "\tvector<int64_t> " + var + str(index) + "_sizes = {"
+          for i in range(numOfDims):
+              sizes += var + str(index) + "_size" + str(i) + ", "
+          sizes = sizes[:-2] + "};"
+          lines.append(sizes)
+
+          strides = "\tvector<int64_t> " + var + str(index) + "_strides = {"
+          for i in range(numOfDims):
+              strides += var + str(index) + "_stride" + str(i) + ", "
+          strides = strides[:-2] + "};"
+          lines.append(strides)
 
         memref = "\tMemRef memRef" + str(index) + "(" + var + str(index) + "_allocated, "
         memref += var + str(index) + "_aligned, "
