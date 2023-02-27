@@ -1,6 +1,45 @@
 # mlir-cgra
 An MLIR dialect to enable the efficient acceleration of ML model on CGRAs. The entire flow depends on mlir, onnx-mlir, mlir-mhlo, and soda-opt.
 
+## Getting started
+Build the required LLVM and MLIR. The current version of this project was tested with `llvm-project` commit:
+`99020b3c73c1e22fa388be8fd0c44391d40b3a38`. Make sure you have the correct commit checked-out.
+
+**Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM/MLIR with CMake so that it installs `FileCheck`.
+
+To build LLVM&MLIR, execute:
+```sh
+git clone https://github.com/llvm/llvm-project.git
+git checkout 99020b3c73c1e22fa388be8fd0c44391d40b3a38
+mkdir llvm-project/build
+cd llvm-project/build
+cmake -G Ninja ../llvm \
+   -DLLVM_ENABLE_PROJECTS=mlir \
+   -DLLVM_BUILD_EXAMPLES=ON \
+   -DLLVM_TARGETS_TO_BUILD="X86;NVPTX;AMDGPU" \
+   -DCMAKE_BUILD_TYPE=Release \
+   -DLLVM_ENABLE_ASSERTIONS=ON
+   -DLLVM_INSTALL_UTILS=ON
+```
+## How to build?
+
+This setup assumes that you have built LLVM and MLIR in `$BUILD_DIR` and
+installed it to `$PREFIX`. 
+
+```sh
+mkdir build && cd build
+cmake -G Ninja .. \
+    -DLLVM_EXTERNAL_LIT=$BUILD_DIR/bin/llvm-lit \
+    -DMLIR_DIR=$PREFIX/lib/cmake/mlir
+
+# Run tests
+cmake --build . --target check-soda
+```
+## How to use?
+### prepare .mlir for ML model  with torchmlir
+### 
+
+
 # SODA-OPT - Enabling System Level Design in MLIR
 
 This project aims to create `soda-opt`, a tool that leverages `mlir` to extract, 
