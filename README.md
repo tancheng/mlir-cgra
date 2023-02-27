@@ -37,8 +37,14 @@ cmake -G Ninja .. \
 cmake --build . --target check-soda
 ```
 ## How to use?
-Use the MiniNet as the sample.
-### prepare .mlir for ML model  with torchmlir
+In this repository, we provide scripts for 4 ML models (CamemBERT/MiniLM/SENTENCE-BERT/VIT). Assume the model name is `$MODELNAME`.
+
+### generate the .mlir file from PyTorch model
+In this step, you need to install the corresponding torch/torchmlir package in a specific version.
+
+```sh
+python ../$MODELNAME/model/MODELNAME.py
+```
 
 ### 
 
