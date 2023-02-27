@@ -10,9 +10,10 @@ Build the required LLVM and MLIR. The current version of this project was tested
 To build LLVM&MLIR, execute:
 ```sh
 git clone https://github.com/llvm/llvm-project.git
+cd llvm-project
 git checkout 99020b3c73c1e22fa388be8fd0c44391d40b3a38
-mkdir llvm-project/build
-cd llvm-project/build
+mkdir build
+cd build
 cmake -G Ninja ../llvm \
    -DLLVM_ENABLE_PROJECTS=mlir \
    -DLLVM_BUILD_EXAMPLES=ON \
@@ -36,7 +37,9 @@ cmake -G Ninja .. \
 cmake --build . --target check-soda
 ```
 ## How to use?
+Use the MiniNet as the sample.
 ### prepare .mlir for ML model  with torchmlir
+
 ### 
 
 
