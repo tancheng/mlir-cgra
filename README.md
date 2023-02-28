@@ -49,9 +49,17 @@ python ../$MODELNAME/model/MODELNAME.py
 ```
 
 ### run the script 
+In this repository, we provide scripts for different sizes of cgra and different sizes of buffer.
 Assume the cgra type is `CGRA_TYPE`.
-sh ../experiments/MODELNAME/cgra/CGRA_TYPE
+For the baseline:
+```sh
+sh ../experiments/MODELNAME/baseline/CGRA_TYPE
+```
 
+For the optimized:
+```sh
+sh ../experiments/MODELNAME/cgra/CGRA_TYPE
+```
 
 # SODA-OPT - Enabling System Level Design in MLIR
 
