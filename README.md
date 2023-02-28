@@ -41,12 +41,16 @@ In this repository, we provide scripts for 4 ML models (CamemBERT/MiniLM/SENTENC
 
 ### generate the .mlir file from PyTorch model
 In this step, you need to install the corresponding torch/torchmlir package in a specific version.
-
+Pytorch version: `1.14.0.dev20221014+cpu`
+torchmlir version: `20221015.627`
+download link: `https://github.com/llvm/torch-mlir/releases/tag/snapshot-20221015.627`
 ```sh
 python ../$MODELNAME/model/MODELNAME.py
 ```
 
-### 
+### run the script 
+Assume the cgra type is `CGRA_TYPE`.
+sh ../experiments/MODELNAME/cgra/CGRA_TYPE
 
 
 # SODA-OPT - Enabling System Level Design in MLIR
