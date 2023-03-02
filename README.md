@@ -21,6 +21,7 @@ cmake -G Ninja ../llvm \
    -DCMAKE_BUILD_TYPE=Release \
    -DLLVM_ENABLE_ASSERTIONS=ON
    -DLLVM_INSTALL_UTILS=ON
+cmake --build . --target check-mlir
 ```
 ## How to build?
 
@@ -45,6 +46,16 @@ Pytorch version: `1.14.0.dev20221014+cpu`
 torchmlir version: `20221015.627`
 download link: `https://github.com/llvm/torch-mlir/releases/tag/snapshot-20221015.627`
 ```sh
+# download the correspoding version || depends on your python version
+# Here is for python 3.10
+wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch-1.14.0.dev20221014+cpu-cp310-cp310-linux_x86_64.whl
+wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch_mlir-20221015.627-cp310-cp310-linux_x86_64.whl
+
+# install the packages
+pip install torch-1.14.0.dev20221014+cpu-cp310-cp310-linux_x86_64.whl
+pip install torch_mlir-20221015.627-cp310-cp310-linux_x86_64.whl
+
+# use the script
 python ../$MODELNAME/model/MODELNAME.py
 ```
 
