@@ -103,7 +103,7 @@ Note that the input is generated from `experiments/demo/model`, which requires `
 To run a MiniLM model:
 
 ```sh
-cd experiments && cd MiniLM && cd model
+cd experiments/MiniLM/model
 
 # This step requires transformers, torch, and torch-mlir
 python MiniLM.py
