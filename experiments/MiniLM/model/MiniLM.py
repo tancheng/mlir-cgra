@@ -54,7 +54,7 @@ linalg_on_tensors_mlir = torch_mlir.compile(
     output_type=torch_mlir.OutputType.LINALG_ON_TENSORS,
     use_tracing=True)
 file_path = 'bert.txt'
-new_path = 'bert.mlir'
+new_path = '02-linalg.mlir'
 with open(file_path, 'wt') as f:
     print(linalg_on_tensors_mlir.operation.get_asm(), file=f)
 os.rename(file_path,new_path)
