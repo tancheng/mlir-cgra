@@ -89,7 +89,7 @@ extern "C" void cgra_batch_matmul(float* a_allocated, float* a_aligned, int64_t 
 
 // This fusion is an example for add+max+add. A robust fusion call should
 // be able to figure out what type of operation chain is targeted.
-extern "C" void cgra_fusion_add_max_add(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_stride0, int64_t a_stride1,
+extern "C" void cgra_fusion_add_max_add_0(float* a_allocated, float* a_aligned, int64_t a_offset, int64_t a_size0, int64_t a_size1, int64_t a_stride0, int64_t a_stride1,
                  float* b_allocated, float* b_aligned, int64_t b_offset, int64_t b_size0, int64_t b_size1, int64_t b_stride0, int64_t b_stride1,
                  float* c_allocated, float* c_aligned, int64_t c_offset, int64_t c_size0, int64_t c_size1, int64_t c_stride0, int64_t c_stride1,
                  float* d_allocated, float* d_aligned, int64_t d_offset, int64_t d_size0, int64_t d_size1, int64_t d_stride0, int64_t d_stride1) {

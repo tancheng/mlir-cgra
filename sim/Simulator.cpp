@@ -17,6 +17,7 @@ Simulator::Simulator(int dimX, int dimY) {
  
   exFuncMap["matmul"] = matmul;
   exFuncMap["batch_matmul"] = batch_matmul;
+  exFuncMap["fusion_add_max_add"] = fusion_add_max_add;
 }
 
 void Simulator::enableDoubleBuffer() {
