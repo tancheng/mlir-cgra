@@ -72,16 +72,16 @@ download link: `https://github.com/llvm/torch-mlir/releases/tag/snapshot-2022101
 
 ```sh
 # download the correspoding version || depends on your python version
-# Here is for python 3.10
-wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch-1.14.0.dev20221014+cpu-cp310-cp310-linux_x86_64.whl
-wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch_mlir-20221015.627-cp310-cp310-linux_x86_64.whl
+# Here is for python 3.9
+wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch-1.14.0.dev20221014+cpu-cp39-cp39-linux_x86_64.whl
+wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch_mlir-20221015.627-cp39-cp39-linux_x86_64.whl
 
 # install the packages
-pip install torch-1.14.0.dev20221014+cpu-cp310-cp310-linux_x86_64.whl
-pip install torch_mlir-20221015.627-cp310
+pip3.9 install torch-1.14.0.dev20221014+cpu-cp39-cp39-linux_x86_64.whl
+pip3.9 install torch_mlir-20221015.627-cp39-cp39-linux_x86_64.whl
 
 # install transformers
-pip install transformers
+pip3.9 install transformers
 ```
 
 Execution
@@ -94,7 +94,8 @@ To run the demo:
 # baseline
 cd experiments/demo/baseline
 
-# all the scripts assume you have clang-12 and opt-12 installed
+# all the scripts assume you have clang-12 and opt-12 installed and
+# both the mlir-opt and soda-opt are added into $PATH
 sh script.sh
 ./simulate
 
