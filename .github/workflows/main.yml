@@ -28,6 +28,7 @@ jobs:
     - name: install dependencies
       working-directory: ${{github.workspace}}
       run: |
+        sudo apt-get install python3.9
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
         python3.9 get-pip.py
         pip3.9 --version
