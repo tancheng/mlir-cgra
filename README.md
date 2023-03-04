@@ -28,7 +28,7 @@ The docker image is available [here](https://hub.docker.com/repository/docker/cg
 
 Installation
 --------------------------------------------------------
-Build the required LLVM and MLIR. The current version of this project was tested with `llvm-project` commit:
+In stead of using docker, you can build the required LLVM and MLIR manually. The current version of this project was tested with `llvm-project` commit:
 `99020b3c73c1e22fa388be8fd0c44391d40b3a38`. Make sure you have the correct commit checked-out.
 
 **Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM/MLIR with CMake so that it installs `FileCheck`.
