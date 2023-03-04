@@ -66,11 +66,12 @@ jobs:
       run: |
         pip install transformers
         
-        wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch-1.14.0.dev20221014+cpu-cp310-cp310-linux_x86_64.whl
-        wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch_mlir-20221015.627-cp310-cp310-linux_x86_64.whl
+        wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch-1.14.0.dev20221014+cpu-cp39-cp39-linux_x86_64.whl
+        wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch_mlir-20221015.627-cp39-cp39-linux_x86_64.whl
 
-        pip install torch-1.14.0.dev20221014+cpu-cp310-cp310-linux_x86_64.whl
-        pip install torch_mlir-20221015.627-cp310
+        pip install torch-1.14.0.dev20221014+cpu-cp39-cp39-linux_x86_64.whl
+        pip install torch_mlir-20221015.627-cp39-cp39-linux_x86_64.whl
+
 
     # install clang-12/opt-12
     - name: install LLVM and Clang for scripts/experiment
