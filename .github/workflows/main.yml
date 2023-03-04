@@ -88,7 +88,8 @@ jobs:
     - name: add paths
       working-directory: ${{github.workspace}}
       run: |
-        export PATH="${{github.workspace}}/llvm-project/build/bin:${{github.workspace}}/build/bin:$PATH"
+        echo "${{github.workspace}}/llvm-project/build/bin" >> $GITHUB_PATH
+        echo "${{github.workspace}}/build/bin" >> $GITHUB_PATH
 
     # run demo baseline
     - name: run demo baseline
