@@ -26,6 +26,46 @@ The docker image is available [here](https://hub.docker.com/repository/docker/cg
  sh /setup.sh
 ```
 
+
+Execution
+--------------------------------------------------------
+In this repository, we provide scripts for 1 demo and 4 ML models (CamemBERT/MiniLM/SENTENCE-BERT/VIT).
+
+To run the demo:
+
+```sh
+# baseline
+cd experiments/demo/baseline
+
+# all the scripts assume you have clang-12 and opt-12 installed and
+# both the mlir-opt and soda-opt are added into $PATH
+sh script.sh
+./simulate
+
+# enable optimization
+cd ../cgra
+sh script.sh
+./simulate
+```
+Note that the input is generated from `experiments/demo/model`, which requires `onnx-mlir` and `iree`. You can also play with the other front-end (e.g., torch-mlir, xla, mhlo) and it would work as long as the front-ends can lower the model into linalg dialect.
+
+To run a MiniLM model:
+
+```sh
+cd experiments/MiniLM/model
+
+# This step requires transformers, torch, and torch-mlir
+python3.9 MiniLM.py
+
+# mv the generated linalg.mlir into different folder (baseline or cgra) for evaluation
+mv 02-linalg.mlir ../cgra/. && cd ../cgra
+
+# there are multiple scripts indicating different configuration of the target CGRAs
+sh script4x4.sh
+./simulate
+```
+
+
 Installation
 --------------------------------------------------------
 In stead of using docker, you can build the required LLVM and MLIR manually. The current version of this project was tested with `llvm-project` commit:
@@ -82,44 +122,6 @@ pip3.9 install torch_mlir-20221015.627-cp39-cp39-linux_x86_64.whl
 
 # install transformers
 pip3.9 install transformers
-```
-
-Execution
---------------------------------------------------------
-In this repository, we provide scripts for 1 demo and 4 ML models (CamemBERT/MiniLM/SENTENCE-BERT/VIT).
-
-To run the demo:
-
-```sh
-# baseline
-cd experiments/demo/baseline
-
-# all the scripts assume you have clang-12 and opt-12 installed and
-# both the mlir-opt and soda-opt are added into $PATH
-sh script.sh
-./simulate
-
-# enable optimization
-cd ../cgra
-sh script.sh
-./simulate
-```
-Note that the input is generated from `experiments/demo/model`, which requires `onnx-mlir` and `iree`. You can also play with the other front-end (e.g., torch-mlir, xla, mhlo) and it would work as long as the front-ends can lower the model into linalg dialect.
-
-To run a MiniLM model:
-
-```sh
-cd experiments/MiniLM/model
-
-# This step requires transformers, torch, and torch-mlir
-python MiniLM.py
-
-# mv the generated linalg.mlir into different folder (baseline or cgra) for evaluation
-mv 02-linalg.mlir ../cgra/. && cd ../cgra
-
-# there are multiple scripts indicating different configuration of the target CGRAs
-sh script4x4.sh
-./simulate
 ```
 
 
