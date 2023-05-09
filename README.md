@@ -93,7 +93,7 @@ cmake --build . --target check-mlir
 ```
 
 Once you have built LLVM and MLIR in `$BUILD_DIR` and
-installed it to `$PREFIX` (set both vars as "path/llvm-project/build/bin"), to build MLIR, execute:
+installed it to `$PREFIX` (set both vars as "path/llvm-project/build"), to build mlir-cgra, go into the folder of this repo (`cd /path/mlir-cgra`) and execute:
 
 ```sh
 mkdir build && cd build
