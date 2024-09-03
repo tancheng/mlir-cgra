@@ -10,7 +10,6 @@
 </pre>
 [![Github Action](https://github.com/tancheng/mlir-cgra/actions/workflows/main.yml/badge.svg)](https://github.com/tancheng/mlir-cgra/actions/workflows/main.yml)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
 
 MLIR-CGRA is an MLIR dialect to enable the efficient acceleration of ML model on CGRAs.
 
@@ -23,7 +22,7 @@ The docker image is available [here](https://hub.docker.com/repository/docker/cg
  docker run -it cgra/mlir-cgra:demo
 
  # Setup the environment once you are in the container:
- sh /setup.sh
+ source /setup.sh
 ```
 
 
