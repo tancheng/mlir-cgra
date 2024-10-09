@@ -38,6 +38,8 @@ inputs = feature_extractor(images=image, return_tensors="pt").pixel_values
 model = prepare().eval()
 example_input = model(inputs)
 print(example_input.shape)
+
+# The original example_input shape is [1, 197, 768], now we reshape it into [1, 197*768]
 example_input = example_input.reshape(1, 197*768)
 print("example_input shape after reshaping: ", example_input.shape)
 
