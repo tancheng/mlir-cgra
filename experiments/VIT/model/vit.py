@@ -25,6 +25,7 @@ class vit(nn.Module):
 		self.layer2 = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224').vit.layernorm
 		self.layer3 = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224').classifier
 	def forward(self,x):
+		x = x.reshape(1, 197, 768)
 		x = self.layer1(x).last_hidden_state
 		x = self.layer2(x)
 		x = self.layer3(x)
@@ -37,6 +38,11 @@ inputs = feature_extractor(images=image, return_tensors="pt").pixel_values
 model = prepare().eval()
 example_input = model(inputs)
 print(example_input.shape)
+
+# The original example_input shape is [1, 197, 768], now we reshape it into [1, 197*768]
+example_input = example_input.reshape(1, 197*768)
+print("example_input shape after reshaping: ", example_input.shape)
+
 
 vit_model = vit().eval()
 output = vit_model(example_input)

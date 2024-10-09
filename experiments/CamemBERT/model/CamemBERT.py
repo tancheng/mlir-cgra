@@ -24,8 +24,9 @@ class OnlyLogitsHuggingFaceModel(torch.nn.Module):
         self.layer3 = AutoModelForTokenClassification.from_pretrained(model_name).classifier
 
     def forward(self, input):
+        x = input.reshape(1, 7, 768)
         # Return only the logits.
-        x = self.layer1(input).last_hidden_state
+        x = self.layer1(x).last_hidden_state
         x = self.layer2(x)
         x = self.layer3(x)
         return x
@@ -44,7 +45,11 @@ sentence = "Face à un choc inédit"
 
 print("Parsing sentence tokens.")
 example_input = prepare_sentence_tokens(model_name, sentence)
-print(example_input.shape)
+print("example_input shape: ", example_input.shape)
+
+# The original example_input shape is [1, 7, 768], now we reshape it into [1, 7*768]
+example_input = example_input.reshape(1, 7*768)
+print("example_input shape after reshaping: ", example_input.shape)
 
 print("Instantiating model.")
 model = OnlyLogitsHuggingFaceModel(model_name)
