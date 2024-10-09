@@ -46,6 +46,7 @@ sentence = "Face à un choc inédit"
 print("Parsing sentence tokens.")
 example_input = prepare_sentence_tokens(model_name, sentence)
 print("example_input shape: ", example_input.shape)
+assert example_input.shape == (1, 7, 768), f"Expected shape (1,7,768), but got {example_input.shape}"
 
 # The original example_input shape is [1, 7, 768], now we reshape it into [1, 7*768]
 example_input = example_input.reshape(1, 7*768)
@@ -53,6 +54,7 @@ print("example_input shape after reshaping: ", example_input.shape)
 
 print("Instantiating model.")
 model = OnlyLogitsHuggingFaceModel(model_name)
+assert example_input.shape == (1, 7*768), f"Expected the reshaped (1,7*768), but got {example_input.shape}"
 print(model(example_input).shape)
 
 linalg_on_tensors_mlir = torch_mlir.compile(
